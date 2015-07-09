@@ -1,6 +1,6 @@
 name:           multi-trie
 version:        0.1
-cabal-version:  >= 1.6
+cabal-version:  >=1.8
 build-type:     Simple
 author:         Vadim Vinnik <vadim.vinnik@gmail.com>
 maintainer:     Vadim Vinnik <vadim.vinnik@gmail.com>
@@ -13,12 +13,22 @@ license:        MIT
 license-file:   LICENSE
 
 source-repository head
-  type:         Git
-  location:     https://github.com/vvinnik-softheme/multi-trie
+  type:      Git
+  location:  https://github.com/vvinnik-softheme/multi-trie
 
 library
-  hs-source-dirs:  src
-  build-depends:   base == 4.*
-  ghc-options:     -Wall
-  exposed-modules: MultiTrie
+  hs-source-dirs:   src
+  build-depends:    base == 4.*
+  ghc-options:      -Wall
+  exposed-modules:  MultiTrie
+
+test-suite Spec
+  type:            exitcode-stdio-1.0
+  main-is:         Spec.hs
+  ghc-options:     -Wall -rtsopts
+  build-depends:   
+                  base >= 4, HTF > 0.9,
+                  multi-trie
+  other-modules:   MultiTrieTest
+  hs-source-dirs:  tests
 
