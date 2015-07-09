@@ -7,17 +7,14 @@ data MultiTrie n v = MultiTrie
         values :: [v],
         children :: M.Map n v
     }
+    deriving (Eq, Show)
+    -- todo: redefine (==) and show
 
 empty :: MultiTrie n v
-empty = MultiTrie
-    {
-        values = [],
-        children = M.empty
-    }
+empty = MultiTrie [] M.empty
 
 singleton :: v -> MultiTrie n v
-singleton x = MultiTrie
-    {
-        values = [x],
-        children = M.empty
-    }
+singleton x = MultiTrie [x] M.empty
+
+insertValue :: v -> MultiTrie n v -> MultiTrie n v
+insertValue x (MultiTrie vs c) = MultiTrie (x : vs) c 
