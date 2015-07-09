@@ -35,10 +35,11 @@ fetch ns = values . lookup ns
 
 update :: Ord n => (MultiTrie n v -> MultiTrie n v) -> [n] -> MultiTrie n v -> MultiTrie n v
 update f [] mt = f mt
-update f (n:ns) (MultiTrie vs m) = MultiTrie vs (M.alter (Just . update f ns . unnothing) n m)
+update f (n:ns) (MultiTrie vs m) = MultiTrie vs (M.alter (nothingify . update f ns . unnothing) n m)
     where
         unnothing Nothing = empty
-        unnothing (Just mt') = mt'
+        unnothing (Just mt) = mt
+        nothingify mt = if null mt then Nothing else Just mt
 
 put :: v -> MultiTrie n v -> MultiTrie n v
 put x (MultiTrie vs m) = MultiTrie (x : vs) m
