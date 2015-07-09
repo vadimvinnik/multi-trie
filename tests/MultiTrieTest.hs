@@ -1,9 +1,12 @@
-{-# OPTIONS_GHC -F -pgmF htfpp #-}
+{-# OPTIONS_GHC -F -pgmF htfpp -fno-warn-missing-signatures #-}
+
 module MultiTrieTest where
 
 import MultiTrie
 import qualified Data.Map.Lazy as M
 import Test.Framework
+
+{-# ANN module "HLint: ignore Use camelCase" #-}
 
 type TestMultiTrie = MultiTrie String Int
 
