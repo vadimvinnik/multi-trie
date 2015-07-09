@@ -1,0 +1,24 @@
+name:           multi-trie
+version:        0.1
+cabal-version:  >= 1.6
+build-type:     Simple
+author:         Vadim Vinnik <vadim.vinnik@gmail.com>
+maintainer:     Vadim Vinnik <vadim.vinnik@gmail.com>
+synopsis:       Trie of multisets
+description:    Trie of multisets implementing Functor, Applicative, Alternative and Monad
+homepage:       https://github.com/vvinnik-softheme/multi-trie
+category:       Data
+copyright:      Vadim Vinnik, 2015
+license:        MIT
+license-file:   LICENSE
+
+source-repository head
+  type:         Git
+  location:     https://github.com/vvinnik-softheme/multi-trie
+
+library
+  hs-source-dirs:  src
+  build-depends:   base == 4.*
+  ghc-options:     -Wall
+  exposed-modules: MultiTrie
+
