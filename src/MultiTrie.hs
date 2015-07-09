@@ -1,6 +1,6 @@
 module MultiTrie where
 
-import Prelude hiding (lookup, map)
+import Prelude hiding (lookup, map, null)
 import qualified Data.Map as M
 import qualified Data.List as L
 
@@ -18,10 +18,10 @@ singleton :: v -> MultiTrie n v
 singleton x = MultiTrie [x] M.empty
 
 null :: MultiTrie n v -> Bool
-null (MultiTrie vs m) = L.null vs && M.null m
+null (MultiTrie vs m) = L.null vs && L.all null (M.elems m)
 
 size :: MultiTrie n v -> Int
-size (MultiTrie vs m) = L.length vs + M.fold undefined 0 m
+size (MultiTrie vs m) = L.length vs + L.sum (L.map size (M.elems m))
 
 lookup :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
 lookup [] mt = mt
