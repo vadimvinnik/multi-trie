@@ -56,13 +56,19 @@ map :: (v -> w) -> MultiTrie n v -> MultiTrie n w
 map f (MultiTrie vs m) = MultiTrie (L.map f vs) (M.map (map f) m)
 
 applyUniting :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
-applyUniting mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
-    MultiTrie
-        (fs <*> xs)
-        (M.unionWith union (M.map (mtf `applyUniting`) xm) (M.map (`applyUniting` mtx) fm))
+applyUniting = applyop (M.unionWith union)
+
+applyIntersecting :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
+applyIntersecting = applyop (M.intersectionWith intersection)
 
 applyDeepening :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyDeepening = undefined
+
+applyop :: Ord n => (MultiTrieMap n w -> MultiTrieMap n w -> MultiTrieMap n w) -> MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
+applyop op mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
+    MultiTrie
+        (fs <*> xs)
+        (op (M.map (applyop op mtf) xm) (M.map ((flip $ applyop op) mtx) fm))
 
 union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 union = setop (M.unionWith union)
