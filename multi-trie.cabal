@@ -18,7 +18,9 @@ source-repository head
 
 library
   hs-source-dirs:   src
-  build-depends:    base == 4.*
+  build-depends:    
+                    base == 4.*,
+                    containers
   ghc-options:      -Wall
   exposed-modules:  MultiTrie
 
@@ -28,7 +30,8 @@ test-suite Spec
   ghc-options:     -Wall -rtsopts
   build-depends:   
                   base >= 4, HTF > 0.9,
-                  multi-trie
+                  multi-trie,
+                  containers
   other-modules:   MultiTrieTest
   hs-source-dirs:  tests
 
