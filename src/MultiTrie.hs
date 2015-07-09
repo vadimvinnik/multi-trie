@@ -33,11 +33,15 @@ lookup (n:ns) (MultiTrie _ m) = lookup' ns (M.lookup n m)
 fetch :: Ord n => [n] -> MultiTrie n v -> [v]
 fetch ns = values . lookup ns
 
-update :: (MultiTrie n v -> MultiTrie n v) -> [n] -> MultiTrie n v -> MultiTrie n v
-update = undefined
+update :: Ord n => (MultiTrie n v -> MultiTrie n v) -> [n] -> MultiTrie n v -> MultiTrie n v
+update f [] mt = f mt
+update f (n:ns) (MultiTrie vs m) = MultiTrie vs (M.alter (Just . update f ns . unnothing) n m)
+    where
+        unnothing Nothing = empty
+        unnothing (Just mt') = mt'
 
 put :: v -> MultiTrie n v -> MultiTrie n v
-put x (MultiTrie vs c) = MultiTrie (x : vs) c
+put x (MultiTrie vs m) = MultiTrie (x : vs) m
 
 insert :: [n] -> v -> MultiTrie n v -> MultiTrie n v
 insert = undefined
