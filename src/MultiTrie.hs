@@ -33,9 +33,9 @@ lookup (n:ns) (MultiTrie _ m) = lookup' ns (M.lookup n m)
 fetch :: Ord n => [n] -> MultiTrie n v -> [v]
 fetch ns = values . lookup ns
 
-update :: Ord n => (MultiTrie n v -> MultiTrie n v) -> [n] -> MultiTrie n v -> MultiTrie n v
-update f [] mt = f mt
-update f (n:ns) (MultiTrie vs m) = MultiTrie vs (M.alter (nothingify . update f ns . unnothing) n m)
+update :: Ord n => [n] -> (MultiTrie n v -> MultiTrie n v) -> MultiTrie n v -> MultiTrie n v
+update [] f mt = f mt
+update (n:ns) f (MultiTrie vs m) = MultiTrie vs (M.alter (nothingify . update ns f . unnothing) n m)
     where
         unnothing Nothing = empty
         unnothing (Just mt) = mt
@@ -44,14 +44,14 @@ update f (n:ns) (MultiTrie vs m) = MultiTrie vs (M.alter (nothingify . update f 
 put :: v -> MultiTrie n v -> MultiTrie n v
 put x (MultiTrie vs m) = MultiTrie (x : vs) m
 
-insert :: [n] -> v -> MultiTrie n v -> MultiTrie n v
-insert = undefined
+insert :: Ord n => [n] -> v -> MultiTrie n v -> MultiTrie n v
+insert ns v = update ns (put v)
 
-replace :: [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-replace = undefined
+replace :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+replace ns mt1 = update ns (const mt1)
 
-superpose :: [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-superpose = undefined
+superpose :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+superpose ns mt1 = update ns (union mt1)
 
 map :: (v -> w) -> MultiTrie n v -> MultiTrie n w
 map f (MultiTrie vs m) = MultiTrie (L.map f vs) (M.map (map f) m)
@@ -68,7 +68,7 @@ bind = undefined
 toMap :: MultiTrie n v -> M.Map [n] [v]
 toMap = undefined
 
-fromList :: [([n], v)] -> MultiTrie n v
+fromList :: Ord n => [([n], v)] -> MultiTrie n v
 fromList = L.foldr (uncurry insert) empty
 
 showTree :: (Show n, Show v) => MultiTrie n v -> String
