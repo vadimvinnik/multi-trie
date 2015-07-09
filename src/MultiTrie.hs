@@ -61,14 +61,16 @@ applyUniting = applyop (M.unionWith union)
 applyIntersecting :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyIntersecting = applyop (M.intersectionWith intersection)
 
-applyDeepening :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
-applyDeepening = undefined
-
 applyop :: Ord n => (MultiTrieMap n w -> MultiTrieMap n w -> MultiTrieMap n w) -> MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyop op mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
     MultiTrie
         (fs <*> xs)
-        (op (M.map (applyop op mtf) xm) (M.map ((flip $ applyop op) mtx) fm))
+        (op
+            (M.map (applyop op mtf) xm)
+            (M.map ((flip $ applyop op) mtx) fm))
+
+applyDeepening :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
+applyDeepening = undefined
 
 union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 union = setop (M.unionWith union)
