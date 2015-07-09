@@ -5,10 +5,12 @@ import qualified Data.Map as M
 import qualified Data.List as L
 import Control.Applicative hiding (empty)
 
+type MultiTrieMap n v = M.Map n (MultiTrie n v) 
+
 data MultiTrie n v = MultiTrie
     {
         values :: [v],
-        children :: M.Map n (MultiTrie n v)
+        children :: MultiTrieMap n v
     }
     deriving (Eq, Show)
 
@@ -36,11 +38,7 @@ fetch ns = values . lookup ns
 
 update :: Ord n => [n] -> (MultiTrie n v -> MultiTrie n v) -> MultiTrie n v -> MultiTrie n v
 update [] f mt = f mt
-update (n:ns) f (MultiTrie vs m) = MultiTrie vs (M.alter (nothingify . update ns f . unnothing) n m)
-    where
-        unnothing Nothing = empty
-        unnothing (Just mt) = mt
-        nothingify mt = if null mt then Nothing else Just mt
+update (n:ns) f (MultiTrie vs m) = MultiTrie vs (M.alter (toMaybe . update ns f . fromMaybe) n m)
 
 put :: v -> MultiTrie n v -> MultiTrie n v
 put x (MultiTrie vs m) = MultiTrie (x : vs) m
@@ -72,7 +70,7 @@ union = setop (M.unionWith union)
 intersection :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 intersection = setop (M.intersectionWith intersection) 
 
-setop :: Ord n => (M.Map n (MultiTrie n v) -> M.Map n (MultiTrie n v) -> M.Map n (MultiTrie n v)) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+setop :: Ord n => (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 setop op (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (vs1 ++ vs2) (op m1 m2) 
 
 bind :: MultiTrie n v -> (v -> MultiTrie n w) -> MultiTrie n w
@@ -83,6 +81,13 @@ toMap = undefined
 
 fromList :: Ord n => [([n], v)] -> MultiTrie n v
 fromList = L.foldr (uncurry insert) empty
+
+fromMaybe :: Maybe (MultiTrie n v) -> MultiTrie n v
+fromMaybe Nothing = empty
+fromMaybe (Just mt) = mt
+
+toMaybe :: MultiTrie n v -> Maybe (MultiTrie n v)
+toMaybe mt = if null mt then Nothing else Just mt
 
 showTree :: (Show n, Show v) => MultiTrie n v -> String
 showTree = undefined
