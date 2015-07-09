@@ -67,7 +67,13 @@ applyDeepening :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n 
 applyDeepening = undefined
 
 union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-union (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (vs1 ++ vs2) (M.unionWith union m1 m2) 
+union = setop (M.unionWith union)
+
+intersection :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+intersection = setop (M.intersectionWith intersection) 
+
+setop :: Ord n => (M.Map n (MultiTrie n v) -> M.Map n (MultiTrie n v) -> M.Map n (MultiTrie n v)) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+setop op (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (vs1 ++ vs2) (op m1 m2) 
 
 bind :: MultiTrie n v -> (v -> MultiTrie n w) -> MultiTrie n w
 bind = undefined
