@@ -3,6 +3,7 @@ module MultiTrie where
 import Prelude hiding (lookup, map, null)
 import qualified Data.Map as M
 import qualified Data.List as L
+import Control.Applicative hiding (empty)
 
 data MultiTrie n v = MultiTrie
     {
@@ -56,11 +57,17 @@ superpose ns mt1 = update ns (union mt1)
 map :: (v -> w) -> MultiTrie n v -> MultiTrie n w
 map f (MultiTrie vs m) = MultiTrie (L.map f vs) (M.map (map f) m)
 
-apply :: MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
-apply = undefined
+applyUniting :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
+applyUniting mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
+    MultiTrie
+        (fs <*> xs)
+        (M.unionWith union (M.map (mtf `applyUniting`) xm) (M.map (`applyUniting` mtx) fm))
 
-union :: MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-union = undefined
+applyDeepening :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
+applyDeepening = undefined
+
+union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+union (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (vs1 ++ vs2) (M.unionWith union m1 m2) 
 
 bind :: MultiTrie n v -> (v -> MultiTrie n w) -> MultiTrie n w
 bind = undefined
