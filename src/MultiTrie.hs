@@ -76,8 +76,14 @@ setop op (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (vs1 ++ vs2) (op m1 m
 bind :: MultiTrie n v -> (v -> MultiTrie n w) -> MultiTrie n w
 bind = undefined
 
-toMap :: MultiTrie n v -> M.Map [n] [v]
-toMap = undefined
+toMap :: Ord n => MultiTrie n v -> M.Map [n] [v]
+toMap (MultiTrie vs m) = if L.null vs then childrenMap else M.insert [] vs childrenMap
+    where
+        childrenMap =
+            M.unions $
+            M.elems $
+            M.mapWithKey (\n -> M.mapKeys (n:)) $
+            M.map toMap m
 
 fromList :: Ord n => [([n], v)] -> MultiTrie n v
 fromList = L.foldr (uncurry insert) empty
