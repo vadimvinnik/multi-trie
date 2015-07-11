@@ -55,6 +55,9 @@ superpose ns mt1 = update ns (union mt1)
 map :: (v -> w) -> MultiTrie n v -> MultiTrie n w
 map f (MultiTrie vs m) = MultiTrie (L.map f vs) (M.map (map f) m)
 
+mapAll :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
+mapAll fs (MultiTrie xs xm) = MultiTrie (fs <*> xs) (M.map (mapAll fs) xm)
+
 applyUniting :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyUniting = applyop (M.unionWith union)
 
@@ -69,11 +72,17 @@ applyop op mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
             (M.map (applyop op mtf) xm)
             (M.map ((flip $ applyop op) mtx) fm))
 
-applyDeepening :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
-applyDeepening = undefined
+flatten :: Ord n => MultiTrie n (MultiTrie n v) -> MultiTrie n v
+flatten (MultiTrie mts mtm) = unions mts `union` MultiTrie [] (M.map flatten mtm) 
+
+applyCartesian :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
+applyCartesian mtf mtx = flatten $ map (`map` mtx) mtf
 
 union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 union = setop (M.unionWith union)
+
+unions :: Ord n => [MultiTrie n v] -> MultiTrie n v
+unions = L.foldl union empty
 
 intersection :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 intersection = setop (M.intersectionWith intersection) 
@@ -103,8 +112,8 @@ fromMaybe (Just mt) = mt
 toMaybe :: MultiTrie n v -> Maybe (MultiTrie n v)
 toMaybe mt = if null mt then Nothing else Just mt
 
-showTree :: (Show n, Show v) => MultiTrie n v -> String
-showTree = undefined
+draw :: (Show n, Show v) => MultiTrie n v -> String
+draw = drawWith (\n vs -> (show n) ++ ": " ++ (show vs)) 
 
-showTreeWith :: (n -> [v] -> String) -> MultiTrie n v -> Bool -> String
-showTreeWith = undefined
+drawWith :: (n -> [v] -> String) -> MultiTrie n v -> String
+drawWith = undefined
