@@ -58,6 +58,24 @@ map f (MultiTrie vs m) = MultiTrie (L.map f vs) (M.map (map f) m)
 mapAll :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
 mapAll fs (MultiTrie xs xm) = MultiTrie (fs <*> xs) (M.map (mapAll fs) xm)
 
+union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+union = setop (M.unionWith union)
+
+unions :: Ord n => [MultiTrie n v] -> MultiTrie n v
+unions = L.foldl union empty
+
+intersection :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+intersection = setop (M.intersectionWith intersection) 
+
+setop :: Ord n => (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+setop op (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (vs1 ++ vs2) (op m1 m2) 
+
+flatten :: Ord n => MultiTrie n (MultiTrie n v) -> MultiTrie n v
+flatten (MultiTrie mts mtm) = unions mts `union` MultiTrie [] (M.map flatten mtm) 
+
+applyCartesian :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
+applyCartesian mtf mtx = flatten $ map (`map` mtx) mtf
+
 applyUniting :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyUniting = applyop (M.unionWith union)
 
@@ -71,24 +89,6 @@ applyop op mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
         (op
             (M.map (applyop op mtf) xm)
             (M.map ((flip $ applyop op) mtx) fm))
-
-flatten :: Ord n => MultiTrie n (MultiTrie n v) -> MultiTrie n v
-flatten (MultiTrie mts mtm) = unions mts `union` MultiTrie [] (M.map flatten mtm) 
-
-applyCartesian :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
-applyCartesian mtf mtx = flatten $ map (`map` mtx) mtf
-
-union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-union = setop (M.unionWith union)
-
-unions :: Ord n => [MultiTrie n v] -> MultiTrie n v
-unions = L.foldl union empty
-
-intersection :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-intersection = setop (M.intersectionWith intersection) 
-
-setop :: Ord n => (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-setop op (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (vs1 ++ vs2) (op m1 m2) 
 
 bindCartesian :: Ord n => MultiTrie n v -> (v -> MultiTrie n w) -> MultiTrie n w
 bindCartesian mt fmt = flatten $ map fmt mt
