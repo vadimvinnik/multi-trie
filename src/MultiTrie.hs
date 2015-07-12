@@ -90,8 +90,8 @@ intersection = setop (M.intersectionWith intersection)
 setop :: Ord n => (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 setop op (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (vs1 ++ vs2) (op m1 m2) 
 
-bind :: MultiTrie n v -> (v -> MultiTrie n w) -> MultiTrie n w
-bind = undefined
+bindCartesian :: Ord n => MultiTrie n v -> (v -> MultiTrie n w) -> MultiTrie n w
+bindCartesian mt fmt = flatten $ map fmt mt
 
 toMap :: Ord n => MultiTrie n v -> M.Map [n] [v]
 toMap (MultiTrie vs m) = if L.null vs then childrenMap else M.insert [] vs childrenMap
