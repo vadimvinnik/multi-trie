@@ -71,7 +71,7 @@ unions :: Ord n => [MultiTrie n v] -> MultiTrie n v
 unions = L.foldl union empty
 
 intersection :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-intersection = setop (M.intersectionWith intersection) 
+intersection mt = nullToEmpty . setop (M.intersectionWith intersection) mt 
 
 setop :: Ord n => (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 setop op (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (vs1 ++ vs2) (op m1 m2) 
@@ -117,6 +117,9 @@ fromMaybe (Just mt) = mt
 
 toMaybe :: MultiTrie n v -> Maybe (MultiTrie n v)
 toMaybe mt = if null mt then Nothing else Just mt
+
+nullToEmpty :: MultiTrie n v -> MultiTrie n v
+nullToEmpty mt = if null mt then empty else mt
 
 draw :: (Show n, Show v) => MultiTrie n v -> String
 draw = drawWith (\n vs -> (show n) ++ ": " ++ (show vs)) 
