@@ -49,6 +49,9 @@ insert ns v = update ns (put v)
 replace :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 replace ns mt1 = update ns (const mt1)
 
+delete :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
+delete ns = replace ns empty
+
 superpose :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 superpose ns mt1 = update ns (union mt1)
 
@@ -120,6 +123,9 @@ toMaybe mt = if null mt then Nothing else Just mt
 
 nullToEmpty :: MultiTrie n v -> MultiTrie n v
 nullToEmpty mt = if null mt then empty else mt
+
+cleanupEmpties :: Ord n => MultiTrie n v -> MultiTrie n v
+cleanupEmpties (MultiTrie vs m) = nullToEmpty $ MultiTrie vs (M.map cleanupEmpties m)
 
 draw :: (Show n, Show v) => MultiTrie n v -> String
 draw = drawWith (\n vs -> (show n) ++ ": " ++ (show vs)) 
