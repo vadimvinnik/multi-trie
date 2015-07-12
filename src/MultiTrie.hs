@@ -52,11 +52,14 @@ replace ns mt1 = update ns (const mt1)
 superpose :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 superpose ns mt1 = update ns (union mt1)
 
-map :: (v -> w) -> MultiTrie n v -> MultiTrie n w
-map f (MultiTrie vs m) = MultiTrie (L.map f vs) (M.map (map f) m)
+map :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
+map f = mapList (L.map f)
 
 mapAll :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
-mapAll fs (MultiTrie xs xm) = MultiTrie (fs <*> xs) (M.map (mapAll fs) xm)
+mapAll fs  = mapList (fs <*>)
+
+mapList :: Ord n => ([v] -> [w]) -> MultiTrie n v -> MultiTrie n w
+mapList fl (MultiTrie vs vm) = MultiTrie (fl vs) (M.map (mapList fl) vm) 
 
 union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 union = setop (M.unionWith union)
