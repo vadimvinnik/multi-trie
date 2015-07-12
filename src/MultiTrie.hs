@@ -59,7 +59,10 @@ mapAll :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
 mapAll fs  = mapList (fs <*>)
 
 mapList :: Ord n => ([v] -> [w]) -> MultiTrie n v -> MultiTrie n w
-mapList fl (MultiTrie vs vm) = MultiTrie (fl vs) (M.map (mapList fl) vm) 
+mapList fl (MultiTrie vs vm) = MultiTrie (fl vs) (M.map (mapList fl) vm)
+
+cartesianProduct :: Ord n => MultiTrie n v -> MultiTrie n w -> MultiTrie n (v, w)
+cartesianProduct mtv = applyCartesian (map (,) mtv)
 
 union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 union = setop (M.unionWith union)
