@@ -3,6 +3,7 @@ module MultiTrie where
 import Prelude hiding (lookup, map, null, repeat)
 import qualified Data.Map as M
 import qualified Data.List as L
+import qualified Data.Tree as T
 import Control.Applicative hiding (empty)
 
 type MultiTrieMap n v = M.Map n (MultiTrie n v) 
@@ -58,17 +59,29 @@ replace ns mt1 = update ns (const mt1)
 delete :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
 delete ns = replace ns empty
 
-superpose :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-superpose ns mt1 = update ns (union mt1)
+unite :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+unite ns mt1 = update ns (union mt1)
+
+intersect :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+intersect ns mt1 = update ns (intersection mt1)
 
 map :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
 map f = mapList (L.map f)
 
+mapWithName :: Ord n => ([n] -> v -> w) -> MultiTrie n v -> MultiTrie n w
+mapWithName f = mapListWithName (\ns -> L.map (f ns)) 
+
 mapAll :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
 mapAll fs  = mapList (fs <*>)
 
+mapAllWithName :: Ord n => [[n] -> v -> w] -> MultiTrie n v -> MultiTrie n w
+mapAllWithName fs = mapListWithName (\ns -> ((L.map ($ns) fs) <*>))
+
 mapList :: Ord n => ([v] -> [w]) -> MultiTrie n v -> MultiTrie n w
 mapList fl (MultiTrie vs vm) = MultiTrie (fl vs) (M.map (mapList fl) vm)
+
+mapListWithName :: Ord n => ([n] -> [v] -> [w]) -> MultiTrie n v -> MultiTrie n w
+mapListWithName fl (MultiTrie vs vm) = MultiTrie (fl [] vs) (M.mapWithKey (\n -> mapListWithName $ fl . (n:)) vm)
 
 cartesianProduct :: Ord n => MultiTrie n v -> MultiTrie n w -> MultiTrie n (v, w)
 cartesianProduct mtv = applyCartesian (map (,) mtv)
@@ -136,8 +149,13 @@ nullToEmpty mt = if null mt then empty else mt
 cleanupEmpties :: Ord n => MultiTrie n v -> MultiTrie n v
 cleanupEmpties (MultiTrie vs m) = nullToEmpty $ MultiTrie vs (M.map cleanupEmpties m)
 
+toTree :: (n -> t) -> ([v] -> t) -> MultiTrie n v -> T.Tree t
+toTree f g (MultiTrie vs m) = T.Node (g vs) $ M.elems $ M.mapWithKey namedChildToTree m
+    where
+        namedChildToTree k mt = T.Node (f k) [toTree f g mt]
+
 draw :: (Show n, Show v) => MultiTrie n v -> String
-draw = undefined
+draw = T.drawTree . toTree show show
 
 allValues :: (Bounded a, Enum a) => [a]
 allValues = [minBound..]
