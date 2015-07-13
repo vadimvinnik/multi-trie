@@ -69,13 +69,13 @@ map :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
 map f = mapList (L.map f)
 
 mapWithName :: Ord n => ([n] -> v -> w) -> MultiTrie n v -> MultiTrie n w
-mapWithName f = mapListWithName (\ns -> L.map (f ns)) 
+mapWithName f = mapListWithName (L.map . f) 
 
 mapAll :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
 mapAll fs  = mapList (fs <*>)
 
 mapAllWithName :: Ord n => [[n] -> v -> w] -> MultiTrie n v -> MultiTrie n w
-mapAllWithName fs = mapListWithName (\ns -> ((L.map ($ns) fs) <*>))
+mapAllWithName fs = mapListWithName (\ns -> (L.map ($ns) fs <*>))
 
 mapList :: Ord n => ([v] -> [w]) -> MultiTrie n v -> MultiTrie n w
 mapList fl (MultiTrie vs vm) = MultiTrie (fl vs) (M.map (mapList fl) vm)
