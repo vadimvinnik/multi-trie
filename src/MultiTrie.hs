@@ -17,6 +17,9 @@ data MultiTrie n v = MultiTrie
 empty :: MultiTrie n v
 empty = MultiTrie [] M.empty
 
+universal :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) => MultiTrie n v
+universal = MultiTrie allValues (M.fromList $ zip allValues $ repeat universal) 
+
 singleton :: v -> MultiTrie n v
 singleton x = MultiTrie [x] M.empty
 
@@ -76,6 +79,9 @@ unions = L.foldl union empty
 intersection :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 intersection mt = nullToEmpty . setop (M.intersectionWith intersection) mt 
 
+intersections :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) => [MultiTrie n v] -> MultiTrie n v
+intersections = L.foldl intersection universal 
+
 setop :: Ord n => (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 setop op (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (vs1 ++ vs2) (op m1 m2) 
 
@@ -128,7 +134,7 @@ cleanupEmpties :: Ord n => MultiTrie n v -> MultiTrie n v
 cleanupEmpties (MultiTrie vs m) = nullToEmpty $ MultiTrie vs (M.map cleanupEmpties m)
 
 draw :: (Show n, Show v) => MultiTrie n v -> String
-draw = drawWith (\n vs -> (show n) ++ ": " ++ (show vs)) 
+draw = undefined
 
-drawWith :: (n -> [v] -> String) -> MultiTrie n v -> String
-drawWith = undefined
+allValues :: (Bounded a, Enum a) => [a]
+allValues = [minBound..]
