@@ -62,7 +62,7 @@ delete ns = replace ns empty
 unite :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 unite ns mt1 = update ns (union mt1)
 
-intersect :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+intersect :: (Ord n, Eq v) => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 intersect ns mt1 = update ns (intersection mt1)
 
 map :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
@@ -87,19 +87,19 @@ cartesianProduct :: Ord n => MultiTrie n v -> MultiTrie n w -> MultiTrie n (v, w
 cartesianProduct mtv = applyCartesian (map (,) mtv)
 
 union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-union = setop (M.unionWith union)
+union = setop (++) (M.unionWith union)
 
 unions :: Ord n => [MultiTrie n v] -> MultiTrie n v
 unions = L.foldl union empty
 
-intersection :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-intersection mt = nullToEmpty . setop (M.intersectionWith intersection) mt 
+intersection :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+intersection mt = nullToEmpty . setop L.intersect (M.intersectionWith intersection) mt 
 
-intersections :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) => [MultiTrie n v] -> MultiTrie n v
+intersections :: (Ord n, Bounded n, Enum n, Eq v, Bounded v, Enum v) => [MultiTrie n v] -> MultiTrie n v
 intersections = L.foldl intersection universal 
 
-setop :: Ord n => (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-setop op (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (vs1 ++ vs2) (op m1 m2) 
+setop :: Ord n => ([v] -> [v] -> [v]) -> (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+setop f op (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (f vs1 vs2) (op m1 m2) 
 
 flatten :: Ord n => MultiTrie n (MultiTrie n v) -> MultiTrie n v
 flatten (MultiTrie mts mtm) = unions mts `union` MultiTrie [] (M.map flatten mtm) 
@@ -110,7 +110,7 @@ applyCartesian mtf mtx = flatten $ map (`map` mtx) mtf
 applyUniting :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyUniting = applyop (M.unionWith union)
 
-applyIntersecting :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
+applyIntersecting :: (Ord n, Eq v, Eq w) => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyIntersecting = applyop (M.intersectionWith intersection)
 
 applyop :: Ord n => (MultiTrieMap n w -> MultiTrieMap n w -> MultiTrieMap n w) -> MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
