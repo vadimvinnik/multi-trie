@@ -1,6 +1,6 @@
 module MultiTrie where
 
-import Prelude hiding (lookup, map, null)
+import Prelude hiding (lookup, map, null, repeat)
 import qualified Data.Map as M
 import qualified Data.List as L
 import Control.Applicative hiding (empty)
@@ -18,10 +18,13 @@ empty :: MultiTrie n v
 empty = MultiTrie [] M.empty
 
 universal :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) => MultiTrie n v
-universal = MultiTrie allValues (M.fromList $ zip allValues $ repeat universal) 
+universal = MultiTrie allValues (M.fromList $ zip allValues $ L.repeat universal) 
 
 singleton :: v -> MultiTrie n v
 singleton x = MultiTrie [x] M.empty
+
+repeat :: (Ord n, Bounded n, Enum n) => v -> MultiTrie n v
+repeat x = MultiTrie (L.repeat x) (M.fromList $ zip allValues $ L.repeat $ repeat x)
 
 null :: MultiTrie n v -> Bool
 null (MultiTrie vs m) = L.null vs && L.all null (M.elems m)
