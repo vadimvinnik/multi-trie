@@ -17,7 +17,7 @@ source-repository head
   location:  https://github.com/vvinnik-softheme/multi-trie
 
 library
-  hs-source-dirs:   src
+  hs-source-dirs:   Data
   build-depends:    
                     base == 4.*,
                     containers
