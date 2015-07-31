@@ -1,9 +1,5 @@
 module Data.Container where
 
-import qualified Data.Set as S
-import qualified Data.MultiSet as M
-import qualified Data.List as L
-
 class Elementary s where
     null :: s a -> Bool
     elem :: Eq a => a -> s a -> Bool
@@ -31,19 +27,3 @@ class Intersectible s => Fullable s where
 class Intersectible s => Topable s where
     top :: s a
 
-instance Elementary [] where
-    null = L.null
-    elem = L.elem
-    empty = []
-    singleton x = [x]
-
-instance Insertable [] where
-    insert = (:)
-
-instance Deletable [] where
-    delete = L.delete
-
-    union = (++)
-
-instance Fullable [] where
-    full = L.repeat
