@@ -17,21 +17,24 @@ source-repository head
   location:  https://github.com/vvinnik-softheme/multi-trie
 
 library
-  hs-source-dirs:   Data
   build-depends:    
                     base == 4.*,
-                    containers
+                    containers,
+                    multiset >= 0.3
   ghc-options:      -Wall
-  exposed-modules:  MultiTrie
+  exposed-modules:  Data.MultiTrie,
+                    Data.IsContainer
+                    Data.Allable
 
 test-suite Spec
   type:            exitcode-stdio-1.0
   main-is:         Spec.hs
   ghc-options:     -Wall -rtsopts
   build-depends:   
-                  base >= 4, HTF > 0.9,
-                  multi-trie,
-                  containers
+                   base >= 4,
+                   HTF > 0.9,
+                   multi-trie,
+                   containers
   other-modules:   MultiTrieTest
   hs-source-dirs:  tests
 

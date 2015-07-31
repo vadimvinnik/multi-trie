@@ -1,4 +1,4 @@
-module MultiTrie where
+module Data.MultiTrie where
 
 import Prelude hiding (lookup, map, null, repeat)
 import qualified Data.Map as M
@@ -6,11 +6,13 @@ import qualified Data.List as L
 import qualified Data.Tree as T
 import Control.Applicative hiding (empty)
 
+import Data.Allable
+
 type MultiTrieMap n v = M.Map n (MultiTrie n v) 
 
-data MultiTrie n v = MultiTrie
+data MultiTrie n v c = MultiTrie
     {
-        values :: [v],
+        values :: c v,
         children :: MultiTrieMap n v
     }
     deriving (Eq, Show)
@@ -156,6 +158,3 @@ toTree f g (MultiTrie vs m) = T.Node (g vs) $ M.elems $ M.mapWithKey namedChildT
 
 draw :: (Show n, Show v) => MultiTrie n v -> String
 draw = T.drawTree . toTree show show
-
-allValues :: (Bounded a, Enum a) => [a]
-allValues = [minBound..]
