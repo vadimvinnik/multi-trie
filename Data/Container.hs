@@ -25,5 +25,5 @@ class Intersectible s => Fullable s where
     full :: a -> s a
 
 class Intersectible s => Topable s where
-    top :: s a
+    top :: (Bounded a, Enum a) => s a
 
