@@ -23,7 +23,8 @@ library
                     multiset >= 0.3
   ghc-options:      -Wall
   exposed-modules:  Data.MultiTrie,
-                    Data.Container
+                    Data.Container,
+                    Data.Container.MultisetFromList,
                     Data.Allable
 
 test-suite Spec

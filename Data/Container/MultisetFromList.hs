@@ -1,4 +1,4 @@
-module Data.Container.List where
+module Data.Container.MultisetFromList where
 
 import qualified Data.List as L
 import Data.Container
