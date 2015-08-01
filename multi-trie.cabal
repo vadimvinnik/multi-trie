@@ -25,6 +25,7 @@ library
   exposed-modules:  Data.MultiTrie,
                     Data.Container,
                     Data.Container.MultisetFromList,
+                    Data.Container.SetFromList,
                     Data.Allable
 
 test-suite Spec
