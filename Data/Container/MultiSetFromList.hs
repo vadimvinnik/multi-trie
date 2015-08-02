@@ -31,6 +31,3 @@ listAsMultiSetIntersection (x:xs) ys = if x `L.elem` ys
 
 instance Eq a => Intersectible a MultiSetFromList where
     intersection u v = MultiSetFromList $ listAsMultiSetIntersection (listFromMultiSet u) (listFromMultiSet v)
-
-instance Fullable a MultiSetFromList where
-    full = MultiSetFromList . L.repeat
