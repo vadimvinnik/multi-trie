@@ -4,7 +4,7 @@
 module Data.Container.MultisetFromList (MultisetFromList, listFromMultiset) where
 
 import qualified Data.List as L
-import Data.Container
+import Data.Container.Base
 
 newtype MultisetFromList a = MultisetFromList { listFromMultiset :: [a] } deriving (Show)
 

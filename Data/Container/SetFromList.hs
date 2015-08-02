@@ -4,7 +4,7 @@
 module Data.Container.SetFromList (SetFromList, listFromSet) where
 
 import qualified Data.List as L
-import Data.Container
+import Data.Container.Base
 import Data.Allable
 
 newtype SetFromList a = SetFromList { listFromSet :: [a] } deriving (Show)

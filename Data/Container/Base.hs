@@ -1,6 +1,6 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 
-module Data.Container where
+module Data.Container.Base where
 
 class Elementary a s where
     null :: s a -> Bool

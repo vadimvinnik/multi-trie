@@ -24,6 +24,7 @@ library
   ghc-options:      -Wall
   exposed-modules:  Data.MultiTrie,
                     Data.Container,
+                    Data.Container.Base,
                     Data.Container.MultisetFromList,
                     Data.Container.SetFromList,
                     Data.Allable
