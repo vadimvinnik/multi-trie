@@ -1,3 +1,6 @@
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances #-}
+
 module Data.Container.MultisetFromList where
 
 import qualified Data.List as L
@@ -5,19 +8,19 @@ import Data.Container
 
 newtype MultisetFromList a = MultisetFromList { listFromMultiset :: [a] }
 
-instance Elementary MultisetFromList where
+instance Elementary a MultisetFromList where
     null = L.null . listFromMultiset
     elem x = L.elem x . listFromMultiset
     empty = MultisetFromList []
     singleton x = MultisetFromList [x]
 
-instance Insertable MultisetFromList where
+instance Insertable a MultisetFromList where
     insert x = MultisetFromList . (x:) . listFromMultiset
 
-instance Deletable MultisetFromList where
+instance Eq a => Deletable a MultisetFromList where
     delete x = MultisetFromList . L.delete x . listFromMultiset
 
-instance Unitable MultisetFromList where
+instance Unitable a MultisetFromList where
     union u v = MultisetFromList $ listFromMultiset u ++ listFromMultiset v
 
 listAsMultisetIntersection :: Eq a => [a] -> [a] -> [a]
@@ -26,8 +29,8 @@ listAsMultisetIntersection (x:xs) ys = if x `L.elem` ys
     then x : listAsMultisetIntersection xs (L.delete x ys)
     else listAsMultisetIntersection xs ys
 
-instance Intersectible MultisetFromList where
+instance Eq a => Intersectible a MultisetFromList where
     intersection u v = MultisetFromList $ listAsMultisetIntersection (listFromMultiset u) (listFromMultiset v)
 
-instance Fullable MultisetFromList where
+instance Fullable a MultisetFromList where
     full = MultisetFromList . L.repeat
