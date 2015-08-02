@@ -1,12 +1,12 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Data.Container.MultisetFromList where
+module Data.Container.MultisetFromList (MultisetFromList, listFromMultiset) where
 
 import qualified Data.List as L
 import Data.Container
 
-newtype MultisetFromList a = MultisetFromList { listFromMultiset :: [a] }
+newtype MultisetFromList a = MultisetFromList { listFromMultiset :: [a] } deriving (Show)
 
 instance Elementary a MultisetFromList where
     null = L.null . listFromMultiset

@@ -1,13 +1,13 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Data.Container.SetFromList where
+module Data.Container.SetFromList (SetFromList, listFromSet) where
 
 import qualified Data.List as L
 import Data.Container
 import Data.Allable
 
-newtype SetFromList a = SetFromList { listFromSet :: [a] }
+newtype SetFromList a = SetFromList { listFromSet :: [a] } deriving (Show)
 
 instance Elementary a SetFromList where
     null = L.null . listFromSet
