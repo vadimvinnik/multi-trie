@@ -2,29 +2,29 @@ module Data.MultiTrie where
 
 import Prelude hiding (lookup, map, null, repeat)
 import qualified Data.Map as M
-import qualified Data.List as L
 import qualified Data.Tree as T
 import Control.Applicative hiding (empty)
 
 import Data.Allable
+import Data.Container as C
 
-type MultiTrieMap n v = M.Map n (MultiTrie n v) 
+type MultiTrieMap n v c = M.Map n (MultiTrie n v c) 
 
 data MultiTrie n v c = MultiTrie
     {
         values :: c v,
-        children :: MultiTrieMap n v
+        children :: MultiTrieMap n v c
     }
     deriving (Eq, Show)
 
-empty :: MultiTrie n v
-empty = MultiTrie [] M.empty
+empty :: Elementary v c => MultiTrie n v c
+empty = MultiTrie C.empty M.empty
 
-universal :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) => MultiTrie n v
-universal = MultiTrie allValues (M.fromList $ zip allValues $ L.repeat universal) 
+top :: (Ord n, Bounded n, Enum n, Topable v c) => MultiTrie n v
+top = MultiTrie allValues (M.fromList $ zip allValues $ L.repeat top) 
 
-singleton :: v -> MultiTrie n v
-singleton x = MultiTrie [x] M.empty
+singleton :: Elementary v c => v -> MultiTrie n v c
+singleton x = MultiTrie (C.singleton x) M.empty
 
 repeat :: (Ord n, Bounded n, Enum n) => v -> MultiTrie n v
 repeat x = MultiTrie (L.repeat x) (M.fromList $ zip allValues $ L.repeat $ repeat x)
@@ -98,7 +98,7 @@ intersection :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 intersection mt = nullToEmpty . setop L.intersect (M.intersectionWith intersection) mt 
 
 intersections :: (Ord n, Bounded n, Enum n, Eq v, Bounded v, Enum v) => [MultiTrie n v] -> MultiTrie n v
-intersections = L.foldl intersection universal 
+intersections = L.foldl intersection top 
 
 setop :: Ord n => ([v] -> [v] -> [v]) -> (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 setop f op (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (f vs1 vs2) (op m1 m2) 

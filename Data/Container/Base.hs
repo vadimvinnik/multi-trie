@@ -23,8 +23,8 @@ class (Elementary a s, Eq a) => Intersectible a s where
 class (Elementary a s, Eq a) => Subtractible a s where
     difference :: s a -> s a -> s a
 
-class Elementary a s => Fullable a s where
-    full :: a -> s a
+class Elementary a s => Repeatable a s where
+    repeat :: a -> s a
 
 class (Elementary a s, Bounded a, Enum a) => Topable a s where
     top :: s a

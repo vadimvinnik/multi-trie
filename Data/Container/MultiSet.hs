@@ -5,7 +5,6 @@ module Data.Container.MultiSet where
 
 import qualified Data.MultiSet as M
 import Data.Container.Base
-import Data.Allable
 
 instance Ord a => Elementary a M.MultiSet where
     null = M.null

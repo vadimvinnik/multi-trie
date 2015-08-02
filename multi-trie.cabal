@@ -25,7 +25,7 @@ library
   exposed-modules:  Data.MultiTrie,
                     Data.Container,
                     Data.Container.Base,
-                    Data.Container.MultisetFromList,
+                    Data.Container.MultiSetFromList,
                     Data.Container.SetFromList,
                     Data.Container.Set,
                     Data.Allable

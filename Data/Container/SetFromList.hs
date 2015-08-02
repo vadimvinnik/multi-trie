@@ -30,8 +30,8 @@ instance Eq a => Unitable a SetFromList where
 instance Eq a => Intersectible a SetFromList where
     intersection u v = SetFromList $ L.intersect (listFromSet u) (listFromSet v)
 
-instance Fullable a SetFromList where
-    full = SetFromList . L.repeat
+instance Repeatable a SetFromList where
+    repeat = SetFromList . L.repeat
 
 instance (Enum a, Bounded a) => Topable a SetFromList where
     top = SetFromList allValues

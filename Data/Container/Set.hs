@@ -25,8 +25,8 @@ instance Ord a => Unitable a S.Set where
 instance Ord a => Intersectible a S.Set where
     intersection = S.intersection
 
-instance Ord a => Fullable a S.Set where
-    full = S.singleton
+instance Ord a => Repeatable a S.Set where
+    repeat = S.singleton
 
 instance (Enum a, Bounded a, Ord a) => Topable a S.Set where
     top = S.fromDistinctAscList allValues
