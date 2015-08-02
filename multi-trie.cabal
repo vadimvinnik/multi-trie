@@ -27,6 +27,7 @@ library
                     Data.Container.Base,
                     Data.Container.MultisetFromList,
                     Data.Container.SetFromList,
+                    Data.Container.Set,
                     Data.Allable
 
 test-suite Spec
