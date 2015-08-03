@@ -9,8 +9,12 @@ import Data.Container.Base
 instance Ord a => Elementary a M.MultiSet where
     null = M.null
     elem = M.member
+    count = M.size
     empty = M.empty
     singleton = M.singleton
+
+instance (Ord a, Ord b) => Mapable a b M.MultiSet where
+    map = M.map
 
 instance Ord a => Insertable a M.MultiSet where
     insert = M.insert

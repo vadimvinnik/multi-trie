@@ -11,8 +11,12 @@ newtype MultiSetFromList a = MultiSetFromList { listFromMultiSet :: [a] } derivi
 instance Elementary a MultiSetFromList where
     null = L.null . listFromMultiSet
     elem x = L.elem x . listFromMultiSet
+    count = L.length . listFromMultiSet
     empty = MultiSetFromList []
     singleton x = MultiSetFromList [x]
+
+instance Mapable a b MultiSetFromList where
+    map f = MultiSetFromList . L.map f . listFromMultiSet
 
 instance Insertable a MultiSetFromList where
     insert x = MultiSetFromList . (x:) . listFromMultiSet

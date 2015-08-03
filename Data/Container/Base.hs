@@ -5,8 +5,12 @@ module Data.Container.Base where
 class Elementary a s where
     null :: s a -> Bool
     elem :: Eq a => a -> s a -> Bool
+    count :: s a -> Int
     empty :: s a
     singleton :: a -> s a
+
+class Elementary a s => Mapable a b s where
+    map :: Elementary b s => (a -> b) -> s a -> s b
 
 class Elementary a s => Insertable a s where
     insert :: a -> s a -> s a
