@@ -8,12 +8,14 @@ import Data.Container.Base
 
 newtype MultiSetFromList a = MultiSetFromList { listFromMultiSet :: [a] } deriving (Show)
 
-instance Elementary a MultiSetFromList where
+instance Elementary MultiSetFromList where
     null = L.null . listFromMultiSet
-    elem x = L.elem x . listFromMultiSet
     count = L.length . listFromMultiSet
     empty = MultiSetFromList []
     singleton x = MultiSetFromList [x]
+
+instance Eq a => Decidable a MultiSetFromList where
+    elem x = L.elem x . listFromMultiSet
 
 instance Mapable a b MultiSetFromList where
     map f = MultiSetFromList . L.map f . listFromMultiSet

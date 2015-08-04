@@ -6,12 +6,14 @@ module Data.Container.MultiSet where
 import qualified Data.MultiSet as M
 import Data.Container.Base
 
-instance Ord a => Elementary a M.MultiSet where
+instance Elementary M.MultiSet where
     null = M.null
-    elem = M.member
     count = M.size
     empty = M.empty
     singleton = M.singleton
+
+instance  Ord a => Decidable a M.MultiSet where
+    elem = M.member
 
 instance (Ord a, Ord b) => Mapable a b M.MultiSet where
     map = M.map

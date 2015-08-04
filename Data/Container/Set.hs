@@ -7,12 +7,14 @@ import qualified Data.Set as S
 import Data.Container.Base
 import Data.Allable
 
-instance Ord a => Elementary a S.Set where
+instance Elementary S.Set where
     null = S.null
-    elem = S.member
     count = S.size
     empty = S.empty
     singleton = S.singleton
+
+instance Ord a => Decidable a S.Set where
+    elem = S.member
 
 instance (Ord a, Ord b) => Mapable a b S.Set where
     map = S.map

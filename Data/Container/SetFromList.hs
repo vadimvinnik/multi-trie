@@ -9,12 +9,14 @@ import Data.Allable
 
 newtype SetFromList a = SetFromList { listFromSet :: [a] } deriving (Show)
 
-instance Elementary a SetFromList where
+instance Elementary SetFromList where
     null = L.null . listFromSet
-    elem x = L.elem x . listFromSet
     count = L.length . listFromSet
     empty = SetFromList []
     singleton x = SetFromList [x]
+
+instance Eq a => Decidable a SetFromList where
+    elem x = L.elem x . listFromSet
 
 instance Eq b => Mapable a b SetFromList where
     map f = SetFromList . L.nub . L.map f . listFromSet
