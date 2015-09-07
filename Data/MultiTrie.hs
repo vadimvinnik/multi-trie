@@ -38,13 +38,9 @@ null (MultiTrie vs m) = C.null vs && L.all null (M.elems m)
 size :: C.Elementary c => MultiTrie n v c -> Int
 size (MultiTrie vs m) = C.count vs + L.sum (L.map size (M.elems m))
 
--- todo: get rid of C.Elementary constraint?
 lookup :: (Ord n, C.Elementary c) => [n] -> MultiTrie n v c -> MultiTrie n v c
 lookup [] mt = mt
-lookup (n:ns) (MultiTrie _ m) = lookup' ns (M.lookup n m)
-    where
-        lookup' _ Nothing = empty
-        lookup' ns' (Just mt) = lookup ns' mt
+lookup (n:ns) (MultiTrie _ m) = maybe empty (lookup ns) (M.lookup n m)
 
 fetch :: (Ord n, C.Elementary c) => [n] -> MultiTrie n v c -> c v
 fetch ns = values . lookup ns
