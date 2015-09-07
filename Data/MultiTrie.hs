@@ -3,6 +3,7 @@
 module Data.MultiTrie where
 
 import Prelude hiding (lookup, map, null, repeat)
+import qualified Data.Foldable as F
 import qualified Data.Map as M
 import qualified Data.Tree as T
 import qualified Data.List as L
@@ -105,10 +106,10 @@ intersections = L.foldl intersection top
 zipContentsAndChildren :: Ord n => (c v -> c v -> c v) -> (MultiTrieMap n v c -> MultiTrieMap n v c -> MultiTrieMap n v c) -> MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
 zipContentsAndChildren f g (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (f vs1 vs2) (g m1 m2) 
 
-{- todo: Foldable or toList
-flatten :: (Ord n, C.Unitable v c) => MultiTrie n (MultiTrie n v c) c -> MultiTrie n v c
-flatten (MultiTrie mts mtm) = unions mts `union` MultiTrie C.empty (M.map flatten mtm) 
+flatten :: (Ord n, C.Unitable v c, F.Foldable c) => MultiTrie n (MultiTrie n v c) c -> MultiTrie n v c
+flatten (MultiTrie mts mtm) = F.foldr union empty mts `union` MultiTrie C.empty (M.map flatten mtm)
 
+{-
 applyCartesian :: (Ord n, C.Unitable v c) => MultiTrie n (v -> w) c -> MultiTrie n v c -> MultiTrie n w c
 applyCartesian mtf mtx = flatten $ map (`map` mtx) mtf
 -}
