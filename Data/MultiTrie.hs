@@ -86,10 +86,9 @@ mapContainers fl (MultiTrie vs vm) = MultiTrie (fl vs) (M.map (mapContainers fl)
 mapContainersWithName :: Ord n => ([n] -> c v -> c w) -> MultiTrie n v c -> MultiTrie n w c
 mapContainersWithName fl (MultiTrie vs vm) = MultiTrie (fl [] vs) (M.mapWithKey (\n -> mapContainersWithName $ fl . (n:)) vm)
 
-{-
-cartesianProduct :: (Ord n, C.Unitable w c, C.Mapable v (v, w) c) => MultiTrie n v c -> MultiTrie n w c -> MultiTrie n (v, w) c
+cartesianProduct :: (Ord n, F.Foldable c, C.Unitable (v, w) c, C.Mapable w (v, w) c, C.Mapable (w -> (v, w)) (MultiTrie n (v, w) c) c, C.Mapable v (w -> (v, w)) c) =>
+        MultiTrie n v c -> MultiTrie n w c -> MultiTrie n (v, w) c
 cartesianProduct mtv = applyCartesian (map (,) mtv)
--}
 
 union :: (Ord n, C.Unitable v c) => MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
 union = zipContentsAndChildren C.union (M.unionWith union)
