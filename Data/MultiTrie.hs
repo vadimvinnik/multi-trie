@@ -91,19 +91,19 @@ cartesianProduct mtv = applyCartesian (map (,) mtv)
 -}
 
 union :: (Ord n, C.Unitable v c) => MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
-union = setop C.union (M.unionWith union)
+union = zipContentsAndChildren C.union (M.unionWith union)
 
 unions :: (Ord n, C.Unitable v c) => [MultiTrie n v c] -> MultiTrie n v c
 unions = L.foldl union empty
 
 intersection :: (Ord n, C.Intersectible v c) => MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
-intersection mt = nullToEmpty . setop C.intersection (M.intersectionWith intersection) mt 
+intersection mt = nullToEmpty . zipContentsAndChildren C.intersection (M.intersectionWith intersection) mt 
 
 intersections :: (Ord n, Bounded n, Enum n, Eq v, Bounded v, Enum v, C.Intersectible v c, C.Topable v c) => [MultiTrie n v c] -> MultiTrie n v c
 intersections = L.foldl intersection top 
 
-setop :: Ord n => (c v -> c v -> c v) -> (MultiTrieMap n v c -> MultiTrieMap n v c -> MultiTrieMap n v c) -> MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
-setop f op (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (f vs1 vs2) (op m1 m2) 
+zipContentsAndChildren :: Ord n => (c v -> c v -> c v) -> (MultiTrieMap n v c -> MultiTrieMap n v c -> MultiTrieMap n v c) -> MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
+zipContentsAndChildren f g (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (f vs1 vs2) (g m1 m2) 
 
 {- todo: Foldable or toList
 flatten :: (Ord n, C.Unitable v c) => MultiTrie n (MultiTrie n v c) c -> MultiTrie n v c
