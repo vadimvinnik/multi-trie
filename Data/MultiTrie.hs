@@ -114,18 +114,18 @@ applyCartesian mtf mtx = flatten $ map (`map` mtx) mtf
 -}
 
 applyUniting :: (Ord n, C.Unitable w c, Applicative c) => MultiTrie n (v -> w) c -> MultiTrie n v c -> MultiTrie n w c
-applyUniting = applyop (M.unionWith union)
+applyUniting = applyZippingChildren (M.unionWith union)
 
 applyIntersecting :: (Ord n, C.Intersectible w c, Applicative c) => MultiTrie n (v -> w) c -> MultiTrie n v c -> MultiTrie n w c
-applyIntersecting = applyop (M.intersectionWith intersection)
+applyIntersecting = applyZippingChildren (M.intersectionWith intersection)
 
-applyop :: (Ord n, Applicative c) => (MultiTrieMap n w c -> MultiTrieMap n w c -> MultiTrieMap n w c) -> MultiTrie n (v -> w) c -> MultiTrie n v c -> MultiTrie n w c
-applyop op mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
+applyZippingChildren :: (Ord n, Applicative c) => (MultiTrieMap n w c -> MultiTrieMap n w c -> MultiTrieMap n w c) -> MultiTrie n (v -> w) c -> MultiTrie n v c -> MultiTrie n w c
+applyZippingChildren op mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
     MultiTrie
         (fs <*> xs)
         (op
-            (M.map (applyop op mtf) xm)
-            (M.map ((flip $ applyop op) mtx) fm))
+            (M.map (applyZippingChildren op mtf) xm)
+            (M.map ((flip $ applyZippingChildren op) mtx) fm))
 
 {-
 bindCartesian :: (Ord n, C.Mapable v w c) => MultiTrie n v c -> (v -> MultiTrie n w c) -> MultiTrie n w c
