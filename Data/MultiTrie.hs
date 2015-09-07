@@ -109,10 +109,8 @@ zipContentsAndChildren f g (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (f 
 flatten :: (Ord n, C.Unitable v c, F.Foldable c) => MultiTrie n (MultiTrie n v c) c -> MultiTrie n v c
 flatten (MultiTrie mts mtm) = F.foldr union empty mts `union` MultiTrie C.empty (M.map flatten mtm)
 
-{-
-applyCartesian :: (Ord n, C.Unitable v c) => MultiTrie n (v -> w) c -> MultiTrie n v c -> MultiTrie n w c
+applyCartesian :: (Ord n, C.Unitable w c, F.Foldable c, C.Mapable v w c, C.Mapable (v -> w) (MultiTrie n w c) c) => MultiTrie n (v -> w) c -> MultiTrie n v c -> MultiTrie n w c
 applyCartesian mtf mtx = flatten $ map (`map` mtx) mtf
--}
 
 applyUniting :: (Ord n, C.Unitable w c, Applicative c) => MultiTrie n (v -> w) c -> MultiTrie n v c -> MultiTrie n w c
 applyUniting = applyZippingChildren (M.unionWith union)
