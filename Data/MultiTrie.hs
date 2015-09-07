@@ -79,7 +79,6 @@ mapAll fs  = mapContainers (fs <*>)
 mapAllWithName :: (Ord n, C.Mapable ([n] -> v -> w) (v -> w) c, Applicative c) => c ([n] -> v -> w) -> MultiTrie n v c -> MultiTrie n w c
 mapAllWithName fs = mapContainersWithName (\ns -> (C.map ($ns) fs <*>))
 
--- todo: rename
 mapContainers :: Ord n => (c v -> c w) -> MultiTrie n v c -> MultiTrie n w c
 mapContainers fl (MultiTrie vs vm) = MultiTrie (fl vs) (M.map (mapContainers fl) vm)
 
