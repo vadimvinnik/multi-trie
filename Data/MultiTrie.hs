@@ -68,23 +68,23 @@ intersect :: (Ord n, C.Intersectible v c) => [n] -> MultiTrie n v c -> MultiTrie
 intersect ns mt1 = update ns (intersection mt1)
 
 map :: (Ord n, C.Mapable v w c) => (v -> w) -> MultiTrie n v c -> MultiTrie n w c
-map f = mapList (C.map f)
+map f = mapContainers (C.map f)
 
 mapWithName :: (Ord n, C.Mapable v w c) => ([n] -> v -> w) -> MultiTrie n v c -> MultiTrie n w c
-mapWithName f = mapListWithName (C.map . f) 
+mapWithName f = mapContainersWithName (C.map . f) 
 
 mapAll :: (Ord n, Applicative c) => c (v -> w) -> MultiTrie n v c -> MultiTrie n w c
-mapAll fs  = mapList (fs <*>)
+mapAll fs  = mapContainers (fs <*>)
 
 mapAllWithName :: (Ord n, C.Mapable ([n] -> v -> w) (v -> w) c, Applicative c) => c ([n] -> v -> w) -> MultiTrie n v c -> MultiTrie n w c
-mapAllWithName fs = mapListWithName (\ns -> (C.map ($ns) fs <*>))
+mapAllWithName fs = mapContainersWithName (\ns -> (C.map ($ns) fs <*>))
 
 -- todo: rename
-mapList :: Ord n => (c v -> c w) -> MultiTrie n v c -> MultiTrie n w c
-mapList fl (MultiTrie vs vm) = MultiTrie (fl vs) (M.map (mapList fl) vm)
+mapContainers :: Ord n => (c v -> c w) -> MultiTrie n v c -> MultiTrie n w c
+mapContainers fl (MultiTrie vs vm) = MultiTrie (fl vs) (M.map (mapContainers fl) vm)
 
-mapListWithName :: Ord n => ([n] -> c v -> c w) -> MultiTrie n v c -> MultiTrie n w c
-mapListWithName fl (MultiTrie vs vm) = MultiTrie (fl [] vs) (M.mapWithKey (\n -> mapListWithName $ fl . (n:)) vm)
+mapContainersWithName :: Ord n => ([n] -> c v -> c w) -> MultiTrie n v c -> MultiTrie n w c
+mapContainersWithName fl (MultiTrie vs vm) = MultiTrie (fl [] vs) (M.mapWithKey (\n -> mapContainersWithName $ fl . (n:)) vm)
 
 {-
 cartesianProduct :: (Ord n, C.Unitable w c, C.Mapable v (v, w) c) => MultiTrie n v c -> MultiTrie n w c -> MultiTrie n (v, w) c
