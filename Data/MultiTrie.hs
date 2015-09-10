@@ -125,10 +125,8 @@ applyZippingChildren op mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
             (M.map (applyZippingChildren op mtf) xm)
             (M.map ((flip $ applyZippingChildren op) mtx) fm))
 
-{-
-bindCartesian :: (Ord n, C.Mapable v w c) => MultiTrie n v c -> (v -> MultiTrie n w c) -> MultiTrie n w c
+bindCartesian :: (Ord n, F.Foldable c, C.Unitable w c, C.Mapable v (MultiTrie n w c) c) => MultiTrie n v c -> (v -> MultiTrie n w c) -> MultiTrie n w c
 bindCartesian mt fmt = flatten $ map fmt mt
--}
 
 toMap :: (Ord n, C.Elementary c) => MultiTrie n v c -> M.Map [n] (c v)
 toMap (MultiTrie vs m) = if C.null vs then childrenMap else M.insert [] vs childrenMap
