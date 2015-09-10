@@ -10,7 +10,6 @@ import qualified Data.List as L
 import Control.Applicative hiding (empty)
 
 import Data.Allable
-import qualified Data.Container as C
 
 type MultiTrieMap n v c = M.Map n (MultiTrie n v c) 
 
@@ -21,64 +20,64 @@ data MultiTrie n v c = MultiTrie
     }
     deriving (Eq, Show)
 
-empty :: C.Elementary c => MultiTrie n v c
-empty = MultiTrie C.empty M.empty
+empty :: MultiTrie n v c
+empty = MultiTrie [] M.empty
 
-top :: (Ord n, Bounded n, Enum n, C.Topable v c) => MultiTrie n v c
-top = MultiTrie C.top (M.fromList $ zip allValues $ L.repeat top) 
+singleton :: v -> MultiTrie n v c
+singleton x = MultiTrie [x] M.empty
 
-singleton :: C.Elementary c => v -> MultiTrie n v c
-singleton x = MultiTrie (C.singleton x) M.empty
+repeat :: Ord n => [n] -> [v] -> MultiTrie n v c
+repeat ns xs = MultiTrie xs (M.fromList $ zip ns $ L.repeat $ repeat ns xs)
 
-repeat :: (Ord n, Bounded n, Enum n, C.Repeatable v c) => v -> MultiTrie n v c
-repeat x = MultiTrie (C.repeat x) (M.fromList $ zip allValues $ L.repeat $ repeat x)
+top :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) => MultiTrie n v c
+top = repeat allValues $ L.cycle allValues
 
-null :: C.Elementary c => MultiTrie n v c -> Bool
-null (MultiTrie vs m) = C.null vs && L.all null (M.elems m)
+null :: MultiTrie n v c -> Bool
+null (MultiTrie vs m) = null vs && L.all null (M.elems m)
 
-size :: C.Elementary c => MultiTrie n v c -> Int
-size (MultiTrie vs m) = C.count vs + L.sum (L.map size (M.elems m))
+size :: MultiTrie n v c -> Int
+size (MultiTrie vs m) = L.length vs + L.sum (L.map size (M.elems m))
 
-lookup :: (Ord n, C.Elementary c) => [n] -> MultiTrie n v c -> MultiTrie n v c
+lookup :: Ord n => [n] -> MultiTrie n v c -> MultiTrie n v c
 lookup [] mt = mt
 lookup (n:ns) (MultiTrie _ m) = maybe empty (lookup ns) (M.lookup n m)
 
-fetch :: (Ord n, C.Elementary c) => [n] -> MultiTrie n v c -> c v
+fetch :: Ord n => [n] -> MultiTrie n v c -> c v
 fetch ns = values . lookup ns
 
-update :: (Ord n, C.Elementary c) => [n] -> (MultiTrie n v c -> MultiTrie n v c) -> MultiTrie n v c -> MultiTrie n v c
+update :: Ord n => [n] -> (MultiTrie n v c -> MultiTrie n v c) -> MultiTrie n v c -> MultiTrie n v c
 update [] f mt = f mt
 update (n:ns) f (MultiTrie vs m) = MultiTrie vs (M.alter (toMaybe . update ns f . fromMaybe) n m)
 
-put :: C.Insertable v c => v -> MultiTrie n v c -> MultiTrie n v c
-put x (MultiTrie vs m) = MultiTrie (C.insert x vs) m
+put :: v -> MultiTrie n v c -> MultiTrie n v c
+put x (MultiTrie vs m) = MultiTrie x:vs m
 
-insert :: (Ord n, C.Insertable v c) => [n] -> v -> MultiTrie n v c -> MultiTrie n v c
+insert :: Ord n => [n] -> v -> MultiTrie n v c -> MultiTrie n v c
 insert ns v = update ns (put v)
 
-replace :: (Ord n, C.Elementary c) => [n] -> MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
+replace :: Ord n => [n] -> MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
 replace ns mt1 = update ns (const mt1)
 
-delete :: (Ord n, C.Elementary c) => [n] -> MultiTrie n v c -> MultiTrie n v c
+delete :: Ord n => [n] -> MultiTrie n v c -> MultiTrie n v c
 delete ns = replace ns empty
 
-unite :: (Ord n, C.Unitable v c) => [n] -> MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
+unite :: Ord n => [n] -> MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
 unite ns mt1 = update ns (union mt1)
 
-intersect :: (Ord n, C.Intersectible v c) => [n] -> MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
+intersect :: Ord n => [n] -> MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
 intersect ns mt1 = update ns (intersection mt1)
 
-map :: (Ord n, C.Mapable v w c) => (v -> w) -> MultiTrie n v c -> MultiTrie n w c
-map f = mapContainers (C.map f)
+map :: Ord n => (v -> w) -> MultiTrie n v c -> MultiTrie n w c
+map f = mapContainers (L.map f)
 
-mapWithName :: (Ord n, C.Mapable v w c) => ([n] -> v -> w) -> MultiTrie n v c -> MultiTrie n w c
-mapWithName f = mapContainersWithName (C.map . f) 
+mapWithName :: Ord n => ([n] -> v -> w) -> MultiTrie n v c -> MultiTrie n w c
+mapWithName f = mapContainersWithName (L.map . f) 
 
 mapAll :: (Ord n, Applicative c) => c (v -> w) -> MultiTrie n v c -> MultiTrie n w c
 mapAll fs  = mapContainers (fs <*>)
 
-mapAllWithName :: (Ord n, C.Mapable ([n] -> v -> w) (v -> w) c, Applicative c) => c ([n] -> v -> w) -> MultiTrie n v c -> MultiTrie n w c
-mapAllWithName fs = mapContainersWithName (\ns -> (C.map ($ns) fs <*>))
+mapAllWithName :: (Ord n, Applicative c) => c ([n] -> v -> w) -> MultiTrie n v c -> MultiTrie n w c
+mapAllWithName fs = mapContainersWithName (\ns -> (L.map ($ns) fs <*>))
 
 mapContainers :: Ord n => (c v -> c w) -> MultiTrie n v c -> MultiTrie n w c
 mapContainers fl (MultiTrie vs vm) = MultiTrie (fl vs) (M.map (mapContainers fl) vm)
@@ -86,17 +85,18 @@ mapContainers fl (MultiTrie vs vm) = MultiTrie (fl vs) (M.map (mapContainers fl)
 mapContainersWithName :: Ord n => ([n] -> c v -> c w) -> MultiTrie n v c -> MultiTrie n w c
 mapContainersWithName fl (MultiTrie vs vm) = MultiTrie (fl [] vs) (M.mapWithKey (\n -> mapContainersWithName $ fl . (n:)) vm)
 
-cartesianProduct :: (Ord n, F.Foldable c, C.Unitable (v, w) c, C.Mapable w (v, w) c, C.Mapable (w -> (v, w)) (MultiTrie n (v, w) c) c, C.Mapable v (w -> (v, w)) c) =>
-        MultiTrie n v c -> MultiTrie n w c -> MultiTrie n (v, w) c
+cartesianProduct :: Ord n => MultiTrie n v c -> MultiTrie n w c -> MultiTrie n (v, w) c
 cartesianProduct mtv = applyCartesian (map (,) mtv)
 
-union :: (Ord n, C.Unitable v c) => MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
+-- TODO
+union :: Ord n => MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
 union = zipContentsAndChildren C.union (M.unionWith union)
 
-unions :: (Ord n, C.Unitable v c) => [MultiTrie n v c] -> MultiTrie n v c
+unions :: Ord n => [MultiTrie n v c] -> MultiTrie n v c
 unions = L.foldl union empty
 
-intersection :: (Ord n, C.Intersectible v c) => MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
+-- TODO
+intersection :: Ord n => MultiTrie n v c -> MultiTrie n v c -> MultiTrie n v c
 intersection mt = nullToEmpty . zipContentsAndChildren C.intersection (M.intersectionWith intersection) mt 
 
 intersections :: (Ord n, Bounded n, Enum n, Eq v, Bounded v, Enum v, C.Intersectible v c, C.Topable v c) => [MultiTrie n v c] -> MultiTrie n v c
