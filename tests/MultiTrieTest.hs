@@ -2,7 +2,7 @@
 
 module MultiTrieTest where
 
-import MultiTrie
+import Data.MultiTrie
 import qualified Data.Map.Lazy as M
 import Test.Framework
 
