@@ -9,8 +9,6 @@ import qualified Data.Tree as T
 import qualified Data.List as L
 import Control.Applicative hiding (empty)
 
-import Data.Allable
-
 type MultiTrieMap n v = M.Map n (MultiTrie n v) 
 
 data MultiTrie n v = MultiTrie
@@ -33,7 +31,7 @@ top :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) => MultiTrie n v
 top = repeat allValues $ L.cycle allValues
 
 null :: MultiTrie n v -> Bool
-null (MultiTrie vs m) = null vs && L.all null (M.elems m)
+null (MultiTrie vs m) = L.null vs && L.all null (M.elems m)
 
 size :: MultiTrie n v -> Int
 size (MultiTrie vs m) = L.length vs + L.sum (L.map size (M.elems m))
@@ -50,7 +48,7 @@ update [] f mt = f mt
 update (n:ns) f (MultiTrie vs m) = MultiTrie vs (M.alter (toMaybe . update ns f . fromMaybe) n m)
 
 put :: v -> MultiTrie n v -> MultiTrie n v
-put x (MultiTrie vs m) = MultiTrie x:vs m
+put v (MultiTrie vs m) = MultiTrie (v:vs) m
 
 insert :: Ord n => [n] -> v -> MultiTrie n v -> MultiTrie n v
 insert ns v = update ns (put v)
@@ -64,7 +62,7 @@ delete ns = replace ns empty
 unite :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 unite ns mt1 = update ns (union mt1)
 
-intersect :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+intersect :: (Ord n, Eq v) => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 intersect ns mt1 = update ns (intersection mt1)
 
 map :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
@@ -94,9 +92,8 @@ union = zipContentsAndChildren (++) (M.unionWith union)
 unions :: Ord n => [MultiTrie n v] -> MultiTrie n v
 unions = L.foldl union empty
 
--- TODO: correct multiset intersection
-intersection :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-intersection mt = nullToEmpty . zipContentsAndChildren L.intersection (M.intersectionWith intersection) mt 
+intersection :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+intersection mt = nullToEmpty . zipContentsAndChildren listAsMultiSetIntersection (M.intersectionWith intersection) mt 
 
 intersections :: (Ord n, Bounded n, Enum n, Eq v, Bounded v, Enum v) => [MultiTrie n v] -> MultiTrie n v
 intersections = L.foldl intersection top 
@@ -113,7 +110,7 @@ applyCartesian mtf mtx = flatten $ map (`map` mtx) mtf
 applyUniting :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyUniting = applyZippingChildren (M.unionWith union)
 
-applyIntersecting :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
+applyIntersecting :: (Ord n, Eq w) => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyIntersecting = applyZippingChildren (M.intersectionWith intersection)
 
 applyZippingChildren :: Ord n => (MultiTrieMap n w -> MultiTrieMap n w -> MultiTrieMap n w) -> MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
@@ -159,3 +156,13 @@ toTree f g (MultiTrie vs m) = T.Node (g vs) $ M.elems $ M.mapWithKey namedChildT
 
 draw :: (Show n, Show [v]) => MultiTrie n v -> String
 draw = T.drawTree . toTree show show
+
+listAsMultiSetIntersection :: Eq a => [a] -> [a] -> [a]
+listAsMultiSetIntersection [] _ = []
+listAsMultiSetIntersection (x:xs) ys = if x `L.elem` ys
+    then x : listAsMultiSetIntersection xs (L.delete x ys)
+    else listAsMultiSetIntersection xs ys
+
+allValues :: (Bounded a, Enum a) => [a]
+allValues = [minBound..]
+

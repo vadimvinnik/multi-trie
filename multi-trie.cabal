@@ -22,13 +22,7 @@ library
                     containers,
                     multiset >= 0.3
   ghc-options:      -Wall
-  exposed-modules:  Data.MultiTrie,
-                    Data.Container,
-                    Data.Container.Base,
-                    Data.Container.MultiSetFromList,
-                    Data.Container.SetFromList,
-                    Data.Container.Set,
-                    Data.Allable
+  exposed-modules:  Data.MultiTrie
 
 test-suite Spec
   type:            exitcode-stdio-1.0
