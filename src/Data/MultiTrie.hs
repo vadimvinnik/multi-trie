@@ -84,24 +84,29 @@ unite ns mt1 = update ns (union mt1)
 intersect :: (Ord n, Eq v) => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 intersect ns mt1 = update ns (intersection mt1)
 
--- | Map a function over each node's multiset of values
+-- | Map a function over all values
 map :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
 map f = mapContainers (L.map f)
 
-mapWithName :: Ord n => ([n] -> v -> w) -> MultiTrie n v -> MultiTrie n w
-mapWithName f = mapContainersWithName (L.map . f) 
+-- | Map a function over all values, together with node paths as well
+mapWithPath :: Ord n => ([n] -> v -> w) -> MultiTrie n v -> MultiTrie n w
+mapWithPath f = mapContainersWithPath (L.map . f) 
 
+-- | Apply a multiset of functions to all values
 mapAll :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
 mapAll fs  = mapContainers (fs <*>)
 
+-- | Apply a multiset of functions to all values, together witn node path as well
 mapAllWithName :: Ord n => [[n] -> v -> w] -> MultiTrie n v -> MultiTrie n w
-mapAllWithName fs = mapContainersWithName (\ns -> (L.map ($ns) fs <*>))
+mapAllWithName fs = mapContainersWithPath (\ns -> (L.map ($ns) fs <*>))
 
+-- | Map a function over entire multisets
 mapContainers :: Ord n => ([v] -> [w]) -> MultiTrie n v -> MultiTrie n w
 mapContainers fl (MultiTrie vs vm) = MultiTrie (fl vs) (M.map (mapContainers fl) vm)
 
-mapContainersWithName :: Ord n => ([n] -> [v] -> [w]) -> MultiTrie n v -> MultiTrie n w
-mapContainersWithName fl (MultiTrie vs vm) = MultiTrie (fl [] vs) (M.mapWithKey (\n -> mapContainersWithName $ fl . (n:)) vm)
+-- | Map a function over entire multisets, together witn node path as well
+mapContainersWithPath :: Ord n => ([n] -> [v] -> [w]) -> MultiTrie n v -> MultiTrie n w
+mapContainersWithPath fl (MultiTrie vs vm) = MultiTrie (fl [] vs) (M.mapWithKey (\n -> mapContainersWithPath $ fl . (n:)) vm)
 
 cartesianProduct :: Ord n => MultiTrie n v -> MultiTrie n w -> MultiTrie n (v, w)
 cartesianProduct mtv = applyCartesian (map (,) mtv)
