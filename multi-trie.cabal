@@ -21,6 +21,7 @@ library
                     base == 4.*,
                     containers,
                     multiset >= 0.3
+  Hs-Source-Dirs:   src/
   ghc-options:      -Wall
   exposed-modules:  Data.MultiTrie
 
