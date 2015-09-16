@@ -25,13 +25,13 @@ test_singleton =
         u = singleton x :: TestMultiTrie
         x = 0
 
-test_put_single = assertEqual (put x u) v
+test_add_single = assertEqual (add x u) v
     where
         u = empty :: TestMultiTrie
         v = singleton x :: TestMultiTrie
         x = 0
  
-test_put_multiple = assertEqual u (MultiTrie l M.empty)
+test_add_multiple = assertEqual u (MultiTrie l M.empty)
     where
-        u = foldr put (empty :: TestMultiTrie) l
+        u = foldr add (empty :: TestMultiTrie) l
         l = [1..10]
