@@ -3,7 +3,7 @@
 -- | A multi-trie is a trie (i.e. a prefix tree) with each node containing a list of values considered as a multiset.
 module Data.MultiTrie where
 
-import Prelude hiding (lookup, map, null, repeat)
+import Prelude hiding (lookup, null, repeat)
 import qualified Data.Foldable as F
 import qualified Data.Map as M
 import qualified Data.Tree as T
@@ -20,6 +20,17 @@ data MultiTrie n v = MultiTrie
         children :: MultiTrieMap n v    -- ^ child nodes
     }
     deriving (Eq, Show)
+
+instance Ord n => Functor (MultiTrie n) where
+    fmap = mtmap
+
+instance Ord n => Applicative (MultiTrie n) where
+    pure = singleton
+    (<*>) = applyCartesian
+
+instance Ord n => Monad (MultiTrie n) where
+    return = singleton
+    (>>=) = bindCartesian
 
 -- | Constant: an empty multi-trie. A neutral element with respect to 'union'.
 empty :: MultiTrie n v
@@ -85,8 +96,8 @@ intersect :: (Ord n, Eq v) => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie
 intersect ns mt1 = update ns (intersection mt1)
 
 -- | Map a function over all values
-map :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
-map f = mapContainers (L.map f)
+mtmap :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
+mtmap f = mapContainers (L.map f)
 
 -- | Map a function over all values, together with node paths as well
 mapWithPath :: Ord n => ([n] -> v -> w) -> MultiTrie n v -> MultiTrie n w
@@ -115,7 +126,7 @@ mapContainersWithPath fl (MultiTrie vs vm) = MultiTrie (fl [] vs) (M.mapWithKey 
 -- any path s from P and every path t from Q, and values under st in R are pairs (v, w) where v is every
 -- value under s in P, and w is every value under t in Q.
 cartesianProduct :: Ord n => MultiTrie n v -> MultiTrie n w -> MultiTrie n (v, w)
-cartesianProduct mtv = applyCartesian (map (,) mtv)
+cartesianProduct mtv = applyCartesian (mtmap (,) mtv)
 
 -- | Union of two multi-tries P and Q is a multi-trie R that contains every path s that is present in
 -- either P or Q or both, and a multiset of values under s in R is a union of multisets contained in P
@@ -146,7 +157,7 @@ flatten (MultiTrie mts mtm) = F.foldr union empty mts `union` MultiTrie [] (M.ma
 -- | Given a multi-trie P of functions and a multi-trie Q of values, apply each
 -- function from P to each value from Q arranging results as described in 'cartesianProduct'.
 applyCartesian :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
-applyCartesian mtf mtx = flatten $ map (`map` mtx) mtf
+applyCartesian mtf mtx = flatten $ mtmap (`mtmap` mtx) mtf
 
 -- | Given a multi-trie P of functions and a multi-trie Q of values, apply each
 -- function from P to each value from Q combining results with 'union'.
@@ -159,7 +170,7 @@ applyIntersecting :: (Ord n, Eq w) => MultiTrie n (v -> w) -> MultiTrie n v -> M
 applyIntersecting = applyZippingChildren (M.intersectionWith intersection)
 
 bindCartesian :: Ord n => MultiTrie n v -> (v -> MultiTrie n w) -> MultiTrie n w
-bindCartesian mt fmt = flatten $ map fmt mt
+bindCartesian mt fmt = flatten $ mtmap fmt mt
 
 -- | Convert a multi-trie P to a map M whose keys are paths from P, and values
 -- in M are respective lists representing multi-sets of values in P.
