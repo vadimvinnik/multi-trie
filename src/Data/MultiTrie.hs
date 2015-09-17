@@ -137,38 +137,32 @@ intersection mt = nullToEmpty . zipContentsAndChildren listAsMultiSetIntersectio
 intersections :: (Ord n, Bounded n, Enum n, Eq v, Bounded v, Enum v) => [MultiTrie n v] -> MultiTrie n v
 intersections = L.foldl intersection top 
 
--- | Given multi-tries P(V1, M1) and Q(V2, M2) and a pair of binary functions:
--- f on multisets of values and g on maps of multi-tries, build a new
--- multi-trie R(f V1 V2, g M1 M2)
-zipContentsAndChildren :: Ord n => ([v] -> [v] -> [v]) -> (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-zipContentsAndChildren f g (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (f vs1 vs2) (g m1 m2) 
-
 -- | Given a multi-trie whose values are multi-tries in their turn, convert it into a 'plain' multi-trie.
 -- If P is a multi-trie that contains a multi-trie Q as its value under a path s, and Q contains a value x
 -- under a path t, then the plain multi-trie R will contain x as a value under a path st.
 flatten :: Ord n => MultiTrie n (MultiTrie n v) -> MultiTrie n v
 flatten (MultiTrie mts mtm) = F.foldr union empty mts `union` MultiTrie [] (M.map flatten mtm)
 
+-- | Given a multi-trie P of functions and a multi-trie Q of values, apply each
+-- function from P to each value from Q arranging results as described in 'cartesianProduct'.
 applyCartesian :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyCartesian mtf mtx = flatten $ map (`map` mtx) mtf
 
+-- | Given a multi-trie P of functions and a multi-trie Q of values, apply each
+-- function from P to each value from Q combining results with 'union'.
 applyUniting :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyUniting = applyZippingChildren (M.unionWith union)
 
+-- | Given a multi-trie P of functions and a multi-trie Q of values, apply each
+-- function from P to each value from Q combining results with 'intersection'.
 applyIntersecting :: (Ord n, Eq w) => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyIntersecting = applyZippingChildren (M.intersectionWith intersection)
-
-applyZippingChildren :: Ord n => (MultiTrieMap n w -> MultiTrieMap n w -> MultiTrieMap n w) -> MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
-applyZippingChildren op mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
-    MultiTrie
-        (fs <*> xs)
-        (op
-            (M.map (applyZippingChildren op mtf) xm)
-            (M.map ((flip $ applyZippingChildren op) mtx) fm))
 
 bindCartesian :: Ord n => MultiTrie n v -> (v -> MultiTrie n w) -> MultiTrie n w
 bindCartesian mt fmt = flatten $ map fmt mt
 
+-- | Convert a multi-trie P to a map M whose keys are paths from P, and values
+-- in M are respective lists representing multi-sets of values in P.
 toMap :: Ord n => MultiTrie n v -> M.Map [n] [v]
 toMap (MultiTrie vs m) = if L.null vs then childrenMap else M.insert [] vs childrenMap
     where
@@ -178,8 +172,17 @@ toMap (MultiTrie vs m) = if L.null vs then childrenMap else M.insert [] vs child
             M.mapWithKey (\n -> M.mapKeys (n:)) $
             M.map toMap m
 
+-- | Convert a list of path-value pairs to a multi-trie
 fromList :: Ord n => [([n], v)] -> MultiTrie n v
 fromList = L.foldr (uncurry addByPath) empty
+
+-- | Convert a multi-trie into an ASCII-drawn tree
+draw :: (Show n, Show [v]) => MultiTrie n v -> String
+draw = T.drawTree . toTree show show
+
+--
+-- Internal helper functions
+--
 
 fromMaybe :: Maybe (MultiTrie n v) -> MultiTrie n v
 fromMaybe Nothing = empty
@@ -194,13 +197,21 @@ nullToEmpty mt = if null mt then empty else mt
 cleanupEmpties :: Ord n => MultiTrie n v -> MultiTrie n v
 cleanupEmpties (MultiTrie vs m) = nullToEmpty $ MultiTrie vs (M.map cleanupEmpties m)
 
+zipContentsAndChildren :: Ord n => ([v] -> [v] -> [v]) -> (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+zipContentsAndChildren f g (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (f vs1 vs2) (g m1 m2) 
+
+applyZippingChildren :: Ord n => (MultiTrieMap n w -> MultiTrieMap n w -> MultiTrieMap n w) -> MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
+applyZippingChildren op mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
+    MultiTrie
+        (fs <*> xs)
+        (op
+            (M.map (applyZippingChildren op mtf) xm)
+            (M.map ((flip $ applyZippingChildren op) mtx) fm))
+
 toTree :: (n -> t) -> ([v] -> t) -> MultiTrie n v -> T.Tree t
 toTree f g (MultiTrie vs m) = T.Node (g vs) $ M.elems $ M.mapWithKey namedChildToTree m
     where
         namedChildToTree k mt = T.Node (f k) [toTree f g mt]
-
-draw :: (Show n, Show [v]) => MultiTrie n v -> String
-draw = T.drawTree . toTree show show
 
 listAsMultiSetIntersection :: Eq a => [a] -> [a] -> [a]
 listAsMultiSetIntersection [] _ = []
