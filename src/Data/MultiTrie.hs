@@ -1,6 +1,29 @@
 {-# LANGUAGE FlexibleContexts #-}
 
--- | A multi-trie is a trie (i.e. a prefix tree) with each node containing a list of values considered as a multiset.
+{- |
+A multi-trie is a trie (i.e. a tree whose child nodes have distinct labels)
+with each node containing a list of values considered as a multiset.
+
+Lookup of a sub-trie under a path is defined in an obvious way.
+
+The simplest possible multi-trie is 'empty' that has an empty multiset of
+values and an empty children map.
+
+Since the only essential feature of a multi-trie is carrying values, the
+'empty' multi-trie could be equated with an absense of a multi-trie. In
+particular, instead of saying that there is no path @p@ in a multi-trie @t@,
+let us say that @t@ contains a path @p@, and it points to an 'empty' node. 
+
+Therefore, every multi-trie could be considered as infinite, where each node
+has children under all possible names - and most of nodes are likely to be
+'empty'.
+
+Some operations could be defined for multi-tries in a rather natural way.
+Union of multi-tries @a@ and @b@ is, substantially, such a multi-trie @c@
+that under any path @p@, @C@ contains all values from @a@ under @p@ and all
+values from @b@ under @p@.
+-}
+
 module Data.MultiTrie where
 
 import Prelude hiding (lookup, null, repeat)
