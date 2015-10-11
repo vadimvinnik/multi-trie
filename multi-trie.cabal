@@ -5,7 +5,18 @@ build-type:     Simple
 author:         Vadim Vinnik <vadim.vinnik@gmail.com>
 maintainer:     Vadim Vinnik <vadim.vinnik@gmail.com>
 synopsis:       Trie of multisets
-description:    Trie of multisets implementing Functor, Applicative, Alternative and Monad
+description:
+    A multi-trie is a trie (i.e. a tree whose child nodes have distinct labels)
+    with each node containing a list of values considered as a multiset.
+    
+    Some operations could be defined for multi-tries in a rather natural way,
+    including 'map', 'union', 'intersection', 'cartesianProduct'.
+    
+    Moreover, a multi-trie can contain not only ordinary values but also functions
+    that makes it possible to apply a multi-trie of functions to a multi-trie of
+    argument values, combining results with 'cartesianProduct', 'union' or
+    'intersection'. This makes multi-tries a kind of 'Applicative' and 'Monad'.
+
 homepage:       https://github.com/vvinnik-softheme/multi-trie
 category:       Data
 copyright:      Vadim Vinnik, 2015

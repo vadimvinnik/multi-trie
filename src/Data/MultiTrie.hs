@@ -27,7 +27,56 @@ argument values, combining results with 'cartesianProduct', 'union' or
 'intersection'. This makes multi-tries a kind of 'Applicative' and 'Monad'.
 -}
 
-module Data.MultiTrie where
+module Data.MultiTrie(
+    -- * Type
+    MultiTrie(..),
+    -- * Simple constructors
+    empty,
+    singleton,
+    leaf,
+    repeat,
+    top,
+    add,
+    -- * Simple selectors
+    null,
+    size,
+    -- * Subnode access
+    lookup,
+    valuesByPath,
+    update,
+    addByPath,
+    replace,
+    delete,
+    unite,
+    intersect,
+    -- * Mappings
+    mtmap,
+    mapWithPath,
+    mapAll,
+    mapAllWithPath,
+    mapContainers,
+    mapContainersWithPath,
+    -- * High-level operations
+    cartesianProduct,
+    union,
+    unions,
+    intersection,
+    intersections,
+    flatten,
+    -- * Applications
+    applyCartesian,
+    applyUniting,
+    applyIntersecting,
+    bindCartesian,
+    -- * Conversions
+    toMap,
+    toList,
+    fromList,
+    fromMaybe,
+    toMaybe,
+    -- * Debug
+    draw
+) where
 
 import Prelude hiding (lookup, null, repeat)
 import qualified Data.Foldable as F
