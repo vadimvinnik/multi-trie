@@ -202,7 +202,7 @@ a multiset contained in @Q@ under @p@.
 union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 union = zipContentsAndChildren (++) (M.unionWith union)
 
--- | Union of a list of multi-tries
+-- | Union of a list of multi-tries.
 unions :: Ord n => [MultiTrie n v] -> MultiTrie n v
 unions = L.foldl union empty
 
@@ -288,6 +288,16 @@ toMap (MultiTrie vs m) = if L.null vs
             M.elems $
             M.mapWithKey (\n -> M.mapKeys (n:)) $
             M.map toMap m
+
+-- | Convert a multi-trie to a list of path-value pairs.
+toList :: Ord n => MultiTrie n v -> [([n], v)]
+toList (MultiTrie vs m) = (map ((,) []) vs) ++
+    (
+        L.concat $
+        L.map (\(n, ps) -> L.map (\(ns, ws) -> (n:ns, ws)) ps) $
+        M.toList $
+        M.map toList m
+    )
 
 -- | Convert a list of path-value pairs to a multi-trie.
 fromList :: Ord n => [([n], v)] -> MultiTrie n v
