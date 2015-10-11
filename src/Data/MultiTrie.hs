@@ -314,12 +314,23 @@ nullToEmpty :: MultiTrie n v -> MultiTrie n v
 nullToEmpty mt = if null mt then empty else mt
 
 cleanupEmpties :: Ord n => MultiTrie n v -> MultiTrie n v
-cleanupEmpties (MultiTrie vs m) = nullToEmpty $ MultiTrie vs (M.map cleanupEmpties m)
+cleanupEmpties (MultiTrie vs m) =
+    nullToEmpty $ MultiTrie vs (M.map cleanupEmpties m)
 
-zipContentsAndChildren :: Ord n => ([v] -> [v] -> [v]) -> (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-zipContentsAndChildren f g (MultiTrie vs1 m1) (MultiTrie vs2 m2) = MultiTrie (f vs1 vs2) (g m1 m2) 
+zipContentsAndChildren :: Ord n =>
+    ([v] -> [v] -> [v]) ->
+    (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) ->
+    MultiTrie n v ->
+    MultiTrie n v ->
+    MultiTrie n v
+zipContentsAndChildren f g (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
+    MultiTrie (f vs1 vs2) (g m1 m2) 
 
-applyZippingChildren :: Ord n => (MultiTrieMap n w -> MultiTrieMap n w -> MultiTrieMap n w) -> MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
+applyZippingChildren :: Ord n =>
+    (MultiTrieMap n w -> MultiTrieMap n w -> MultiTrieMap n w) ->
+    MultiTrie n (v -> w) ->
+    MultiTrie n v ->
+    MultiTrie n w
 applyZippingChildren op mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
     MultiTrie
         (fs <*> xs)
@@ -328,7 +339,8 @@ applyZippingChildren op mtf@(MultiTrie fs fm) mtx@(MultiTrie xs xm) =
             (M.map ((flip $ applyZippingChildren op) mtx) fm))
 
 toTree :: (n -> t) -> ([v] -> t) -> MultiTrie n v -> T.Tree t
-toTree f g (MultiTrie vs m) = T.Node (g vs) $ M.elems $ M.mapWithKey namedChildToTree m
+toTree f g (MultiTrie vs m) =
+    T.Node (g vs) $ M.elems $ M.mapWithKey namedChildToTree m
     where
         namedChildToTree k mt = T.Node (f k) [toTree f g mt]
 
