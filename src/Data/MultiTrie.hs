@@ -42,6 +42,8 @@ module Data.MultiTrie(
     children,
     null,
     size,
+    -- * Comparison
+    isEqual,
     -- * Subnode access
     lookup,
     valuesByPath,
@@ -111,6 +113,9 @@ instance Ord n => Monad (MultiTrie n) where
     return = singleton
     (>>=) = bindCartesian
 
+instance (Ord n, Eq v) => Eq (MultiTrie n v) where
+    (==) = isEqual
+
 -- | Constant: an empty multi-trie. A neutral element with respect to 'union'.
 empty :: MultiTrie n v
 empty = MultiTrie [] M.empty
@@ -149,10 +154,10 @@ null (MultiTrie vs m) = L.null vs && L.all null (M.elems m)
 size :: MultiTrie n v -> Int
 size (MultiTrie vs m) = L.length vs + L.sum (L.map size (M.elems m))
 
-{- TODO minViewWithKey and equivalence
 isEqual :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> Bool
-isEqual (MultiTrie vs1 m1) (MultiTrie vs2 m2) = vs1 == vs2 && m1 == m2
--}
+isEqual (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
+    (listAsMultiSetEquals vs1 vs2) &&
+    (compareMapsWith isEqual m1 m2)
 
 {-
 Select a multi-trie subnode identified by the given path, or 'empty' if there
@@ -427,9 +432,31 @@ toTree f g (MultiTrie vs m) =
 
 listAsMultiSetIntersection :: Eq a => [a] -> [a] -> [a]
 listAsMultiSetIntersection [] _ = []
+listAsMultiSetIntersection _ [] = []
 listAsMultiSetIntersection (x:xs) ys = if x `L.elem` ys
     then x : listAsMultiSetIntersection xs (L.delete x ys)
     else listAsMultiSetIntersection xs ys
+
+listAsMultiSetEquals :: Eq a => [a] -> [a] -> Bool
+listAsMultiSetEquals [] [] = True
+listAsMultiSetEquals [] _ = False
+listAsMultiSetEquals _ [] = False
+listAsMultiSetEquals (x:xs) ys = if x `L.elem` ys
+    then listAsMultiSetEquals xs (L.delete x ys)
+    else False
+
+compareMapsWith :: Ord k => (a -> b -> Bool) -> M.Map k a -> M.Map k b -> Bool
+compareMapsWith fc m1 m2 = compareMapsHelper
+    (M.minViewWithKey m1)
+    (M.minViewWithKey m2)
+  where
+    compareMapsHelper Nothing Nothing = True
+    compareMapsHelper _ Nothing = False
+    compareMapsHelper Nothing _ = False
+    compareMapsHelper (Just ((k1, v1), m1')) (Just ((k2, v2), m2')) =
+        k1 == k2 &&
+        fc v1 v2 &&
+        compareMapsWith fc m1' m2'
 
 allValues :: (Bounded a, Enum a) => [a]
 allValues = [minBound..]
