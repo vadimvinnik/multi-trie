@@ -29,7 +29,7 @@ argument values, combining results with 'cartesianProduct', 'union' or
 
 module Data.MultiTrie(
     -- * Type
-    MultiTrie(..),
+    MultiTrie,
     -- * Simple constructors
     empty,
     singleton,
@@ -38,6 +38,8 @@ module Data.MultiTrie(
     top,
     add,
     -- * Simple selectors
+    values,
+    children,
     null,
     size,
     -- * Subnode access
@@ -60,8 +62,10 @@ module Data.MultiTrie(
     cartesianProduct,
     union,
     unions,
+    unions1,
     intersection,
     intersections,
+    intersections1,
     flatten,
     -- * Applications
     applyCartesian,
@@ -120,11 +124,14 @@ leaf :: [v] -> MultiTrie n v
 leaf vs = MultiTrie vs M.empty
 
 {- |
-An infinite multi-trie that has in each node the same multiset of values and
-children (identical to the root) under all names from the given set.
+An infinite multi-trie that has in each node the same multiset of values and,
+under each name from the given set, a child identical to the root.
 -}
 repeat :: Ord n => [n] -> [v] -> MultiTrie n v
-repeat ns xs = MultiTrie xs (M.fromList $ zip ns $ L.repeat $ repeat ns xs)
+repeat ns xs =
+    if   L.null xs
+    then empty
+    else MultiTrie xs (M.fromList $ zip ns $ L.repeat $ repeat ns xs)
 
 {- |
 A multi-trie that has all possible values and all possible chid names in each
@@ -141,6 +148,11 @@ null (MultiTrie vs m) = L.null vs && L.all null (M.elems m)
 -- | A total number of values in all nodes.
 size :: MultiTrie n v -> Int
 size (MultiTrie vs m) = L.length vs + L.sum (L.map size (M.elems m))
+
+{- TODO minViewWithKey and equivalence
+isEqual :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> Bool
+isEqual (MultiTrie vs1 m1) (MultiTrie vs2 m2) = vs1 == vs2 && m1 == m2
+-}
 
 {-
 Select a multi-trie subnode identified by the given path, or 'empty' if there
@@ -184,7 +196,11 @@ delete :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
 delete ns = replace ns empty
 
 -- | Unite a subnode identified by the path with another multi-trie.
-unite :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+unite :: Ord n =>
+    [n] ->
+    MultiTrie n v ->
+    MultiTrie n v ->
+    MultiTrie n v
 unite ns mt1 = update ns (union mt1)
 
 -- | Intersect a subnode identified by the path with another multi-trie.
@@ -219,7 +235,7 @@ mapAllWithPath fs = mapContainersWithPath (\ns -> (L.map ($ns) fs <*>))
 -- | Map a function over entire multisets contained in nodes.
 mapContainers :: Ord n => ([v] -> [w]) -> MultiTrie n v -> MultiTrie n w
 mapContainers fl (MultiTrie vs vm) =
-    MultiTrie (fl vs) (M.map (mapContainers fl) vm)
+    MultiTrie (fl vs) (M.mapMaybe (toMaybe . mapContainers fl) vm)
 
 -- | Map a function over entire multisets, passing node path as well.
 mapContainersWithPath :: Ord n =>
@@ -229,7 +245,8 @@ mapContainersWithPath :: Ord n =>
 mapContainersWithPath fl (MultiTrie vs vm) =
     MultiTrie
         (fl [] vs)
-        (M.mapWithKey (\n -> mapContainersWithPath $ fl . (n:)) vm)
+        (M.mapMaybeWithKey transformChild vm) where
+    transformChild n = toMaybe . (mapContainersWithPath $ fl . (n:))
 
 {- |
 Cartesian product of two multi-tries @P@ and @Q@ is a multi-trie @R@ whose
@@ -255,6 +272,10 @@ union = zipContentsAndChildren (++) (M.unionWith union)
 unions :: Ord n => [MultiTrie n v] -> MultiTrie n v
 unions = L.foldl union empty
 
+-- | Union of a non-empty list of multi-tries.
+unions1 :: Ord n => [MultiTrie n v] -> MultiTrie n v
+unions1 = L.foldl1 union
+
 {- |
 Intersection of multi-tries @P@ and @Q@ is such a multi-trie @R@ that, under
 any path @p@, @R@ contains a union of a multiset that is contained in @P@ under
@@ -267,14 +288,20 @@ intersection :: (Ord n, Eq v) =>
 intersection mt = nullToEmpty .
     zipContentsAndChildren
         listAsMultiSetIntersection
-        (M.intersectionWith intersection)
+        (\x y -> M.filter (not . null) (M.intersectionWith intersection x y))
         mt 
 
--- | Intersection of a list of multi-tries.
+-- | Intersection of a non-empty list of multi-tries.
 intersections :: (Ord n, Bounded n, Enum n, Eq v, Bounded v, Enum v) =>
     [MultiTrie n v] ->
     MultiTrie n v
 intersections = L.foldl intersection top 
+
+-- | Intersection of a non-empty list of multi-tries.
+intersections1 :: (Ord n, Eq v) =>
+    [MultiTrie n v] ->
+    MultiTrie n v
+intersections1 = L.foldl1 intersection
 
 {- |
 Given a multi-trie whose values are multi-tries in their turn, convert it into
@@ -354,8 +381,7 @@ fromList = L.foldr (uncurry addByPath) empty
 
 -- | Map 'Nothing' to 'empty' and @Just mt@ to @mt@.
 fromMaybe :: Maybe (MultiTrie n v) -> MultiTrie n v
-fromMaybe Nothing = empty
-fromMaybe (Just mt) = mt
+fromMaybe = maybe empty id
 
 -- | Map 'empty' to 'Nothing' and a non-empty @mt@ to @Just mt@.
 toMaybe :: MultiTrie n v -> Maybe (MultiTrie n v)
@@ -371,10 +397,6 @@ draw = T.drawTree . toTree show show
 
 nullToEmpty :: MultiTrie n v -> MultiTrie n v
 nullToEmpty mt = if null mt then empty else mt
-
-cleanupEmpties :: Ord n => MultiTrie n v -> MultiTrie n v
-cleanupEmpties (MultiTrie vs m) =
-    nullToEmpty $ MultiTrie vs (M.map cleanupEmpties m)
 
 zipContentsAndChildren :: Ord n =>
     ([v] -> [v] -> [v]) ->
