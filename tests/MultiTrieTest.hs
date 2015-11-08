@@ -4,13 +4,14 @@ module MultiTrieTest where
 
 import Prelude hiding (lookup, null, repeat)
 import Data.MultiTrie
+import Data.Int
 import qualified Data.Map as M
 import qualified Data.List as L
 import Test.Framework
 
 {-# ANN module "HLint: ignore Use camelCase" #-}
 
-type TestMultiTrie = MultiTrie Char Int
+type TestMultiTrie = MultiTrie Char Int8
 
 -- | properties of the empty MT
 test_empty =
@@ -106,3 +107,25 @@ test_general_basic =
         q = [("a", 1), ("aa", 2), ("ab", 3), ("aaa", 4), ("aba", 5)]
         r = map (\(_:ns, x) -> (ns, x)) q
 
+-- | properties of an infinite MT
+test_repeat =
+    do
+        assertBool  (not $ null u)
+        assertEqual l (values u)
+        assertEqual s (M.keys $ children u)
+        assertEqual l (values v)
+        assertEqual s (M.keys $ children v)
+        assertEqual w (delete "a" $ delete "b" u)
+        assertEqual w (intersection w u)
+    where
+        u = repeat s l :: TestMultiTrie
+        v = lookup "baabbab" u
+        w = leaf l
+        l = [0, 1]
+        s = ['a', 'b']
+
+-- | properties of the largest MT
+test_top = assertEqual v (intersection v u)
+    where
+        u = top :: TestMultiTrie
+        v = fromList [("a", 0), ("ab", 1), ("ab", 2), ("aab", 3)]

@@ -142,6 +142,9 @@ repeat ns xs =
 A multi-trie that has all possible values and all possible chid names in each
 node. A neutral element with respect to 'intersection'. An opposite to the
 'empty' multi-trie.
+
+Use with causion! Consumes lots of memory even despite laziness. Consider using
+it only if both @n@ and @v@ types have less than dozen of values like Bool.
 -}
 top :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) => MultiTrie n v
 top = repeat allValues $ L.cycle allValues
