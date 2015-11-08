@@ -24,10 +24,12 @@ test_empty =
         assertBool  (null w)
         assertEqual u x
         assertBool  (null x)
-        assertEqual y u
+        assertEqual u y
         assertBool  (null y)
-        assertEqual z u
+        assertEqual u z
         assertBool  (null z)
+        assertEqual u t
+        assertBool  (null t)
     where
         u = empty :: TestMultiTrie
         v = leaf []
@@ -35,57 +37,64 @@ test_empty =
         x = intersection u u
         y = lookup "abc" u
         z = replace "abc" u u
+        t = fromList []
 
 -- | properties of the singleton MT
 test_singleton =
     do
         assertEqual (values u) [x]
-        assertBool (M.null $ children u)
-        assertBool (not $ null u)
-        assertBool (not $ null v)
-        assertEqual u v
-        assertBool (null $ lookup "abc" u)
+        assertBool  (M.null $ children u)
+        assertBool  (not $ null u)
+        assertEqual u (fromList [("", x)])
+        assertEqual u (add x empty)
+        assertEqual u (union empty u)
+        assertEqual u (intersection u u)
+        assertBool  (null $ lookup "abc" u)
+        assertEqual (delete "" u) empty
+        assertEqual u (delete "abc" u)
     where
         u = singleton x :: TestMultiTrie
-        v = fromList [("", x)]
         x = 0
 
--- | adding one value to an empty MT must make a singleton
-test_add_one_to_empty_is_singleton = assertEqual u v
+-- | properties of a leaf MT
+test_leaf =
+    do
+        assertEqual l (values u)
+        assertBool  (M.null $ children u)
+        assertEqual u v
+        assertEqual u w
+        assertEqual (leaf $ 0 : l) (add 0 u)
+        assertEqual u (intersection u u)
+        assertEqual u (intersection u $ leaf [0..20])
+        assertEqual u (union empty u)
+        assertEqual u (union (leaf [1..5]) (leaf [6..10]))
+        assertEqual u (replace "abc" empty u)
     where
-        u = add x empty :: TestMultiTrie
-        v = singleton x :: TestMultiTrie
-        x = 0
- 
--- | a leaf MT must be equal to an MT composed elementwise
-test_leaf_is_multiple_add = assertEqual u v
-    where
-        u = foldr add (empty :: TestMultiTrie) l
-        v = leaf l
-        l = [1..10]
-
--- | fromList makes the same leaf
-test_leaf_equals_fromList = assertEqual u v
-    where
-        u = fromList $ map (\x -> ("", x)) l
-        v = leaf l :: TestMultiTrie
+        u = leaf l :: TestMultiTrie
+        v = foldr add (empty :: TestMultiTrie) l
+        w = fromList $ map (\a -> ("", a)) l
         l = [1..10]
 
 -- | the order of construction does not matter
-test_eq = assertEqual u v
+test_fromList =
+    do
+        assertBool  (not $ null u)
+        assertEqual [0, 1, 2] (values u)
+        assertEqual ['a', 'b'] (M.keys $ children u)
+        assertEqual u (fromList $ q ++ p)
+        assertEqual u (lookup "" u)
+        assertEqual empty (lookup "zzz" u)
+        assertEqual u (delete "zzz" u)
+        assertEqual (lookup "a" u) t
+        assertEqual u (union v w)
+        assertEqual u (replace "a" t v)
     where
         u = fromList l :: TestMultiTrie
-        v = fromList $ reverse l :: TestMultiTrie
-        l = [("", 0),
-             ("a", 1), ("aa", 2), ("aaa", 3),
-             ("b", 9), ("bb", 8), ("bbb", 7)]
+        v = fromList p
+        w = fromList q
+        t = fromList r
+        l = p ++ q
+        p = [("", 0), ("b", 9), ("", 1), ("b", 8), ("", 2), ("b", 7)]
+        q = [("a", 1), ("aa", 2), ("ab", 3), ("aaa", 4), ("aba", 5)]
+        r = map (\(_:ns, x) -> (ns, x)) q
 
--- | fetching the sub-MT works
-test_lookup = assertEqual (lookup "ab" u) v
-    where
-        u = fromList p :: TestMultiTrie
-        v = fromList q :: TestMultiTrie
-        p = [("", 1), ("a", 2), ("ab", 3), ("ab", 4), ("abc", 5)]
-        q = [("", 3), ("", 4), ("c", 5)]
-
--- | adding an empty child does not change the MT
