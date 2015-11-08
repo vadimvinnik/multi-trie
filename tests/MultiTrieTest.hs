@@ -17,6 +17,7 @@ test_empty =
     do
         assertBool  (L.null $ values u)
         assertBool  (M.null $ children u)
+        assertEqual 0 (size u)
         assertBool  (null u)
         assertEqual u v
         assertBool  (null v)
@@ -45,6 +46,7 @@ test_singleton =
         assertEqual (values u) [x]
         assertBool  (M.null $ children u)
         assertBool  (not $ null u)
+        assertEqual 1 (size u)
         assertEqual u (fromList [("", x)])
         assertEqual u (add x empty)
         assertEqual u (union empty u)
@@ -61,8 +63,9 @@ test_leaf =
     do
         assertEqual l (values u)
         assertBool  (M.null $ children u)
-        assertEqual u v
-        assertEqual u w
+        assertEqual (length l) (size u)
+        assertEqual u (foldr add (empty :: TestMultiTrie) l)
+        assertEqual u (fromList $ map (\a -> ("", a)) l)
         assertEqual (leaf $ 0 : l) (add 0 u)
         assertEqual u (intersection u u)
         assertEqual u (intersection u $ leaf [0..20])
@@ -71,23 +74,28 @@ test_leaf =
         assertEqual u (replace "abc" empty u)
     where
         u = leaf l :: TestMultiTrie
-        v = foldr add (empty :: TestMultiTrie) l
-        w = fromList $ map (\a -> ("", a)) l
         l = [1..10]
 
--- | the order of construction does not matter
-test_fromList =
+-- | basic properties of a general case MT
+test_general_basic =
     do
         assertBool  (not $ null u)
         assertEqual [0, 1, 2] (values u)
         assertEqual ['a', 'b'] (M.keys $ children u)
+        assertEqual (length l) (size u)
         assertEqual u (fromList $ q ++ p)
         assertEqual u (lookup "" u)
         assertEqual empty (lookup "zzz" u)
-        assertEqual u (delete "zzz" u)
         assertEqual (lookup "a" u) t
-        assertEqual u (union v w)
+        assertEqual u (delete "zzz" u)
+        assertEqual v (delete "a" u)
+        assertEqual u (replace "a" t u)
         assertEqual u (replace "a" t v)
+        assertEqual u (union v w)
+        assertBool  (u /= (union u u))
+        assertEqual empty (intersection v w)
+        assertEqual w (intersection u w)
+        assertEqual u (intersection u (union u u))
     where
         u = fromList l :: TestMultiTrie
         v = fromList p
