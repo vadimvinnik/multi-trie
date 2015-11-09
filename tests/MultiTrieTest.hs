@@ -97,15 +97,16 @@ test_general_basic =
         assertEqual empty (intersection v w)
         assertEqual w (intersection u w)
         assertEqual u (intersection u (union u u))
+        assertEqual y (mtmap (+1) u)
     where
         u = fromList l :: TestMultiTrie
         v = fromList p
         w = fromList q
-        t = fromList r
+        t = fromList $ map (\(_:ns, x) -> (ns, x)) q
+        y = fromList $ map (\(ns, x) -> (ns, x + 1)) l
         l = p ++ q
         p = [("", 0), ("b", 9), ("", 1), ("b", 8), ("", 2), ("b", 7)]
         q = [("a", 1), ("aa", 2), ("ab", 3), ("aaa", 4), ("aba", 5)]
-        r = map (\(_:ns, x) -> (ns, x)) q
 
 -- | properties of an infinite MT
 test_repeat =
@@ -117,6 +118,7 @@ test_repeat =
         assertEqual s (M.keys $ children v)
         assertEqual w (delete "a" $ delete "b" u)
         assertEqual w (intersection w u)
+        assertEqual w (intersection u w)
     where
         u = repeat s l :: TestMultiTrie
         v = lookup "baabbab" u
@@ -125,7 +127,27 @@ test_repeat =
         s = ['a', 'b']
 
 -- | properties of the largest MT
-test_top = assertEqual v (intersection v u)
+test_top =
+    do
+        assertEqual v (intersection u v)
+        assertEqual v (intersection v u)
+        assertEqual q (M.keys $ children u)
+        assertEqual q (M.keys $ children w)
+        assertEqual (f r) (f $ values u)
+        assertEqual (f r) (f $ values w)
     where
-        u = top :: TestMultiTrie
-        v = fromList [("a", 0), ("ab", 1), ("ab", 2), ("aab", 3)]
+        u = top :: MultiTrie Ordering Bool
+        v = fromList $
+            [
+                ([EQ], True),
+                ([EQ, GT], False),
+                ([EQ, GT], True),
+                ([LT, GT, EQ, LT, GT], False),
+                ([LT, GT, EQ, GT, GT], False)
+            ]
+        w = lookup p u
+        p = [LT, GT, EQ, GT, GT]
+        q = [LT, EQ, GT]
+        r = cycle [False, True]
+        f = take 20
+        

@@ -46,7 +46,6 @@ module Data.MultiTrie(
     isEqual,
     -- * Subnode access
     lookup,
-    valuesByPath,
     update,
     addByPath,
     replace,
@@ -169,13 +168,6 @@ is no such path.
 lookup :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
 lookup [] mt = mt
 lookup (n:ns) (MultiTrie _ m) = maybe empty (lookup ns) (M.lookup n m)
-
-{-
-A multiset of values from a subnode identified by the given path (empty list
-if there is no such path).
--}
-valuesByPath :: Ord n => [n] -> MultiTrie n v -> [v]
-valuesByPath ns = values . lookup ns
 
 -- | Perform the given transformation on a subnode identified by the path.
 update :: Ord n =>
