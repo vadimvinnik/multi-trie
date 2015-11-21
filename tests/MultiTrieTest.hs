@@ -181,4 +181,19 @@ test_binop =
         p = [("", 1), ("abc", 2), ("a", 3), ("", 4), ("ab", 5), ("b", 6), ("bc", 7)]
         q = [("pqr", 9), ("ac", 8), ("bc", 7), ("", 6), ("", 4), ("abc", 3), ("abc", 2), ("p", 1)]
 
+test_flatten =
+    do
+        assertEqual u (flatten v)
+    where
+        u = fromList p :: TestMultiTrie
+        v = fromList q
+        p = [(n1 ++ n2, x2) | (n1, l1) <- r, (n2, x2) <- l1]
+        q = map (\(n, l) -> (n, fromList l)) r
+        r = [
+                ("", [("", 0), ("ab", 1), ("abcba", 2), ("", 3), ("abc", 4)]),
+                ("ab", [("c", 1), ("", 2), ("b", 3), ("cba", 4)]),
+                ("abcb", []),
+                ("abc", [("", 2), ("b", 1), ("ba", 0)])
+            ]
+
 listProduct l1 l2 = [(n1 ++ n2, (v1, v2)) | (n1, v1) <- l1, (n2, v2) <- l2] 
