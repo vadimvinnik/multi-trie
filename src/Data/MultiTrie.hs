@@ -46,7 +46,7 @@ module Data.MultiTrie(
     isEqual,
     -- * Subnode access
     subnode,
-    update,
+    updateSubnode,
     addByPath,
     replace,
     delete,
@@ -172,14 +172,14 @@ subnode [] mt = mt
 subnode (n:ns) (MultiTrie _ m) = maybe empty (subnode ns) (M.lookup n m)
 
 -- | Perform the given transformation on a subnode identified by the path.
-update :: Ord n =>
+updateSubnode :: Ord n =>
     [n] ->
     (MultiTrie n v -> MultiTrie n v) ->
     MultiTrie n v ->
     MultiTrie n v
-update [] f mt = f mt
-update (n:ns) f (MultiTrie vs m) =
-    MultiTrie vs (M.alter (toMaybe . update ns f . fromMaybe) n m)
+updateSubnode [] f mt = f mt
+updateSubnode (n:ns) f (MultiTrie vs m) =
+    MultiTrie vs (M.alter (toMaybe . updateSubnode ns f . fromMaybe) n m)
 
 -- | Add a new value to the root node's multiset of values.
 add :: v -> MultiTrie n v -> MultiTrie n v
@@ -187,11 +187,11 @@ add v (MultiTrie vs m) = MultiTrie (v:vs) m
 
 -- | Add a value to a multiset of values in a subnode identified by the path.
 addByPath :: Ord n => [n] -> v -> MultiTrie n v -> MultiTrie n v
-addByPath ns v = update ns (add v)
+addByPath ns v = updateSubnode ns (add v)
 
 -- | Replace a subnode identified by the path with a new multi-trie.
 replace :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-replace ns mt1 = update ns (const mt1)
+replace ns mt1 = updateSubnode ns (const mt1)
 
 -- | Delete a subnode identified by the given path.
 delete :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
@@ -203,7 +203,7 @@ unite :: Ord n =>
     MultiTrie n v ->
     MultiTrie n v ->
     MultiTrie n v
-unite ns mt1 = update ns (union mt1)
+unite ns mt1 = updateSubnode ns (union mt1)
 
 -- | Intersect a subnode identified by the path with another multi-trie.
 intersect :: (Ord n, Eq v) =>
@@ -211,7 +211,7 @@ intersect :: (Ord n, Eq v) =>
     MultiTrie n v ->
     MultiTrie n v ->
     MultiTrie n v
-intersect ns mt1 = update ns (intersection mt1)
+intersect ns mt1 = updateSubnode ns (intersection mt1)
 
 -- | Map a function over all values in a multi-trie.
 mtmap :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
