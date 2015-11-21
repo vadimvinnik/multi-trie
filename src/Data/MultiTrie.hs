@@ -43,7 +43,9 @@ module Data.MultiTrie(
     null,
     size,
     -- * Comparison
-    isEqual,
+    isEqualStrict,
+    isEqualWeak,
+    isEqualUpTo,
     -- * Subnode access
     subnode,
     updateSubnode,
@@ -115,7 +117,7 @@ instance Ord n => Monad (MultiTrie n) where
     (>>=) = bindCartesian
 
 instance (Ord n, Eq v) => Eq (MultiTrie n v) where
-    (==) = isEqual
+    (==) = isEqualStrict
 
 -- | Constant: an empty multi-trie. A neutral element with respect to 'union'.
 empty :: MultiTrie n v
@@ -158,10 +160,22 @@ null (MultiTrie vs m) = L.null vs && L.all null (M.elems m)
 size :: MultiTrie n v -> Int
 size (MultiTrie vs m) = L.length vs + L.sum (L.map size (M.elems m))
 
-isEqual :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> Bool
-isEqual (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
-    (listAsMultiSetEquals vs1 vs2) &&
-    (compareMapsWith isEqual m1 m2)
+-- | Check for equality, order of elements is important
+isEqualStrict :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> Bool
+isEqualStrict = isEqualUpTo (==)
+
+-- | Check for equality, ignore order of elements
+isEqualWeak :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> Bool
+isEqualWeak = isEqualUpTo listAsMultiSetEquals
+
+isEqualUpTo :: (Ord n, Eq v) =>
+    ([v] -> [v] -> Bool) ->
+    MultiTrie n v ->
+    MultiTrie n v ->
+    Bool
+isEqualUpTo f (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
+    (f vs1 vs2) &&
+    (compareMapsWith (isEqualUpTo f) m1 m2)
 
 {-
 Select a multi-trie subnode identified by the given path, or 'empty' if there

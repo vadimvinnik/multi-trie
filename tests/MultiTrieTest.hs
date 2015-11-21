@@ -185,7 +185,7 @@ test_binop =
         v = fromList q
         w = fromList (p ++ q)
         x = fromList (L.intersect p q)
-        y = fromList (listProduct p q)
+        y = fromList (listProduct (toList u) (toList v))
         p = [("", 1), ("abc", 2), ("a", 3), ("", 4), ("ab", 5), ("b", 6), ("bc", 7)]
         q = [("pqr", 9), ("ac", 8), ("bc", 7), ("", 6), ("", 4), ("abc", 3), ("abc", 2), ("p", 1)]
 
