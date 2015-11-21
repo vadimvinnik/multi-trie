@@ -170,8 +170,14 @@ test_mtmap =
 test_binop =
     do
         assertEqual w (union u v)
+        assertEqual v (union empty v)
+        assertEqual u (union u empty)
         assertEqual x (intersection u v)
+        assertBool  (null $ intersection u empty)
+        assertBool  (null $ intersection empty v)
         assertEqual y (cartesianProduct u v)
+        assertBool  (null $ cartesianProduct u empty)
+        assertBool  (null $ cartesianProduct empty v)
     where
         u = fromList p :: TestMultiTrie
         v = fromList q
