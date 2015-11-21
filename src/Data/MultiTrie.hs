@@ -80,7 +80,9 @@ module Data.MultiTrie(
     fromMaybe,
     toMaybe,
     -- * Debug
-    draw
+    draw,
+    -- * Other
+    listAsMultiSetEquals
 ) where
 
 import Prelude hiding (lookup, null, repeat)

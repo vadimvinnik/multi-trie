@@ -98,6 +98,8 @@ test_general_basic =
         assertEqual w (intersection u w)
         assertEqual u (intersection u (union u u))
         assertEqual y (mtmap (+1) u)
+        assertEqual u (fromList $ toList u)
+        assertBool  (listAsMultiSetEquals l $ toList u)
     where
         u = fromList l :: TestMultiTrie
         v = fromList p
