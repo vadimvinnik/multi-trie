@@ -54,11 +54,11 @@ module Data.MultiTrie(
     intersect,
     -- * Mappings
     mtmap,
-    mapWithPath,
-    mapAll,
-    mapAllWithPath,
-    mapContainers,
-    mapContainersWithPath,
+    mtmapWithPath,
+    mtmapAll,
+    mtmapAllWithPath,
+    mtmapContainers,
+    mtmapContainersWithPath,
     -- * High-level operations
     cartesianProduct,
     union,
@@ -215,11 +215,11 @@ intersect ns mt1 = update ns (intersection mt1)
 
 -- | Map a function over all values in a multi-trie.
 mtmap :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
-mtmap f = mapContainers (L.map f)
+mtmap f = mtmapContainers (L.map f)
 
 -- | Map a function over all values, passing node paths as well.
-mapWithPath :: Ord n => ([n] -> v -> w) -> MultiTrie n v -> MultiTrie n w
-mapWithPath f = mapContainersWithPath (L.map . f) 
+mtmapWithPath :: Ord n => ([n] -> v -> w) -> MultiTrie n v -> MultiTrie n w
+mtmapWithPath f = mtmapContainersWithPath (L.map . f) 
 
 {-
 Apply a multiset @F@ of functions to all values in a multi-trie. If @V@ is a
@@ -227,28 +227,28 @@ multi-set of values under a certain path @s@ in a multi-trie @P@, the result
 @Q@ will contain under @s@ a multi-set of all @(f v)@ values, for all @v@ from
 @V@ and all @f@ from F.
 -}
-mapAll :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
-mapAll fs  = mapContainers (fs <*>)
+mtmapAll :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
+mtmapAll fs  = mtmapContainers (fs <*>)
 
 -- | Apply a multiset of functions to each value and its path.
-mapAllWithPath :: Ord n => [[n] -> v -> w] -> MultiTrie n v -> MultiTrie n w
-mapAllWithPath fs = mapContainersWithPath (\ns -> (L.map ($ns) fs <*>))
+mtmapAllWithPath :: Ord n => [[n] -> v -> w] -> MultiTrie n v -> MultiTrie n w
+mtmapAllWithPath fs = mtmapContainersWithPath (\ns -> (L.map ($ns) fs <*>))
 
 -- | Map a function over entire multisets contained in nodes.
-mapContainers :: Ord n => ([v] -> [w]) -> MultiTrie n v -> MultiTrie n w
-mapContainers fl (MultiTrie vs vm) =
-    MultiTrie (fl vs) (M.mapMaybe (toMaybe . mapContainers fl) vm)
+mtmapContainers :: Ord n => ([v] -> [w]) -> MultiTrie n v -> MultiTrie n w
+mtmapContainers fl (MultiTrie vs vm) =
+    MultiTrie (fl vs) (M.mapMaybe (toMaybe . mtmapContainers fl) vm)
 
 -- | Map a function over entire multisets, passing node path as well.
-mapContainersWithPath :: Ord n =>
+mtmapContainersWithPath :: Ord n =>
     ([n] -> [v] -> [w]) ->
     MultiTrie n v ->
     MultiTrie n w
-mapContainersWithPath fl (MultiTrie vs vm) =
+mtmapContainersWithPath fl (MultiTrie vs vm) =
     MultiTrie
         (fl [] vs)
         (M.mapMaybeWithKey transformChild vm) where
-    transformChild n = toMaybe . (mapContainersWithPath $ fl . (n:))
+    transformChild n = toMaybe . (mtmapContainersWithPath $ fl . (n:))
 
 {- |
 Cartesian product of two multi-tries @P@ and @Q@ is a multi-trie @R@ whose

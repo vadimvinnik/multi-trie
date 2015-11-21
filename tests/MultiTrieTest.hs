@@ -157,7 +157,7 @@ test_top =
 test_mtmap =
     do
         assertEqual v (mtmap f u)
-        assertEqual w (mapWithPath g u)
+        assertEqual w (mtmapWithPath g u)
     where
         u = fromList p :: TestMultiTrie
         v = fromList q
