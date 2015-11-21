@@ -48,8 +48,8 @@ module Data.MultiTrie(
     subnode,
     updateSubnode,
     addToSubnode,
-    replace,
-    delete,
+    replaceSubnode,
+    deleteSubnode,
     unite,
     intersect,
     -- * Mappings
@@ -190,12 +190,12 @@ addToSubnode :: Ord n => [n] -> v -> MultiTrie n v -> MultiTrie n v
 addToSubnode ns v = updateSubnode ns (add v)
 
 -- | Replace a subnode identified by the path with a new multi-trie.
-replace :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-replace ns mt1 = updateSubnode ns (const mt1)
+replaceSubnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+replaceSubnode ns mt1 = updateSubnode ns (const mt1)
 
 -- | Delete a subnode identified by the given path.
-delete :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
-delete ns = replace ns empty
+deleteSubnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
+deleteSubnode ns = replaceSubnode ns empty
 
 -- | Unite a subnode identified by the path with another multi-trie.
 unite :: Ord n =>
