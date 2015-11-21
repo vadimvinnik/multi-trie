@@ -50,8 +50,8 @@ module Data.MultiTrie(
     addToSubnode,
     replaceSubnode,
     deleteSubnode,
-    unite,
-    intersect,
+    uniteSubnode,
+    intersectSubnode,
     -- * Mappings
     mtmap,
     mtmapWithPath,
@@ -198,20 +198,20 @@ deleteSubnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
 deleteSubnode ns = replaceSubnode ns empty
 
 -- | Unite a subnode identified by the path with another multi-trie.
-unite :: Ord n =>
+uniteSubnode :: Ord n =>
     [n] ->
     MultiTrie n v ->
     MultiTrie n v ->
     MultiTrie n v
-unite ns mt1 = updateSubnode ns (union mt1)
+uniteSubnode ns mt1 = updateSubnode ns (union mt1)
 
 -- | Intersect a subnode identified by the path with another multi-trie.
-intersect :: (Ord n, Eq v) =>
+intersectSubnode :: (Ord n, Eq v) =>
     [n] ->
     MultiTrie n v ->
     MultiTrie n v ->
     MultiTrie n v
-intersect ns mt1 = updateSubnode ns (intersection mt1)
+intersectSubnode ns mt1 = updateSubnode ns (intersection mt1)
 
 -- | Map a function over all values in a multi-trie.
 mtmap :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
@@ -342,7 +342,8 @@ applyIntersecting :: (Ord n, Eq w) =>
     MultiTrie n (v -> w) ->
     MultiTrie n v ->
     MultiTrie n w
-applyIntersecting = applyZippingChildren (M.intersectionWith intersection)
+applyIntersecting =
+    applyZippingChildren (M.intersectionWith intersection)
 
 {-
 Given a multi-tree @P@ of values and a function @f@ that maps an arbitrary value
