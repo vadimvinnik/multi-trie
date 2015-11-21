@@ -45,7 +45,7 @@ module Data.MultiTrie(
     -- * Comparison
     isEqual,
     -- * Subnode access
-    lookup,
+    subnode,
     update,
     addByPath,
     replace,
@@ -85,7 +85,7 @@ module Data.MultiTrie(
     listAsMultiSetEquals
 ) where
 
-import Prelude hiding (lookup, null, repeat)
+import Prelude hiding (null, repeat)
 import qualified Data.Foldable as F
 import qualified Data.Map as M
 import qualified Data.Tree as T
@@ -167,9 +167,9 @@ isEqual (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
 Select a multi-trie subnode identified by the given path, or 'empty' if there
 is no such path.
 -}
-lookup :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
-lookup [] mt = mt
-lookup (n:ns) (MultiTrie _ m) = maybe empty (lookup ns) (M.lookup n m)
+subnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
+subnode [] mt = mt
+subnode (n:ns) (MultiTrie _ m) = maybe empty (subnode ns) (M.lookup n m)
 
 -- | Perform the given transformation on a subnode identified by the path.
 update :: Ord n =>

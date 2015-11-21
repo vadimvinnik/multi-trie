@@ -2,7 +2,7 @@
 
 module MultiTrieTest where
 
-import Prelude hiding (lookup, null, repeat)
+import Prelude hiding (null, repeat)
 import Data.MultiTrie
 import Data.Int
 import qualified Data.Map as M
@@ -37,7 +37,7 @@ test_empty =
         v = leaf []
         w = union u u
         x = intersection u u
-        y = lookup "abc" u
+        y = subnode "abc" u
         z = replace "abc" u u
         t = fromList []
 
@@ -52,7 +52,7 @@ test_singleton =
         assertEqual u (add x empty)
         assertEqual u (union empty u)
         assertEqual u (intersection u u)
-        assertBool  (null $ lookup "abc" u)
+        assertBool  (null $ subnode "abc" u)
         assertEqual (delete "" u) empty
         assertEqual u (delete "abc" u)
     where
@@ -85,9 +85,9 @@ test_general_basic =
         assertEqual ['a', 'b'] (M.keys $ children u)
         assertEqual (length l) (size u)
         assertEqual u (fromList $ q ++ p)
-        assertEqual u (lookup "" u)
-        assertEqual empty (lookup "zzz" u)
-        assertEqual (lookup "a" u) t
+        assertEqual u (subnode "" u)
+        assertEqual empty (subnode "zzz" u)
+        assertEqual (subnode "a" u) t
         assertEqual u (delete "zzz" u)
         assertEqual v (delete "a" u)
         assertEqual u (replace "a" t u)
@@ -123,7 +123,7 @@ test_repeat =
         assertEqual w (intersection u w)
     where
         u = repeat s l :: TestMultiTrie
-        v = lookup "baabbab" u
+        v = subnode "baabbab" u
         w = leaf l
         l = [0, 1]
         s = ['a', 'b']
@@ -147,7 +147,7 @@ test_top =
                 ([LT, GT, EQ, LT, GT], False),
                 ([LT, GT, EQ, GT, GT], False)
             ]
-        w = lookup p u
+        w = subnode p u
         p = [LT, GT, EQ, GT, GT]
         q = [LT, EQ, GT]
         r = cycle [False, True]
