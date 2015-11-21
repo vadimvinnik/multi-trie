@@ -155,12 +155,16 @@ test_top =
 test_mtmap =
     do
         assertEqual v (mtmap f u)
+        assertEqual w (mapWithPath g u)
     where
         u = fromList p :: TestMultiTrie
         v = fromList q
+        w = fromList r
         p = [("", 1), ("abc", 2), ("a", 3), ("", 4), ("ab", 5), ("b", 6), ("bc", 7)]
         q = map (\(n, x) -> (n, f x)) p
+        r = map (\(n, x) -> (n, g n x)) p
         f = (+7) . (*13)
+        g n x = (fromIntegral $ L.length n) + x
 
 -- | union, intersection and cartesian product
 test_binop =
