@@ -151,6 +151,17 @@ test_top =
         r = cycle [False, True]
         f = take 20
 
+-- | map a function over a multi-trie
+test_mtmap =
+    do
+        assertEqual v (mtmap f u)
+    where
+        u = fromList p :: TestMultiTrie
+        v = fromList q
+        p = [("", 1), ("abc", 2), ("a", 3), ("", 4), ("ab", 5), ("b", 6), ("bc", 7)]
+        q = map (\(n, x) -> (n, f x)) p
+        f = (+7) . (*13)
+
 -- | union, intersection and cartesian product
 test_binop =
     do
