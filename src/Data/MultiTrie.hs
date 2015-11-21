@@ -47,7 +47,7 @@ module Data.MultiTrie(
     -- * Subnode access
     subnode,
     updateSubnode,
-    addByPath,
+    addToSubnode,
     replace,
     delete,
     unite,
@@ -186,8 +186,8 @@ add :: v -> MultiTrie n v -> MultiTrie n v
 add v (MultiTrie vs m) = MultiTrie (v:vs) m
 
 -- | Add a value to a multiset of values in a subnode identified by the path.
-addByPath :: Ord n => [n] -> v -> MultiTrie n v -> MultiTrie n v
-addByPath ns v = updateSubnode ns (add v)
+addToSubnode :: Ord n => [n] -> v -> MultiTrie n v -> MultiTrie n v
+addToSubnode ns v = updateSubnode ns (add v)
 
 -- | Replace a subnode identified by the path with a new multi-trie.
 replace :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
@@ -379,7 +379,7 @@ toList (MultiTrie vs m) = (map ((,) []) vs) ++
 
 -- | Convert a list of path-value pairs to a multi-trie.
 fromList :: Ord n => [([n], v)] -> MultiTrie n v
-fromList = L.foldr (uncurry addByPath) empty
+fromList = L.foldr (uncurry addToSubnode) empty
 
 -- | Map 'Nothing' to 'empty' and @Just mt@ to @mt@.
 fromMaybe :: Maybe (MultiTrie n v) -> MultiTrie n v
