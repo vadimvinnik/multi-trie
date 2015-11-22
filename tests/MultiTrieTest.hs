@@ -162,7 +162,8 @@ test_mtmap =
         u = fromList p :: TestMultiTrie
         v = fromList q
         w = fromList r
-        p = [("", 1), ("abc", 2), ("a", 3), ("", 4), ("ab", 5), ("b", 6), ("bc", 7)]
+        p = [("", 1), ("abc", 2), ("a", 3), ("", 4),
+                ("ab", 5), ("b", 6), ("bc", 7)]
         q = map (\(n, x) -> (n, f x)) p
         r = map (\(n, x) -> (n, g n x)) p
         f = (+7) . (*13)
@@ -186,8 +187,10 @@ test_binop =
         w = fromList (p ++ q)
         x = fromList (L.intersect p q)
         y = fromList (listProduct (toList u) (toList v))
-        p = [("", 1), ("abc", 2), ("a", 3), ("", 4), ("ab", 5), ("b", 6), ("bc", 7)]
-        q = [("pqr", 9), ("ac", 8), ("bc", 7), ("", 6), ("", 4), ("abc", 3), ("abc", 2), ("p", 1)]
+        p = [("", 1), ("abc", 2), ("a", 3), ("", 4),
+                ("ab", 5), ("b", 6), ("bc", 7)]
+        q = [("pqr", 9), ("ac", 8), ("bc", 7), ("", 6),
+                ("", 4), ("abc", 3), ("abc", 2), ("p", 1)]
 
 test_flatten =
     do

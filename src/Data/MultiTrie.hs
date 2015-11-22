@@ -18,13 +18,31 @@ multi-trie @t@, let us say that @t@ contains a path @p@, and it points to an
 Therefore, every multi-trie could be considered as infinite, where each node
 has children under all possible names - and some of nodes are 'empty'.
 
+The opposite to the 'empty' is a 'top' multi-trie whose each node contains
+the greatest possible multi-set of the element type's values (i.e. an infinite
+list that has infinite instances of every of the element type's values) under
+every possible path.
+
 Some operations could be defined for multi-tries in a rather natural way,
 including 'map', 'union', 'intersection', 'cartesianProduct'.
+
+Obviously, 'empty' is a neutral element of union, and 'top' is that for
+intersection. Cartesian product is 'empty' if any of the two operands is
+'empty'. Dually, from the pure mathematical perspective, cartesian square of
+'empty' is 'empty'; although this cannot be implemented in this library within
+finite time and memory.
 
 Moreover, a multi-trie can contain not only ordinary values but also functions
 that makes it possible to apply a multi-trie of functions to a multi-trie of
 argument values, combining results with 'cartesianProduct', 'union' or
-'intersection'. This makes multi-tries a kind of 'Applicative' and 'Monad'.
+'intersection'. It makes multi-tries an instance of 'Applicative' and 'Monad'.
+
+Implementaion notes. There are @Set@ and @Multiset@ and @Set@ types already
+implemented. However, this library only uses lists. The reason is that
+(Multi)Set requires its element type to be order-comparable, i.e. an instance
+of @Ord@ that is obviously not the case for functions. In this library's
+design, flexibility was the main priority, and a decision was made to sacrifice
+some efficiency for the sake of genericity.
 -}
 
 module Data.MultiTrie(
