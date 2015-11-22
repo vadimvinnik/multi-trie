@@ -54,6 +54,7 @@ module Data.MultiTrie(
     leaf,
     repeat,
     top,
+    updateValues,
     add,
     -- * Simple selectors
     values,
@@ -63,7 +64,7 @@ module Data.MultiTrie(
     -- * Comparison
     isEqualStrict,
     isEqualWeak,
-    isEqualUpTo,
+    areEquivalentUpTo,
     -- * Subnode access
     subnode,
     updateSubnode,
@@ -102,7 +103,8 @@ module Data.MultiTrie(
     -- * Debug
     draw,
     -- * Other
-    listAsMultiSetEquals
+    listAsMultiSetEquals,
+    areMapsEquivalentUpTo 
 ) where
 
 import Prelude hiding (null, repeat)
@@ -170,6 +172,14 @@ it only if both @n@ and @v@ types have less than dozen of values like Bool.
 top :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) => MultiTrie n v
 top = repeat allValues $ L.cycle allValues
 
+-- | Change a multiset in the root node
+updateValues :: ([v] -> [v]) -> MultiTrie n v -> MultiTrie n v
+updateValues f (MultiTrie vs m) = MultiTrie (f vs) m
+
+-- | Add a new value to the root node's multiset of values.
+add :: v -> MultiTrie n v -> MultiTrie n v
+add v = updateValues (v:)
+
 -- | Check whether a multi-trie is empty.
 null :: MultiTrie n v -> Bool
 null (MultiTrie vs m) = L.null vs && L.all null (M.elems m)
@@ -180,20 +190,27 @@ size (MultiTrie vs m) = L.length vs + L.sum (L.map size (M.elems m))
 
 -- | Check for equality, order of elements is important
 isEqualStrict :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> Bool
-isEqualStrict = isEqualUpTo (==)
+isEqualStrict = areEquivalentUpTo (==)
 
 -- | Check for equality, ignore order of elements
 isEqualWeak :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> Bool
-isEqualWeak = isEqualUpTo listAsMultiSetEquals
+isEqualWeak = areEquivalentUpTo listAsMultiSetEquals
 
-isEqualUpTo :: (Ord n, Eq v) =>
+{- |
+Decide whether two multi-tries @u@ and @v@ are equivalent up to a custom list
+equivalence predicate @p@.
+True if and only if (1) the multi-tries have non-empty nodes at the same paths
+and (2) for each such path @s@, value lists from @u@ and @v@ under @p@ are
+equivalent, i.e. satisfy @p@.
+-}
+areEquivalentUpTo :: (Ord n, Eq v) =>
     ([v] -> [v] -> Bool) ->
     MultiTrie n v ->
     MultiTrie n v ->
     Bool
-isEqualUpTo f (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
-    (f vs1 vs2) &&
-    (compareMapsWith (isEqualUpTo f) m1 m2)
+areEquivalentUpTo p (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
+    (p vs1 vs2) &&
+    (areMapsEquivalentUpTo (areEquivalentUpTo p) m1 m2)
 
 {-
 Select a multi-trie subnode identified by the given path, or 'empty' if there
@@ -212,10 +229,6 @@ updateSubnode :: Ord n =>
 updateSubnode [] f mt = f mt
 updateSubnode (n:ns) f (MultiTrie vs m) =
     MultiTrie vs (M.alter (toMaybe . updateSubnode ns f . fromMaybe) n m)
-
--- | Add a new value to the root node's multiset of values.
-add :: v -> MultiTrie n v -> MultiTrie n v
-add v (MultiTrie vs m) = MultiTrie (v:vs) m
 
 -- | Add a value to a multiset of values in a subnode identified by the path.
 addToSubnode :: Ord n => [n] -> v -> MultiTrie n v -> MultiTrie n v
@@ -325,7 +338,7 @@ intersection mt = nullToEmpty .
         (\x y -> M.filter (not . null) (M.intersectionWith intersection x y))
         mt 
 
--- | Intersection of a non-empty list of multi-tries.
+-- | Intersection of an empty list of multi-tries.
 intersections :: (Ord n, Bounded n, Enum n, Eq v, Bounded v, Enum v) =>
     [MultiTrie n v] ->
     MultiTrie n v
@@ -426,6 +439,28 @@ toMaybe mt = if null mt then Nothing else Just mt
 draw :: (Show n, Show [v]) => MultiTrie n v -> String
 draw = T.drawTree . toTree show show
 
+{- |
+Decide whether maps are equivalent up to a custom value equivalence predicate.
+True if and only if the maps have exactly the same names and, for each name,
+its values in the two maps are equivalent. `Data.Map` is missing this.
+-}
+areMapsEquivalentUpTo :: Ord k =>
+    (a -> b -> Bool) ->
+    M.Map k a ->
+    M.Map k b ->
+    Bool
+areMapsEquivalentUpTo p m1 m2 = mapEquivalenceHelper
+    (M.minViewWithKey m1)
+    (M.minViewWithKey m2)
+  where
+    mapEquivalenceHelper Nothing Nothing = True
+    mapEquivalenceHelper _ Nothing = False
+    mapEquivalenceHelper Nothing _ = False
+    mapEquivalenceHelper (Just ((k1, v1), m1')) (Just ((k2, v2), m2')) =
+        k1 == k2 &&
+        p v1 v2 &&
+        areMapsEquivalentUpTo p m1' m2'
+
 --
 -- Internal helper functions
 --
@@ -474,19 +509,6 @@ listAsMultiSetEquals _ [] = False
 listAsMultiSetEquals (x:xs) ys = if x `L.elem` ys
     then listAsMultiSetEquals xs (L.delete x ys)
     else False
-
-compareMapsWith :: Ord k => (a -> b -> Bool) -> M.Map k a -> M.Map k b -> Bool
-compareMapsWith fc m1 m2 = compareMapsHelper
-    (M.minViewWithKey m1)
-    (M.minViewWithKey m2)
-  where
-    compareMapsHelper Nothing Nothing = True
-    compareMapsHelper _ Nothing = False
-    compareMapsHelper Nothing _ = False
-    compareMapsHelper (Just ((k1, v1), m1')) (Just ((k2, v2), m2')) =
-        k1 == k2 &&
-        fc v1 v2 &&
-        compareMapsWith fc m1' m2'
 
 allValues :: (Bounded a, Enum a) => [a]
 allValues = [minBound..]
