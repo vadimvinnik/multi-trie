@@ -181,12 +181,15 @@ test_binop =
         assertEqual y (cartesianProduct u v)
         assertBool  (null $ cartesianProduct u empty)
         assertBool  (null $ cartesianProduct empty v)
+        assertEqual u (mtmap snd (cartesianProduct z u))
+        assertEqual u (mtmap fst (cartesianProduct u z))
     where
         u = fromList p :: TestMultiTrie
         v = fromList q
         w = fromList (p ++ q)
         x = fromList (L.intersect p q)
         y = fromList (listProduct (toList u) (toList v))
+        z = leaf [()]
         p = [("", 1), ("abc", 2), ("a", 3), ("", 4),
                 ("ab", 5), ("b", 6), ("bc", 7)]
         q = [("pqr", 9), ("ac", 8), ("bc", 7), ("", 6),
