@@ -15,8 +15,80 @@
 %
 %-------------------------------------------------------------------
 
-\documentclass{report}
+\documentclass{article}
+
+\usepackage{amsthm}
+\usepackage{amsfonts}
+
+\newtheorem{Df}{Definition}
+\newtheorem{Th}{Theorem}
+\newtheorem{Pf}{Proof}
+\newtheorem{Rm}{Remark}
+
+\title{Tries of multisets, their properties, applications and implementation}
+\author{Vadim Vinnik}
+\date{2015}
 
 \begin{document}
+
+\maketitle
+
+\begin{abstract}
+A ``trie of multisets'' is defined as a mathematical concept that
+reflects some aspects of structured data objects in programming;
+Properties thereof are investigated; An implementation in Haskell
+is described.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+\section{Definition and basic properties}
+
+\begin{Df}
+Let~$N$ be a set of objects called \emph{names}, $V$~be a set of objects called
+\emph{values}. Then an \emph{$(N,V)$-multitrie} is a mapping
+\[
+  p : N^* \to V^*
+\]
+\end{Df}
+
+\begin{Rm}
+In other words, a multi-trie maps complex names, i.e. sequences of
+atomic names from~$N$, into sequences of values.
+\end{Rm}
+
+\begin{Rm}
+Whenever $N$ and $V$ are obvious from the context, we'll omit ``$(N,V)$-''
+prefix and write simply ``multitrie''.
+\end{Rm}
+
+\begin{Rm}
+At the current high abstraction level, the only property required from~$N$
+is an ability to decide whether two arbitrary names are the same or
+different~-- that is an obvious implicit assumption. Linear ordering of
+names is important for an efficient implementation but does not add anything
+to the mathematical properties of the objects and, therefore, is now
+ignored.
+\end{Rm}
+
+\begin{Rm}
+Indeed, multitries arising from any practical computation would be finite.
+However, we do not impose this restriction for now~-- all considerations
+below hold for finite as well as infinite multitries.
+\end{Rm}
+
+This definition presents an abstract, topmost view of the objects being
+described. Another view based on a natural implementation is discussed later,
+in section~\ref{sec:constructive}.
+
+\section{Constructive approach}\label{sec:constructive}
+
+\section{Link to mathematical models of naming}
+
+\section{Notes about implementation}
+
+\section{Application}
 
 \end{document}
