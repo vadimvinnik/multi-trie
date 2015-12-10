@@ -19,11 +19,15 @@
 
 \usepackage{amsthm}
 \usepackage{amsfonts}
+\usepackage{amssymb}
 
 \newtheorem{Df}{Definition}
 \newtheorem{Th}{Theorem}
 \newtheorem{Pf}{Proof}
 \newtheorem{Rm}{Remark}
+
+\newcommand{\mtempty}{\bot}
+\newcommand{\mtfull}{\top}
 
 \title{Tries of multisets, their properties, applications and implementation}
 \author{Vadim Vinnik}
@@ -43,6 +47,9 @@ is described.
 \tableofcontents
 
 \section{Introduction}
+
+%todo:
+Why naming is so important. Why its formalisation is needed.
 
 Suppose there is a given set~$D$ whose elements are called \emph{values}, or
 \emph{denotata}, and a set~$V$ of objects called \emph{names}.
@@ -93,17 +100,59 @@ of~$V^\ast$ are called \emph{compound names}. Let us omit the words ``atomic''
 and ``compound'' if it does not lead to confusion.
 
 \begin{Df}
-An \emph{$(V,D)$-multitrie} is a mapping
+An \emph{$(V,D)$-multitrie} is a total mapping
 \[
   p : V^\ast \to 2^D .
 \]
+Whenever $V$ and $D$ are obvious from the context, we'll omit ``$(V,D)$-''
+prefix and write simply ``multitrie''.
 \end{Df}
 
-In other words, a multi-trie maps complex names, i.e. sequences of
-atomic names, into sets of values.
+In other words, a multitrie could be regarded as a naming set whose names are
+compound names and denotata are sets of objects from~$D$. The only important
+detail here is totality of~$p$: every compound name has some value.
 
-Whenever $N$ and $V$ are obvious from the context, we'll omit ``$(N,V)$-''
-prefix and write simply ``multitrie''.
+\begin{Df}
+A multitrie~$p$ is called \emph{empty} (\emph{full}) and denoted~$\mtempty$
+(respectively,~$\mtfull$) if $p(v)=\varnothing$ (resp., $p(v)=D$) for any~$v\in
+N^\ast$. A multitrie~$p$ is said to be \emph{finite} if finite is the set
+\[
+  Q_p = \{ v \in V^\ast \mid p(v) \neq \varnothing \} .
+\]
+\end{Df}
+
+A number of operations can be naturally defined for multitries.
+
+\begin{Df}
+Let~$\odot$ stand for any of~$\cup$ and~$\cap$, and let~$p$ and~$q$ be
+$(V,D)$-multitries. Then their \emph{union} and \emph{intersection} are
+$(V,D)$-multitries, such that
+\[
+  (p\odot q)(v) = p(v) \odot q(v) ,
+\]
+for every~$v\in V^\ast$.
+\end{Df}
+
+Obviously, empty and full multitries are neutral elements of union and intersection,
+respectively. These operations are commutative, associative and idempotent.
+
+\begin{Df}
+Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-multitries, respectively. Their
+\emph{cartesian product} $p\times q$ is a $(V,D'\times D'')$-multitrie such that
+\[
+  (p\times q) % todo
+\]
+for every~$v\in V^\ast$.
+\end{Df}
+
+%todo
+Flatten
+
+\section{Alternative approach}
+
+The above definition is abstract in the sense that it only describes how do
+multitries look like from outside~-- namely, as a correspondence between
+compound names and their values.
 
 \section{Notes about implementation}
 
