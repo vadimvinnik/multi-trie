@@ -44,48 +44,66 @@ is described.
 
 \section{Introduction}
 
+Suppose there is a given set~$D$ whose elements are called \emph{values}, or
+\emph{denotata}, and a set~$V$ of objects called \emph{names}.
+
+A quite natural formalisation of \emph{naming} as a relation between names and
+their values is the following
+\begin{Df}
+A \emph{naming set} is a partial mapping $s: V\to D$.
+\end{Df}
+
+In other words, a naming set is an object of the form
+\[
+  s = \{ (v_1, d_1), (v_2, d_2), \ldots, \} ,
+\]
+where $v_i\in V$, $d_i\in D$ and all names~$v_i$ are pairwise distinct. The
+latter requirement formalizes \emph{unambiguity}, or \emph{univaluedness}: a
+name cannot have different values in a given context.
+
+Naming mappings defined as above are widely used in theoretical computer
+science for syntactical as well as semantical tasks. Maps as direct
+implementations of naming sets are included into standard libraries of various
+languages and platforms and widely used in practice.
+
+At the topmost abstraction level, a naming set represents a plain naming
+relation where names and values are atomic in the sense that their internal
+structures and any non-trivial properties are hidden as being irrelevant. In
+fact, the only special property taken into account by the definition above is
+equatability of names: for any two names it should be possible to decide
+whether they are identical.
+
+Introducing various properties of names and/or denotata, one can obtain a
+number of interesting and useful specialised formalisations of naming for
+theoretical purposes as well as data structures implementing them.
+This article describes a case where
+\begin{itemize}
+\item names form a monoid, i.e. compound names can be concatenated from
+simpler ones;
+\item values are sets (replaced by sequences in the implementation).
+\end{itemize}
+
 \section{Definition and basic properties}
 
+If~$X$ is a set, let~$X^\ast$ denote a set of all sequences of its elements,
+and~$2^X$ be a set of all its subsets.
+
+Let~$V$ be a given set of objects called \emph{atomic names}. Elements
+of~$V^\ast$ are called \emph{compound names}. Let us omit the words ``atomic''
+and ``compound'' if it does not lead to confusion.
+
 \begin{Df}
-Let~$N$ be a set of objects called \emph{names}, $V$~be a set of objects called
-\emph{values}. Then an \emph{$(N,V)$-multitrie} is a mapping
+An \emph{$(V,D)$-multitrie} is a mapping
 \[
-  p : N^* \to V^*
+  p : V^\ast \to 2^D .
 \]
 \end{Df}
 
-\begin{Rm}
 In other words, a multi-trie maps complex names, i.e. sequences of
-atomic names from~$N$, into sequences of values.
-\end{Rm}
+atomic names, into sets of values.
 
-\begin{Rm}
 Whenever $N$ and $V$ are obvious from the context, we'll omit ``$(N,V)$-''
 prefix and write simply ``multitrie''.
-\end{Rm}
-
-\begin{Rm}
-At the current high abstraction level, the only property required from~$N$
-is an ability to decide whether two arbitrary names are the same or
-different~-- that is an obvious implicit assumption. Linear ordering of
-names is important for an efficient implementation but does not add anything
-to the mathematical properties of the objects and, therefore, is now
-ignored.
-\end{Rm}
-
-\begin{Rm}
-Indeed, multitries arising from any practical computation would be finite.
-However, we do not impose this restriction for now~-- all considerations
-below hold for finite as well as infinite multitries.
-\end{Rm}
-
-This definition presents an abstract, topmost view of the objects being
-described. Another view based on a natural implementation is discussed later,
-in section~\ref{sec:constructive}.
-
-\section{Constructive approach}\label{sec:constructive}
-
-\section{Link to mathematical models of naming}
 
 \section{Notes about implementation}
 
