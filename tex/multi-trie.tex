@@ -28,6 +28,10 @@
 
 \newcommand{\mtempty}{\bot}
 \newcommand{\mtfull}{\top}
+\newcommand{\set}[1]{\mathcal{#1}}
+\newcommand{\setmt}[2]{\set{M}_{#1,#2}}
+\newcommand{\flatten}{\mathrm{Fl}}
+\newcommand{\singleleaf}{\mathrm{Sg}}
 
 \title{Tries of multisets, their properties, applications and implementation}
 \author{Vadim Vinnik}
@@ -105,7 +109,8 @@ An \emph{$(V,D)$-multitrie} is a total mapping
   p : V^\ast \to 2^D .
 \]
 Whenever $V$ and $D$ are obvious from the context, we'll omit ``$(V,D)$-''
-prefix and write simply ``multitrie''.
+prefix and write simply ``multitrie''. A set of $(V,D)$-multitries will be
+denoted~$\setmt{V}{D}$.
 \end{Df}
 
 In other words, a multitrie could be regarded as a naming set whose names are
@@ -115,7 +120,13 @@ detail here is totality of~$p$: every compound name has some value.
 \begin{Df}
 A multitrie~$p$ is called \emph{empty} (\emph{full}) and denoted~$\mtempty$
 (respectively,~$\mtfull$) if $p(v)=\varnothing$ (resp., $p(v)=D$) for any~$v\in
-N^\ast$. A multitrie~$p$ is said to be \emph{finite} if finite is the set
+N^\ast$.
+
+Let~$v$ be some compound name and~$A$ be some set of values, $v\in V^\ast$,
+$A\subseteq D$.  Then~$p = \singleleaf(v,A)$ is such a multitrie that~$p(v) =
+A$ and~$p(u) = \varnothing$ for any $u\in V^\ast$, $u\neq v$.
+
+A multitrie~$p$ is said to be \emph{finite} if finite is the set
 \[
   Q_p = \{ v \in V^\ast \mid p(v) \neq \varnothing \} .
 \]
@@ -145,8 +156,25 @@ Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-multitries, respectively. Their
 for every~$v\in V^\ast$.
 \end{Df}
 
-%todo
-Flatten
+Consider a multitrie~$p$ whose values are, in their turn, multitries.
+Flattening operation, formally defined below, turns it into a multitrie whose
+values are those of multitries contained in~$p$.
+\begin{Df}
+\emph{Flattening} is an unary operation $\flatten : \setmt{V}{\setmt{V}{D}}
+\to\setmt{V}{D}$, such that, for any $(V,\setmt{V}{D})$-multitree~$p$ and for any
+name~$w\in V^\ast$, $r=\flatten p$ is defined by
+\[
+  r(w) = \bigcup_{u,v\in V^\ast: uv = w} p(u)(v) .
+\]
+\end{Df}
+
+In other words, let~$u, v\in V^\ast$ be arbitrary names, and let~$q$ be one of
+the values in~$p$ under~$u$, $q \in p(u)$. Now~$r$ is such a multitrie that its
+values under a name~$uv$ contain some~$d$ if and only if~$d\in q(v)$. It is
+easy to see that the definition above is equivalent to the following:
+\[
+  r = \bigcup_{u,v\in V^\ast} \singleleaf(uv, p(u)(v))
+\]
 
 \section{Alternative approach}
 
