@@ -178,7 +178,7 @@ Moreover, these operations are distributive against selection:
   \select(p\odot q, v) = \select(p, v) \odot \select(q, v) .
 \]
 
-\begin{Df}
+\begin{Df}\label{def:cartesian}
 Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-multitries, respectively. Their
 \emph{cartesian product} $p\times q = r$ is a $(V,D'\times D'')$-multitrie
 such that
@@ -200,15 +200,18 @@ corresponding $r=\flatten(p)$ is defined by
 for any name~$w\in V^\ast$.\qed
 \end{Df}
 
-In other words, let~$u, v\in V^\ast$ be arbitrary names, and let~$q$ be one of
-the values in~$p$ under~$u$, i.e. $q \in p(u)$. Now~$r$ is such a multitrie that its
-values under a name~$uv$ contain some~$d$ if and only if~$d\in q(v)$. It is
-easy to see that the definition above is equivalent to the following:
-\begin{equation}\label{eq:alt-flatten}
-  r = \bigcup_{u,v\in V^\ast} \singleleaf(uv, p(u)(v))
-\end{equation}
-(note that~$\cup$ in the definition~\ref{def:flatten} means a set-theoretical
-union whereas in~\ref{eq:alt-flatten} it means union of multitries, see
+It is easy to see that the above definitions are equivalent to the following:
+\begin{eqnarray}
+  \label{eq:alt-cartesian}
+  p\times q =
+    \bigcup_{u,v\in V^\ast} \singleleaf(uv, p(u) \times q(v)) ,\\
+  \label{eq:alt-flatten}
+  \flatten(p) =
+    \bigcup_{u,v\in V^\ast} \singleleaf(uv, p(u)(v)) .
+\end{eqnarray}
+(note that~$\cup$ in the definitions~\ref{def:cartesian} and~\ref{def:flatten}
+means a set-theoretical union whereas in~(\ref{eq:alt-cartesian})
+and~(\ref{eq:alt-flatten}) it means union of multitries, see
 def.~\ref{def:union-intersection}).
 
 \section{Alternative approach}
