@@ -17,10 +17,11 @@
 
 \documentclass{article}
 
-\usepackage{amsthm}
 \usepackage{amsfonts}
 \usepackage{amssymb}
+\usepackage{amsthm}
 
+\theoremstyle{definition}
 \newtheorem{Df}{Definition}
 \newtheorem{Th}{Theorem}
 \newtheorem{Pf}{Proof}
@@ -31,6 +32,7 @@
 \newcommand{\set}[1]{\mathcal{#1}}
 \newcommand{\setmt}[2]{\set{M}_{#1,#2}}
 \newcommand{\flatten}{\mathrm{Fl}}
+\newcommand{\select}{\mathrm{Sel}}
 \newcommand{\singleleaf}{\mathrm{Sg}}
 
 \title{Tries of multisets, their properties, applications and implementation}
@@ -61,7 +63,7 @@ Suppose there is a given set~$D$ whose elements are called \emph{values}, or
 A quite natural formalisation of \emph{naming} as a relation between names and
 their values is the following
 \begin{Df}
-A \emph{naming set} is a partial mapping $s: V\to D$.
+A \emph{naming set} is a partial mapping $s: V\to D$.\qed
 \end{Df}
 
 In other words, a naming set is an object of the form
@@ -96,8 +98,11 @@ simpler ones;
 
 \section{Definition and basic properties}
 
-If~$X$ is a set, let~$X^\ast$ denote a set of all sequences of its elements,
-and~$2^X$ be a set of all its subsets.
+If~$X$ is a set, let~$X^\ast$ denote a set of all sequences of its elements
+(also known as \emph{chains}),
+and~$2^X$ be a set of all its subsets. If~$a,b\in X^\ast$ are two chains,
+their concatenation will be denoted simply as~$ab$. Let~$\varepsilon$ stand for
+the empty chain.
 
 Let~$V$ be a given set of objects called \emph{atomic names}. Elements
 of~$V^\ast$ are called \emph{compound names}. Let us omit the words ``atomic''
@@ -110,7 +115,7 @@ An \emph{$(V,D)$-multitrie} is a total mapping
 \]
 Whenever $V$ and $D$ are obvious from the context, we'll omit ``$(V,D)$-''
 prefix and write simply ``multitrie''. A set of $(V,D)$-multitries will be
-denoted~$\setmt{V}{D}$.
+denoted~$\setmt{V}{D}$.\qed
 \end{Df}
 
 In other words, a multitrie could be regarded as a naming set whose names are
@@ -126,55 +131,85 @@ Let~$v$ be some compound name and~$A$ be some set of values, $v\in V^\ast$,
 $A\subseteq D$.  Then~$p = \singleleaf(v,A)$ is such a multitrie that~$p(v) =
 A$ and~$p(u) = \varnothing$ for any $u\in V^\ast$, $u\neq v$.
 
-A multitrie~$p$ is said to be \emph{finite} if finite is the set
+A multitrie~$p$ is said to be \emph{name-finite} if the set
 \[
   Q_p = \{ v \in V^\ast \mid p(v) \neq \varnothing \} .
 \]
+(i.e. the set of all ``occupird'' names) is finite.\qed
 \end{Df}
 
-A number of operations can be naturally defined for multitries.
+Note that a compound name~$v$ in a multitrie~$p$ not only points to a set
+value but also to a ``bunch'' of names of the form~$vw$, i.e. names having~$u$
+as their common prefix. This gives us
+the most important operation on multItries, selection by a compound name,
+formally defined below. Essentially, if~$p$ is a multitrie and~$v$ is a name,
+$\select(p,v)$ is a multitrie whose names are suffixes of~$v$ in~$p$, with
+respective values.
 
-\begin{Df}
+\begin{Df}\label{def:select}
+Let~$p\in\setmt{V}{D}$, $v\in V^\ast$, then
+\[
+  \select(p,v) = \{ (w, p(vw)) \mid w\in V^\ast \} .\qedhere
+\]
+\end{Df}
+
+Obviously, for any multi-trie~$p$ and compound names~$u,v$:
+\begin{eqnarray*}
+  & \select(p,\varepsilon) = p ,\\
+  & \select(p,uv) = \select(\select(p,u), v) .
+\end{eqnarray*}
+
+Operations similar to those of set theory can be naturally defined for multitries.
+
+\begin{Df}\label{def:union-intersection}
 Let~$\odot$ stand for any of~$\cup$ and~$\cap$, and let~$p$ and~$q$ be
 $(V,D)$-multitries. Then their \emph{union} and \emph{intersection} are
 $(V,D)$-multitries, such that
 \[
   (p\odot q)(v) = p(v) \odot q(v) ,
 \]
-for every~$v\in V^\ast$.
+for every~$v\in V^\ast$.\qed
 \end{Df}
 
 Obviously, empty and full multitries are neutral elements of union and intersection,
 respectively. These operations are commutative, associative and idempotent.
+Moreover, these operations are distributive against selection:
+\[
+  \select(p\odot q, v) = \select(p, v) \odot \select(q, v) .
+\]
 
 \begin{Df}
 Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-multitries, respectively. Their
-\emph{cartesian product} $p\times q$ is a $(V,D'\times D'')$-multitrie such that
+\emph{cartesian product} $p\times q = r$ is a $(V,D'\times D'')$-multitrie
+such that
 \[
-  (p\times q) % todo
+  r(w) = \bigcup_{u,v\in V^\ast: uv = w} p(u) \times q(v)
 \]
-for every~$v\in V^\ast$.
+for any~$w\in V^\ast$.\qed
 \end{Df}
 
-Consider a multitrie~$p$ whose values are, in their turn, multitries.
-Flattening operation, formally defined below, turns it into a multitrie whose
-values are those of multitries contained in~$p$.
-\begin{Df}
+Consider a multitrie whose values are, in their turn, multitries.
+Flattening operation formally defined below turns it into a ``plain'' multitrie.
+\begin{Df}\label{def:flatten}
 \emph{Flattening} is an unary operation $\flatten : \setmt{V}{\setmt{V}{D}}
-\to\setmt{V}{D}$, such that, for any $(V,\setmt{V}{D})$-multitree~$p$ and for any
-name~$w\in V^\ast$, $r=\flatten p$ is defined by
+\to\setmt{V}{D}$, such that, for any $(V,\setmt{V}{D})$-multitrie~$p$, the
+corresponding $r=\flatten(p)$ is defined by
 \[
-  r(w) = \bigcup_{u,v\in V^\ast: uv = w} p(u)(v) .
+  r(w) = \bigcup_{u,v\in V^\ast: uv = w} p(u)(v)
 \]
+for any name~$w\in V^\ast$.\qed
 \end{Df}
 
 In other words, let~$u, v\in V^\ast$ be arbitrary names, and let~$q$ be one of
-the values in~$p$ under~$u$, $q \in p(u)$. Now~$r$ is such a multitrie that its
+the values in~$p$ under~$u$, i.e. $q \in p(u)$. Now~$r$ is such a multitrie that its
 values under a name~$uv$ contain some~$d$ if and only if~$d\in q(v)$. It is
 easy to see that the definition above is equivalent to the following:
-\[
+\begin{equation}\label{eq:alt-flatten}
   r = \bigcup_{u,v\in V^\ast} \singleleaf(uv, p(u)(v))
-\]
+\end{equation}
+(note that~$\cup$ in the definition~\ref{def:flatten} means a set-theoretical
+union whereas in~\ref{eq:alt-flatten} it means union of multitries, see
+def.~\ref{def:union-intersection}).
 
 \section{Alternative approach}
 
@@ -187,3 +222,4 @@ compound names and their values.
 \section{Application}
 
 \end{document}
+
