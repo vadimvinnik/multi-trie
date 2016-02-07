@@ -24,16 +24,26 @@
 \theoremstyle{definition}
 \newtheorem{Df}{Definition}
 \newtheorem{Th}{Theorem}
+\newtheorem{St}{Statement}
 \newtheorem{Pf}{Proof}
 \newtheorem{Rm}{Remark}
 
 \newcommand{\mtempty}{\bot}
 \newcommand{\mtfull}{\top}
-\newcommand{\set}[1]{\mathcal{#1}}
-\newcommand{\setmt}[2]{\set{M}_{#1,#2}}
+
+\newcommand{\setcharmvcn}{C}
+\newcommand{\setcharmt}{M}
+
+\newcommand{\setsymbol}[3]{\mathcal{#1}_{#2,#3}}
+
+\newcommand{\setmvcn}[2]{\setsymbol{\setcharmvcn}{#1}{#2}}
+\newcommand{\setmt}[2]{\setsymbol{\setcharmt}{#1}{#2}}
+
 \newcommand{\flatten}{\mathrm{Fl}}
 \newcommand{\select}{\mathrm{Sel}}
 \newcommand{\singleleaf}{\mathrm{Sg}}
+
+\newcommand{\deref}[2]{\mathrm{Get}(#1, #2)}
 
 \title{Tries of multisets, their properties, applications and implementation}
 \author{Vadim Vinnik}
@@ -62,22 +72,25 @@ Suppose there is a given set~$D$ whose elements are called \emph{values}, or
 
 A quite natural formalisation of \emph{naming} as a relation between names and
 their values is the following
-\begin{Df}\label{def:naming-set}
-A \emph{naming set} is a partial mapping $s: V\to D$.\qed
+\begin{Df}\label{df:naming-set}
+A \emph{naming set} is a partial mapping $s: V\to D$.
 \end{Df}
 
 In other words, a naming set is an object of the form
 \[
   s = \{ (v_1, d_1), (v_2, d_2), \ldots, \} ,
 \]
-where $v_i\in V$, $d_i\in D$ and all names~$v_i$ are pairwise distinct. The
+where $v_i\in V$, $d_i\in D$ and all~$v_i$ are pairwise distinct. The
 latter requirement formalizes \emph{unambiguity}, or \emph{univaluedness}: a
 name cannot have different values in a given context.
 
 Naming mappings defined as above are widely used in theoretical computer
-science for syntactical as well as semantical tasks. Maps as direct
+science for syntactical as well as semantical tasks.
+%todo: references
+Maps as direct
 implementations of naming sets are included into standard libraries of various
 programming languages and platforms and widely used in practice.
+%todo: references
 
 At the topmost abstraction level, a naming set represents a ``plain''
 relation where names and values are atomic in the sense that their internal
@@ -88,13 +101,15 @@ whether they are identical.
 
 Introducing various properties of names and/or denotata, one can obtain a
 number of interesting and useful specialised formalisations of naming for
-theoretical purposes as well as data structures implementing them.
-This article describes a case when
+theoretical purposes as well as implementable data structures suitable for
+practical tasks. This article describes a kind of naming with
+two differences from the definition~\ref{df:naming-set}:
 \begin{itemize}
-\item names form a monoid, i.e. compound names can be concatenated from
-simpler ones;
-\item values are sets (replaced by sequences in the implementation).
+\item multivaluedness: any name can be related to zero or more values;
+\item compoundness of names: names form a monoid i.e. compound names could
+be concatenated from simpler ones.
 \end{itemize}
+
 
 \section{Abstract definition and basic properties}
 
@@ -107,79 +122,98 @@ Let~$V$ be a given set of objects called \emph{atomic names}. Elements
 of~$V^\ast$ are called \emph{compound names}. Let us omit the words ``atomic''
 and ``compound'' if it does not lead to confusion.
 
-% todo: raname MTs here
-\begin{Df}\label{def:multitrie-abstract}
-A \emph{$(V,D)$-multitrie} is a binary relation
+\begin{Df}\label{df:mvcn}
+A \emph{$(V,D)$-multi-valued compound-naming set (MVCNset)} is a binary
+relation
 \[
   p \subseteq V^\ast \times D .
 \]
 Whenever $V$ and $D$ are obvious from the context, we'll omit ``$(V,D)$-''
-prefix and write simply ``multitrie''. A set of $(V,D)$-multitries will be
-denoted~$\setmt{V}{D}$.\qed
+prefix and write simply ``MVCNset''. A set of $(V,D)$-MVCNsets will be
+denoted~$\setmvcn{V}{D}$.
 \end{Df}
 
-Therefore, there are two differences from the definition~\ref{def:naming-set}:
-\begin{itemize}
-\item multivaluedness: any name in a multitrie can be related to zero or more
-values;
-\item compoundness of names: names have some internal structure.
-\end{itemize}
+Obviously, $\setmvcn{V}{D}$ is closed against set-theoretical union
+and intersection:
+\begin{St}\label{st:mvcn-closedness}
+If~$p$ and~$q$ are $(V,D)$-MVCNsets, so are~$p\cup q$ and~$p\cap q$.
+\end{St}
 
-Obviously, a set of $(V,D)$-multitries is closed against set-theoretical union
-and intersection.
+For (univalued) naming sets, to dereference a name means to find its only
+value, if any.  In a similar way, the following operation finds all values
+of a name in an MVCNset, no matter how many.
 
-In a univalued case, dereference a name means to find its only value, if any.
-In a similar way, the following operation finds all values of a name, no matter
-how many.
-
-\begin{Df}\label{def:dereferencing}
-Given a multitrie~$p$ and a name~$v\in V^\ast$, \emph{dereferencing} of~$v$
-in~$p$ is
+\begin{Df}\label{df:mvcn-dereferencing}
+Given a $(V,D)$-MVCNset~$p$ and a name~$v\in V^\ast$, \emph{dereferencing}
+of~$v$ in~$p$ is
 \[
-  p(v) = \{ d | (v,d) \in p \} . \qedhere
+  \deref{p}{v} = p[v] = \{ d | (v, d) \in p \} .
 \]
+where $p[v]$ means a complete image of~$v$ against a non-functional binary
+relation~$p$.
 \end{Df}
 
 Dereferencing distributes over set-theoretical operations:
+\begin{St}\label{st:mvcn-deref-distributivity}
 Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$p$ and~$q$ be
-$(V,D)$-multitries. Then
+$(V,D)$-MVCNsets. Then
 \[
-  (p\odot q)(v) = p(v) \odot q(v) ,
+  \deref{p\odot q}{v} = \deref{p}{v} \odot \deref{q}{v} ,
 \]
 for every~$v\in V^\ast$.
+\end{St}
 
+\begin{Df}\label{df:mvcn-extremes}
 Let us introduce special terms and symbols for the two extreme cases of
-multitries, namely:
+MVCNsets, namely:
 \begin{itemize}
-\item \emph{Empty} $\bot = \varnothing$;
-\item \emph{Full} $\top = V^\ast \times D$.
+\item \emph{Empty}: $\bot = \varnothing$;
+\item \emph{Full}: $\top = V^\ast \times D$.
 \end{itemize}
-In other words, $\bot(v) = \varnothing$ and $\top(v) = D$ for
-every~$v\in V^\ast$. Obviously,~$\bot$ and~$\top$ are neutral elements
-of~$\cup$ and~$\cap$ operations, respectively.
+\end{Df}
+Obviously,
+\begin{St}\label{st:mvcn-extreme-deref}
+For any~$v\in V^\ast$,
+\begin{eqnarray*}
+  & \deref{\bot}{v} = \varnothing, \\
+  & \deref{\top}{v} = D .
+\end{eqnarray*}
+\end{St}
+It is easy to see that~$\bot$ and~$\top$ are neutral elements
+of~$\cup$ and~$\cap$, respectively:
+\begin{St}\label{st:mvcn-neutrals}
+For any MVCNset~$p$,
+\begin{eqnarray*}
+  & \bot \cup p = p, \\
+  & \top \cap p = p .
+\end{eqnarray*}
+\end{St}
 
-Note that a compound name~$v$ in a multitrie~$p$ not only is a reference to
-multiple values but also is a common root for a ``bunch'' of names starting
-with~$v$. In this sence,~$v$ is a name for the entire sub-multitrie that is
+Note that a compound name~$v$ in a MVCNset~$p$ not only is a reference to
+multiple values but also is a common prefix for a ``bunch'' of names starting
+with~$v$. In this sence,~$v$ is a name for an entire selection MVCNset that is
 formalised in the following
-\begin{Df}\label{def:select-abstract}
-Let~$p\in\setmt{V}{D}$, $v\in V^\ast$, then
+\begin{Df}\label{df:mvcn-select}
+Let~$p\in\setmvcn{V}{D}$, $v\in V^\ast$, then \emph{selection} from~$p$
+under~$v$ is
 \[
   \select(p,v) = \{ (w, d) \mid (vw, d)\in p \} .
 \]
 \end{Df}
 
-Obviously,
-\begin{itemize}
-\item $\select(p,\varepsilon) = p$ for any multitrie~$p$;
-\item $\select(p,uv) = \select(\select(p,u), v)$
-  for any~$p\in\setmt{V}{D}$, $u,v\in V^\ast$;
-\item $\select(p\odot q, v) = \select(p,v)\odot \select(q,v)$
-  for any~$p,q\in\setmt{V}{D}$, $v\in V^\ast$, $\odot\in\{\cup, \cap\}$.
-\end{itemize}
+The followig properties of selection are obvious:
+\begin{St}\label{st:mvcn-selection-properties}
+For any~$p,q\in\setmvcn{V}{D}$, $u, v\in V^\ast$, $\odot\in\{\cup, \cap\}$,
+\begin{eqnarray*}
+  & \select(p,\varepsilon) = p, \\
+  & \select(p,uv) = \select(\select(p,u), v), \\
+  & \select(p\odot q, v) = \select(p,v)\odot \select(q,v).
+\end{eqnarray*}
+\end{St}
 
-The next section presents another formalization of the multivalued naming that
-is, however, equivalent to the above definitions.
+It is interesting to note that there is another formalization of the
+multivalued naming that is, however, equivalent to the above definitions.  It
+is described in the next section.
 
 \section{Alternative definition}
 
@@ -210,7 +244,7 @@ $A\subseteq D$.  Then~$p = \singleleaf(v,A)$ is such a multitrie that~$p(v) =
 A$ and~$p(u) = \varnothing$ for any $u\in V^\ast$, $u\neq v$.
 \end{Df}
 
-\begin{Df}\label{def:select}
+\begin{Df}\label{df:select}
 Let~$p\in\setmt{V}{D}$, $v\in V^\ast$, then
 \[
   \select(p,v) = \{ (w, p(vw)) \mid w\in V^\ast \} .\qedhere
@@ -225,7 +259,7 @@ Obviously, for any multi-trie~$p$ and compound names~$u,v$:
 
 Operations similar to those of set theory can be naturally defined for multitries.
 
-\begin{Df}\label{def:union-intersection}
+\begin{Df}\label{df:union-intersection}
 Let~$\odot$ stand for any of~$\cup$ and~$\cap$, and let~$p$ and~$q$ be
 $(V,D)$-multitries. Then their \emph{union} and \emph{intersection} are
 $(V,D)$-multitries, such that
@@ -242,7 +276,7 @@ Moreover, these operations are distributive against selection:
   \select(p\odot q, v) = \select(p, v) \odot \select(q, v) .
 \]
 
-\begin{Df}\label{def:cartesian}
+\begin{Df}\label{df:cartesian}
 Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-multitries, respectively. Their
 \emph{cartesian product} $p\times q = r$ is a $(V,D'\times D'')$-multitrie
 such that
@@ -259,7 +293,7 @@ Obviously,~$\times$ is distributive against $\cap$ and $\cup$:
 
 Consider a multitrie whose values are, in their turn, multitries.
 Flattening operation formally defined below turns it into a ``plain'' multitrie.
-\begin{Df}\label{def:flatten}
+\begin{Df}\label{df:flatten}
 \emph{Flattening} is an unary operation $\flatten : \setmt{V}{\setmt{V}{D}}
 \to\setmt{V}{D}$, such that, for any $(V,\setmt{V}{D})$-multitrie~$p$, the
 corresponding $r=\flatten(p)$ is defined by
@@ -278,10 +312,10 @@ It is easy to see that the above definitions are equivalent to the following:
   \flatten(p) =
     \bigcup_{u,v\in V^\ast} \singleleaf(uv, p(u)(v)) .
 \end{eqnarray}
-(note that~$\cup$ in the definitions~\ref{def:cartesian} and~\ref{def:flatten}
+(note that~$\cup$ in the definitions~\ref{df:cartesian} and~\ref{df:flatten}
 means a set-theoretical union whereas in~(\ref{eq:alt-cartesian})
 and~(\ref{eq:alt-flatten}) it means union of multitries, see
-def.~\ref{def:union-intersection}).
+def.~\ref{df:union-intersection}).
 
 \section{Constructional approach}
 
