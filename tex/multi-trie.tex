@@ -28,15 +28,14 @@
 \newtheorem{Pf}{Proof}
 \newtheorem{Rm}{Remark}
 
-\newcommand{\mtempty}{\bot}
-\newcommand{\mtfull}{\top}
-
-\newcommand{\setcharmvcn}{C}
-\newcommand{\setcharmt}{M}
+\newcommand{\setcharmvcn}{M}
+\newcommand{\setcharsvcn}{S}
+\newcommand{\setcharmt}{T}
 
 \newcommand{\setsymbol}[3]{\mathcal{#1}_{#2,#3}}
 
 \newcommand{\setmvcn}[2]{\setsymbol{\setcharmvcn}{#1}{#2}}
+\newcommand{\setsvcn}[2]{\setsymbol{\setcharsvcn}{#1}{#2}}
 \newcommand{\setmt}[2]{\setsymbol{\setcharmt}{#1}{#2}}
 
 \newcommand{\flatten}{\mathrm{Fl}}
@@ -133,9 +132,19 @@ prefix and write simply ``MVCNset''. A set of $(V,D)$-MVCNsets will be
 denoted~$\setmvcn{V}{D}$.
 \end{Df}
 
+Dereferencing distributes over set-theoretical operations:
+\begin{St}\label{st:mvcn-deref-distributivity}
+Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$p$ and~$q$ be
+$(V,D)$-MVCNsets. Then
+\[
+  \deref{p\odot q}{v} = \deref{p}{v} \odot \deref{q}{v} ,
+\]
+for every~$v\in V^\ast$.
+\end{St}
+
 Obviously, $\setmvcn{V}{D}$ is closed against set-theoretical union
 and intersection:
-\begin{St}\label{st:mvcn-closedness}
+\begin{St}\label{st:mvcn-setop}
 If~$p$ and~$q$ are $(V,D)$-MVCNsets, so are~$p\cup q$ and~$p\cap q$.
 \end{St}
 
@@ -147,30 +156,20 @@ of a name in an MVCNset, no matter how many.
 Given a $(V,D)$-MVCNset~$p$ and a name~$v\in V^\ast$, \emph{dereferencing}
 of~$v$ in~$p$ is
 \[
-  \deref{p}{v} = p[v] = \{ d | (v, d) \in p \} .
+  \deref{p}{v} = \{ d | (v, d) \in p \} .
 \]
-where $p[v]$ means a complete image of~$v$ against a non-functional binary
-relation~$p$.
 \end{Df}
 
-Dereferencing distributes over set-theoretical operations:
-\begin{St}\label{st:mvcn-deref-distributivity}
-Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$p$ and~$q$ be
-$(V,D)$-MVCNsets. Then
-\[
-  \deref{p\odot q}{v} = \deref{p}{v} \odot \deref{q}{v} ,
-\]
-for every~$v\in V^\ast$.
-\end{St}
-
-\begin{Df}\label{df:mvcn-extremes}
 Let us introduce special terms and symbols for the two extreme cases of
 MVCNsets, namely:
-\begin{itemize}
-\item \emph{Empty}: $\bot = \varnothing$;
-\item \emph{Full}: $\top = V^\ast \times D$.
-\end{itemize}
+\begin{Df}\label{df:mvcn-extremes}
+MVCNsets $\bot$ called \emph{empty} and $\top$ called \emph{full} are defined by
+\begin{eqnarray*}
+  &  \bot = \varnothing ; \\
+  &  \top = V^\ast \times D .
+\end{eqnarray*}
 \end{Df}
+
 Obviously,
 \begin{St}\label{st:mvcn-extreme-deref}
 For any~$v\in V^\ast$,
@@ -179,6 +178,7 @@ For any~$v\in V^\ast$,
   & \deref{\top}{v} = D .
 \end{eqnarray*}
 \end{St}
+
 It is easy to see that~$\bot$ and~$\top$ are neutral elements
 of~$\cup$ and~$\cap$, respectively:
 \begin{St}\label{st:mvcn-neutrals}
@@ -223,30 +223,60 @@ reflected the notion. However, the same substantial object could be modelled
 through a naming set (in the sense of definition~\ref{df:naming-set}, i.e.
 uniuvalued) whose values are subsets of~$D$.
 
-% todo: raname MTs here
-\begin{Df}
-A \emph{$(V,D)$-multitrie} is a total mapping
+\begin{Df}\label{df:svcn}
+A \emph{$(V,D)$-set-valued compound-naming set ($(V,D)$-SVCNset)} is a total
+mapping
 \[
   p : V^\ast \to 2^D .
 \]
-Whenever $V$ and $D$ are obvious from the context, we'll omit ``$(V,D)$-''
-prefix and write simply ``multitrie''. A set of $(V,D)$-multitries will be
-denoted~$\setmt{V}{D}$.\qed
+A set of $(V,D)$-SVCNsets will be denoted~$\setsvcn{V}{D}$.\qed
 \end{Df}
 
-In other words, a multitrie could be regarded as a naming set whose names are
-compound names and denotata are sets of objects from~$D$. The only special
-detail here is totality of~$p$: every compound name has some value.
+The only special detail here is totality of~$p$: every compound name has some
+value~-- maybe an empty set.
 
-\begin{Df}
-A multitrie~$p$ is called \emph{empty} (\emph{full}) and denoted~$\mtempty$
-(respectively,~$\mtfull$) if $p(v)=\varnothing$ (resp., $p(v)=D$) for any~$v\in
-N^\ast$.
+Dereferencing needed a special definition (def.~\ref{df:mvcn-dereferencing})
+for MVCNsets. With SVCNsets, however, it is just an alias for a functional
+application of an SVCNset, as a functional binary relation, to a name:
+\begin{Df}\label{df:svcn-dereferencing}
+Given a $(V,D)$-SVCNset~$p$ and a name~$v\in V^\ast$, \emph{dereferencing}
+of~$v$ in~$p$ is
+\[
+  \deref{p}{v} = p(v).
+\]
 \end{Df}
+
+Union, intersection operations as well as empty and full namings whose
+definitions were straightforward for MVCNsets (see st.~\ref{st:mvcn-setop}
+and def.~\ref{df:mvcn-extremes}) need a more elaborate definitions in the
+SVCNset world.
+
+\begin{Df}\label{df:union-intersection}
+Let~$\odot$ stand for any of~$\cup$ and~$\cap$, and let~$p$ and~$q$ be
+$(V,D)$-SVCNsets. Then their \emph{union} and \emph{intersection} are
+$(V,D)$-SVCNsets, such that
+\[
+  p\odot q = \{ (v, p(v) \odot q(v)) \mid v\in V^\ast \} .
+\]
+\end{Df}
+
+\begin{Df}\label{df:svcn-extremes}
+SVCNset~$\bot$ called \emph{empty} and $\top$ called \emph{full} are defined by
+\begin{eqnarray*}
+  &  \bot = \{ (v, \varnothing) \mid v\in V^\ast \} ; \\
+  &  \top = \{ (v, D) \mid v\in V^\ast \} .
+\end{eqnarray*}
+\end{Df}
+
+Properties similar to those of MVCNsets from st.~\ref{st:mvcn-extreme-deref}
+are, for SVCNSets, just a rewritten definition of~$\bot$ and~$\top$.
+Properties similar to st.~\ref{st:mvcn-neutrals} hold for SVCNsets.
+
+%todo: stopped here
 
 \begin{Df}
 Let~$v$ be some compound name and~$A$ be some set of values, $v\in V^\ast$,
-$A\subseteq D$.  Then~$p = \singleleaf(v,A)$ is such a multitrie that~$p(v) =
+$A\subseteq D$.  Then~$p = \singleleaf(v,A)$ is such an SVCNset that~$p(v) =
 A$ and~$p(u) = \varnothing$ for any $u\in V^\ast$, $u\neq v$.
 \end{Df}
 
@@ -262,18 +292,6 @@ Obviously, for any multi-trie~$p$ and compound names~$u,v$:
   & \select(p,\varepsilon) = p ,\\
   & \select(p,uv) = \select(\select(p,u), v) .
 \end{eqnarray*}
-
-Operations similar to those of set theory can be naturally defined for multitries.
-
-\begin{Df}\label{df:union-intersection}
-Let~$\odot$ stand for any of~$\cup$ and~$\cap$, and let~$p$ and~$q$ be
-$(V,D)$-multitries. Then their \emph{union} and \emph{intersection} are
-$(V,D)$-multitries, such that
-\[
-  (p\odot q)(v) = p(v) \odot q(v) ,
-\]
-for every~$v\in V^\ast$.\qed
-\end{Df}
 
 Obviously, empty and full multitries are neutral elements of union and intersection,
 respectively. These operations are commutative, associative and idempotent.
