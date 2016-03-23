@@ -42,7 +42,8 @@
 \newcommand{\select}{\mathrm{Sel}}
 \newcommand{\singleleaf}{\mathrm{Sg}}
 
-\newcommand{\deref}[2]{\mathrm{Get}(#1, #2)}
+\newcommand{\derefsymbol}{\mathrm{Get}}
+\newcommand{\deref}[2]{\derefsymbol(#1, #2)}
 
 \title{Tries of multisets, their properties, applications and implementation}
 \author{Vadim Vinnik}
@@ -132,7 +133,36 @@ prefix and write simply ``MVCNset''. A set of $(V,D)$-MVCNsets will be
 denoted~$\setmvcn{V}{D}$.
 \end{Df}
 
-Dereferencing distributes over set-theoretical operations:
+Note that, in contrast with naming sets, no special conditions are imposed
+on an MVCNset~--- it is just an arbitrary set of name-vale pairs.
+Therefore, $\setmvcn{V}{D}$ is closed against set-theoretical union
+and intersection:
+\begin{St}\label{st:mvcn-setop}
+If~$p$ and~$q$ are $(V,D)$-MVCNsets, so are~$p\cup q$ and~$p\cap q$.
+\end{St}
+
+One of the fundamental operations on (univalued) naming sets is that retrieving
+an only (if any) value~$d$ associated with the name~$v$ in a certain naming
+set~$s$.  Depending on the goals and abstraction level of any particular
+context, it could be regarded either as~$s(v)=d$, i.e. applying a function~$s$
+to an argument~$v$, or as an operation whose arguments are the naming set and
+the name, i.e.~$\deref{s}{v}=d$. Its counterpart in MVCNset world that
+retrieves all values of a name, no matter how many, obviously cannot be denoted
+using the first style because MVCNsets are general binary relations, not
+functional ones.
+
+\begin{Df}\label{df:mvcn-dereferencing}
+\emph{Dereferencing} is an operation, such that for
+a $(V,D)$-MVCNset~$p$ and a name~$v\in V^\ast$,
+\[
+  \deref{p}{v} = \{ d \mid (v, d) \in p \} .
+\]
+\end{Df}
+
+Unlike the univalued case, here~$\derefsymbol$ is a total operation: even if a
+name~$v$ does not have any associated value in an MVCNset~$p$, dereferencing
+just yields an empty list of values.  Dereferencing distributes over
+set-theoretical operations:
 \begin{St}\label{st:mvcn-deref-distributivity}
 Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$p$ and~$q$ be
 $(V,D)$-MVCNsets. Then
@@ -142,40 +172,21 @@ $(V,D)$-MVCNsets. Then
 for every~$v\in V^\ast$.
 \end{St}
 
-Obviously, $\setmvcn{V}{D}$ is closed against set-theoretical union
-and intersection:
-\begin{St}\label{st:mvcn-setop}
-If~$p$ and~$q$ are $(V,D)$-MVCNsets, so are~$p\cup q$ and~$p\cap q$.
-\end{St}
-
-For (univalued) naming sets, to dereference a name means to find its only
-value, if any.  In a similar way, the following operation finds all values
-of a name in an MVCNset, no matter how many.
-
-\begin{Df}\label{df:mvcn-dereferencing}
-Given a $(V,D)$-MVCNset~$p$ and a name~$v\in V^\ast$, \emph{dereferencing}
-of~$v$ in~$p$ is
-\[
-  \deref{p}{v} = \{ d | (v, d) \in p \} .
-\]
-\end{Df}
-
 Let us introduce special terms and symbols for the two extreme cases of
 MVCNsets, namely:
 \begin{Df}\label{df:mvcn-extremes}
 MVCNsets $\bot$ called \emph{empty} and $\top$ called \emph{full} are defined by
 \begin{eqnarray*}
-  &  \bot = \varnothing ; \\
-  &  \top = V^\ast \times D .
+  \bot &  = &  \varnothing ; \\
+  \top &  = &  V^\ast \times D .
 \end{eqnarray*}
 \end{Df}
 
-Obviously,
 \begin{St}\label{st:mvcn-extreme-deref}
 For any~$v\in V^\ast$,
 \begin{eqnarray*}
-  & \deref{\bot}{v} = \varnothing, \\
-  & \deref{\top}{v} = D .
+  \deref{\bot}{v} & = & \varnothing, \\
+  \deref{\top}{v} & = & D .
 \end{eqnarray*}
 \end{St}
 
@@ -184,15 +195,15 @@ of~$\cup$ and~$\cap$, respectively:
 \begin{St}\label{st:mvcn-neutrals}
 For any MVCNset~$p$,
 \begin{eqnarray*}
-  & \bot \cup p = p, \\
-  & \top \cap p = p .
+  \bot \cup p & = & p, \\
+  \top \cap p & = & p .
 \end{eqnarray*}
 \end{St}
 
 Note that a compound name~$v$ in a MVCNset~$p$ not only is a reference to
 multiple values but also is a common prefix for a ``bunch'' of names starting
-with~$v$. In this sence,~$v$ is a name for an entire selection MVCNset that is
-formalised in the following
+with~$v$. In this sence,~$v$ is a name for a sub-object of~$p$ that is
+defined as follows
 \begin{Df}\label{df:mvcn-select}
 Let~$p\in\setmvcn{V}{D}$, $v\in V^\ast$, then \emph{selection} from~$p$
 under~$v$ is
@@ -205,9 +216,11 @@ The followig properties of selection are obvious:
 \begin{St}\label{st:mvcn-selection-properties}
 For any~$p,q\in\setmvcn{V}{D}$, $u, v\in V^\ast$, $\odot\in\{\cup, \cap\}$,
 \begin{eqnarray*}
+  & \select(\bot,u) = \bot, \\
+  & \select(\top,u) = \top, \\
   & \select(p,\varepsilon) = p, \\
   & \select(p,uv) = \select(\select(p,u), v), \\
-  & \select(p\odot q, v) = \select(p,v)\odot \select(q,v).
+  & \select(p\odot q, u) = \select(p,u)\odot \select(q,u).
 \end{eqnarray*}
 \end{St}
 
@@ -215,7 +228,7 @@ It is interesting to note that there is another formalization of the
 multivalued naming that is, however, equivalent to the above definitions.  It
 is described in the next section.
 
-\section{Alternative definition}
+\section{Alternative approach}
 
 The formalization of multivalued naming with compound names presented in the
 previous section was straightforward in the sense that the definition directly
@@ -224,7 +237,7 @@ through a naming set (in the sense of definition~\ref{df:naming-set}, i.e.
 uniuvalued) whose values are subsets of~$D$.
 
 \begin{Df}\label{df:svcn}
-A \emph{$(V,D)$-set-valued compound-naming set ($(V,D)$-SVCNset)} is a total
+A \emph{$(V,D)$-set-valued compound-naming set, or $(V,D)$-SVCNset}, is a total
 mapping
 \[
   p : V^\ast \to 2^D .
@@ -246,10 +259,12 @@ of~$v$ in~$p$ is
 \]
 \end{Df}
 
-Union, intersection operations as well as empty and full namings whose
-definitions were straightforward for MVCNsets (see st.~\ref{st:mvcn-setop}
-and def.~\ref{df:mvcn-extremes}) need a more elaborate definitions in the
-SVCNset world.
+On the other hand, union, intersection operations as well as empty and full
+namings, that in case of MVCNsets were aliases for corresponding
+set-theoretical constructs (see st.~\ref{st:mvcn-setop} and
+def.~\ref{df:mvcn-extremes}), need special definitions in the SVCNset
+world. These definitions here are what had to be a theorem for MVCNsets
+(see st.~\ref{st:mvcn-deref-distributivity} and~\ref{st:mvcn-extreme-deref}).
 
 \begin{Df}\label{df:union-intersection}
 Let~$\odot$ stand for any of~$\cup$ and~$\cap$, and let~$p$ and~$q$ be
@@ -268,9 +283,19 @@ SVCNset~$\bot$ called \emph{empty} and $\top$ called \emph{full} are defined by
 \end{eqnarray*}
 \end{Df}
 
-Properties similar to those of MVCNsets from st.~\ref{st:mvcn-extreme-deref}
-are, for SVCNSets, just a rewritten definition of~$\bot$ and~$\top$.
-Properties similar to st.~\ref{st:mvcn-neutrals} hold for SVCNsets.
+\begin{Df}\label{df:svcn-select}
+Let~$p\in\setsvcn{V}{D}$, $v\in V^\ast$, then
+\[
+  \select(p,v) = \{ (w, p(vw)) \mid w\in V^\ast \} .\qedhere
+\]
+\end{Df}
+
+In general, it is easy to see that MSVNsets and SVCNsets with respective sets
+of operations form isomorphic algebras and formally represent the same idea.
+There is a kind of duality: what is trivial in one of these theories, needs a
+special definition or proof in the other and vice versa. This makes the third
+formalization presented in the following section especially interesting: its
+basic operation with a trivial definition is~$\select$.
 
 %todo: stopped here
 
@@ -278,13 +303,6 @@ Properties similar to st.~\ref{st:mvcn-neutrals} hold for SVCNsets.
 Let~$v$ be some compound name and~$A$ be some set of values, $v\in V^\ast$,
 $A\subseteq D$.  Then~$p = \singleleaf(v,A)$ is such an SVCNset that~$p(v) =
 A$ and~$p(u) = \varnothing$ for any $u\in V^\ast$, $u\neq v$.
-\end{Df}
-
-\begin{Df}\label{df:select}
-Let~$p\in\setmt{V}{D}$, $v\in V^\ast$, then
-\[
-  \select(p,v) = \{ (w, p(vw)) \mid w\in V^\ast \} .\qedhere
-\]
 \end{Df}
 
 Obviously, for any multi-trie~$p$ and compound names~$u,v$:
