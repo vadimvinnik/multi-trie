@@ -111,7 +111,7 @@ be concatenated from simpler ones.
 \end{itemize}
 
 
-\section{Abstract definition and basic properties}
+\section{Relation-based definition and basic properties}
 
 If~$X$ is a set, let~$X^\ast$ denote a set of all sequences of its elements
 (also known as \emph{chains}), and~$2^X$ be a set of all its subsets.
@@ -228,7 +228,7 @@ It is interesting to note that there is another formalization of the
 multivalued naming that is, however, equivalent to the above definitions.  It
 is described in the next section.
 
-\section{Alternative approach}
+\section{Map-based definition}
 
 The formalization of multivalued naming with compound names presented in the
 previous section was straightforward in the sense that the definition directly
@@ -290,12 +290,52 @@ Let~$p\in\setsvcn{V}{D}$, $v\in V^\ast$, then
 \]
 \end{Df}
 
+Properties from st.~\ref{st:mvcn-selection-properties} obviously hold for this
+operation.
+
 In general, it is easy to see that MSVNsets and SVCNsets with respective sets
-of operations form isomorphic algebras and formally represent the same idea.
+of operations form isomorphic algebras and formalize the same concept of
+multi-valued naming with compound names.
 There is a kind of duality: what is trivial in one of these theories, needs a
 special definition or proof in the other and vice versa. This makes the third
 formalization presented in the following section especially interesting: its
 basic operation with a trivial definition is~$\select$.
+
+
+\section{Trie-based definition}
+
+\begin{Df}\label{df:mt}
+A class of \emph{$(V,D)$-multitries} (or simply \emph{multitries} when~$V$
+and~$D$ are known from the context or irrelevant):
+\[
+  \setmt{V}{D} = 2^D \times (V \to \setmt{V}{D}) .
+\]
+\end{Df}
+
+In other words, a $(V,D)$-multitrie is a pair $p = (s, f)$ where~$s\subseteq D$
+is a set of values and $f: V \to \setmt{V}{D}$ is a function that maps any
+atomic name to some $(V,D)$-multitrie. Note that this recursive definition does
+not have any basic case: every multitrie contains named sub-multitries that, in
+their turn, have the same structure.
+
+\begin{Df}\label{df:mt-extreme}
+\emph{Empty} and \emph{full} $(V,D)$-multitries:
+\begin{eqnarray*}
+  \bot & = & ( \varnothing, \{ v \mapsto \bot \mid v\in V \} ) , \\
+  \top & = & ( D,           \{ v \mapsto \top \mid v\in V \} ) .
+\end{eqnarray*}
+\end{Df}
+
+The basic operation on multitries is selection that had a non-trivial
+definition in both previous approaches.
+
+\begin{Df}\label{df:mt-select}
+\begin{eqnarray*}
+  \select(p, \varepsilon) & = & p , \\
+  \select((s, f), u v) & = & \select(f(u), v) ,
+\end{eqnarray*}
+where $u\in V$, $v\in V^\ast$.
+\end{Df}
 
 %todo: stopped here
 
@@ -304,19 +344,6 @@ Let~$v$ be some compound name and~$A$ be some set of values, $v\in V^\ast$,
 $A\subseteq D$.  Then~$p = \singleleaf(v,A)$ is such an SVCNset that~$p(v) =
 A$ and~$p(u) = \varnothing$ for any $u\in V^\ast$, $u\neq v$.
 \end{Df}
-
-Obviously, for any multi-trie~$p$ and compound names~$u,v$:
-\begin{eqnarray*}
-  & \select(p,\varepsilon) = p ,\\
-  & \select(p,uv) = \select(\select(p,u), v) .
-\end{eqnarray*}
-
-Obviously, empty and full multitries are neutral elements of union and intersection,
-respectively. These operations are commutative, associative and idempotent.
-Moreover, these operations are distributive against selection:
-\[
-  \select(p\odot q, v) = \select(p, v) \odot \select(q, v) .
-\]
 
 \begin{Df}\label{df:cartesian}
 Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-multitries, respectively. Their
@@ -330,7 +357,7 @@ for any~$w\in V^\ast$.\qed
 
 Obviously,~$\times$ is distributive against $\cap$ and $\cup$:
 \[
-  p\times(q\dot r) = p\times(q\dot r)
+  p\times(q\odot r) = p\times(q\odot r)
 \]
 
 Consider a multitrie whose values are, in their turn, multitries.
