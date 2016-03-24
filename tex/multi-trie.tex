@@ -41,6 +41,7 @@
 \newcommand{\flatten}{\mathrm{Fl}}
 \newcommand{\select}{\mathrm{Sel}}
 \newcommand{\singleleaf}{\mathrm{Sg}}
+\newcommand{\proj}[1]{\mathrm{pr}_{#1}}
 
 \newcommand{\derefsymbol}{\mathrm{Get}}
 \newcommand{\deref}[2]{\derefsymbol(#1, #2)}
@@ -266,7 +267,7 @@ def.~\ref{df:mvcn-extremes}), need special definitions in the SVCNset
 world. These definitions here are what had to be a theorem for MVCNsets
 (see st.~\ref{st:mvcn-deref-distributivity} and~\ref{st:mvcn-extreme-deref}).
 
-\begin{Df}\label{df:union-intersection}
+\begin{Df}\label{df:svcn-setop}
 Let~$\odot$ stand for any of~$\cup$ and~$\cap$, and let~$p$ and~$q$ be
 $(V,D)$-SVCNsets. Then their \emph{union} and \emph{intersection} are
 $(V,D)$-SVCNsets, such that
@@ -318,6 +319,13 @@ atomic name to some $(V,D)$-multitrie. Note that this recursive definition does
 not have any basic case: every multitrie contains named sub-multitries that, in
 their turn, have the same structure.
 
+The definition means that a $(V,D)$-multitrie is a \emph{trie} also known as
+a prefx tree, where every node stores a subset of~$D$ as a value, and has
+children labelled with all atomic names from~$V$. This means that such a trie
+is infinite and has no leaf nodes.
+%todo: reference about trie
+
+Extreme multitries have the following recurrent definitions.
 \begin{Df}\label{df:mt-extreme}
 \emph{Empty} and \emph{full} $(V,D)$-multitries:
 \begin{eqnarray*}
@@ -325,17 +333,52 @@ their turn, have the same structure.
   \top & = & ( D,           \{ v \mapsto \top \mid v\in V \} ) .
 \end{eqnarray*}
 \end{Df}
+In other words, empty (full) multitrie is a multitrie that has an empty
+(full) set of values and whose children under all atomic names are, in their
+turn, empty (full) multitries.
 
-The basic operation on multitries is selection that had a non-trivial
-definition in both previous approaches.
-
+The following is the basic operation on multitries.
 \begin{Df}\label{df:mt-select}
+\emph{Selection} operation. Let $p=(s,f) \in \setmt{V}{D}$, $u\in V$,
+$v\in V^\ast$, then
 \begin{eqnarray*}
   \select(p, \varepsilon) & = & p , \\
-  \select((s, f), u v) & = & \select(f(u), v) ,
+  \select(p, u v) & = & \select(f(u), v) .
 \end{eqnarray*}
-where $u\in V$, $v\in V^\ast$.
 \end{Df}
+
+In other words, selection operation traverses finds a node pointed to by the
+compound name as a path in the trie.
+
+Let $\proj{k}$ be a function that maps a tuple to its $k$-th component.
+Then dereferencing could be defined as follows:
+\begin{Df}\label{df:mt-deref}
+Given a $(V,D)$-multitrie~$p$ and a name~$v\in V^\ast$, \emph{dereferencing}
+of~$v$ in~$p$ is
+\[
+  \deref{p}{v} = \proj{1}(\select(p, v)) .
+\]
+\end{Df}
+
+In other words, if $\select(p,v) = (s,f)$, then $\deref{p}{v} = s$. To
+dereference a name in a multitrie, one needs to follow the compound name
+as a path to a node in the trie and then take the value stored in that node.
+
+It is easy to see that properties identical to
+st.~\ref{st:mvcn-selection-properties} and, therefore,
+st.~\ref{st:mvcn-extreme-deref} hold for multitries.
+
+Union and intersection could be defined for multitries.
+\begin{Df}\label{df:mt-setop}
+Let $\odot \in \{ \cup, \cap \}$, $p, q \in \setmt{V}{D}$,
+$p = (s,f)$, $q = (t, g)$. Then
+\[
+  p \odot q = (s \odot t, \{ v \mapsto f(v) \odot g(v) \mid v \in V \}) .
+\]
+\end{Df}
+
+The counterparts of st.~\ref{st:mvcn-deref-distributivity}
+and~\ref{st:mvcn-neutrals} hold for multitries.
 
 %todo: stopped here
 
@@ -384,13 +427,11 @@ It is easy to see that the above definitions are equivalent to the following:
 (note that~$\cup$ in the definitions~\ref{df:cartesian} and~\ref{df:flatten}
 means a set-theoretical union whereas in~(\ref{eq:alt-cartesian})
 and~(\ref{eq:alt-flatten}) it means union of multitries, see
-def.~\ref{df:union-intersection}).
+def.~\ref{df:svcn-setop}).
 
-\section{Constructional approach}
-
-The above definition is abstract in the sense that it only describes how do
-multitries look like from outside~-- namely, as a correspondence between
-compound names and their values.
+The first two formalizations (MVCN- and SVCNsets) were abstract in the sense
+that they only described how do namings look like from outside~-- namely, as a
+correspondence between compound names and their values.
 
 \section{Notes about implementation}
 
