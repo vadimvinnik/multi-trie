@@ -29,13 +29,11 @@
 \newtheorem{Rm}{Remark}
 
 \newcommand{\setcharmvcn}{M}
-\newcommand{\setcharsvcn}{S}
 \newcommand{\setcharmt}{T}
 
 \newcommand{\setsymbol}[3]{\mathcal{#1}_{#2,#3}}
 
 \newcommand{\setmvcn}[2]{\setsymbol{\setcharmvcn}{#1}{#2}}
-\newcommand{\setsvcn}[2]{\setsymbol{\setcharsvcn}{#1}{#2}}
 \newcommand{\setmt}[2]{\setsymbol{\setcharmt}{#1}{#2}}
 
 \newcommand{\flatten}{\mathrm{Fl}}
@@ -229,79 +227,6 @@ It is interesting to note that there is another formalization of the
 multivalued naming that is, however, equivalent to the above definitions.  It
 is described in the next section.
 
-\section{Map-based definition}
-
-The formalization of multivalued naming with compound names presented in the
-previous section was straightforward in the sense that the definition directly
-reflected the notion. However, the same substantial object could be modelled
-through a naming set (in the sense of definition~\ref{df:naming-set}, i.e.
-uniuvalued) whose values are subsets of~$D$.
-
-\begin{Df}\label{df:svcn}
-A \emph{$(V,D)$-set-valued compound-naming set, or $(V,D)$-SVCNset}, is a total
-mapping
-\[
-  p : V^\ast \to 2^D .
-\]
-A set of $(V,D)$-SVCNsets will be denoted~$\setsvcn{V}{D}$.\qed
-\end{Df}
-
-The only special detail here is totality of~$p$: every compound name has some
-value~-- maybe an empty set.
-
-Dereferencing needed a special definition (def.~\ref{df:mvcn-dereferencing})
-for MVCNsets. With SVCNsets, however, it is just an alias for a functional
-application of an SVCNset, as a functional binary relation, to a name:
-\begin{Df}\label{df:svcn-dereferencing}
-Given a $(V,D)$-SVCNset~$p$ and a name~$v\in V^\ast$, \emph{dereferencing}
-of~$v$ in~$p$ is
-\[
-  \deref{p}{v} = p(v).
-\]
-\end{Df}
-
-On the other hand, union, intersection operations as well as empty and full
-namings, that in case of MVCNsets were aliases for corresponding
-set-theoretical constructs (see st.~\ref{st:mvcn-setop} and
-def.~\ref{df:mvcn-extremes}), need special definitions in the SVCNset
-world. These definitions here are what had to be a theorem for MVCNsets
-(see st.~\ref{st:mvcn-deref-distributivity} and~\ref{st:mvcn-extreme-deref}).
-
-\begin{Df}\label{df:svcn-setop}
-Let~$\odot$ stand for any of~$\cup$ and~$\cap$, and let~$p$ and~$q$ be
-$(V,D)$-SVCNsets. Then their \emph{union} and \emph{intersection} are
-$(V,D)$-SVCNsets, such that
-\[
-  p\odot q = \{ (v, p(v) \odot q(v)) \mid v\in V^\ast \} .
-\]
-\end{Df}
-
-\begin{Df}\label{df:svcn-extremes}
-SVCNset~$\bot$ called \emph{empty} and $\top$ called \emph{full} are defined by
-\begin{eqnarray*}
-  &  \bot = \{ (v, \varnothing) \mid v\in V^\ast \} ; \\
-  &  \top = \{ (v, D) \mid v\in V^\ast \} .
-\end{eqnarray*}
-\end{Df}
-
-\begin{Df}\label{df:svcn-select}
-Let~$p\in\setsvcn{V}{D}$, $v\in V^\ast$, then
-\[
-  \select(p,v) = \{ (w, p(vw)) \mid w\in V^\ast \} .\qedhere
-\]
-\end{Df}
-
-Properties from st.~\ref{st:mvcn-selection-properties} obviously hold for this
-operation.
-
-In general, it is easy to see that MSVNsets and SVCNsets with respective sets
-of operations form isomorphic algebras and formalize the same concept of
-multi-valued naming with compound names.
-There is a kind of duality: what is trivial in one of these theories, needs a
-special definition or proof in the other and vice versa. This makes the third
-formalization presented in the following section especially interesting: its
-basic operation with a trivial definition is~$\select$.
-
 
 \section{Trie-based definition}
 
@@ -427,7 +352,7 @@ It is easy to see that the above definitions are equivalent to the following:
 (note that~$\cup$ in the definitions~\ref{df:cartesian} and~\ref{df:flatten}
 means a set-theoretical union whereas in~(\ref{eq:alt-cartesian})
 and~(\ref{eq:alt-flatten}) it means union of multitries, see
-def.~\ref{df:svcn-setop}).
+def.~\ref{df:mvcn-setop}).
 
 The first two formalizations (MVCN- and SVCNsets) were abstract in the sense
 that they only described how do namings look like from outside~-- namely, as a
