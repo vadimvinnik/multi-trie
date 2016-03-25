@@ -272,7 +272,7 @@ $v\in V^\ast$, then
 \end{eqnarray*}
 \end{Df}
 
-In other words, selection operation traverses finds a node pointed to by the
+In other words, selection operation finds a node pointed to by the
 compound name as a path in the trie.
 
 Let $\proj{k}$ be a function that maps a tuple to its $k$-th component.
@@ -305,9 +305,27 @@ st.~\ref{st:mvcn-deref-distributivity},
 \ref{st:mvcn-neutrals}
 and~\ref{st:mvcn-selection-properties}.
 
-%todo: stopped here
+Moreover, all properties of MVCNsets and multitries are identical, and these
+two kinds of objects should be regarded as essentially the same thing because
+of the following.
 
-%todo: isomorphism
+\begin{St}\label{st:isomorph}
+There is a bijection~$\varphi: \setmvcn{V}{D} \to \setmt{V}{D}$ that preserves
+union, intersection, dereferencing and selection operations:
+\begin{eqnarray*}
+  & \varphi(p \mathbin{\odot_{\setcharmvcn}} q) =
+      \varphi(p) \mathbin{\odot_{\setcharmt}} \varphi(q) , \\
+  & \derefsymbol_{\setcharmvcn}(p, v) =
+      \derefsymbol_{\setcharmt}(\varphi(p), v) , \\
+  & \select_{\setcharmvcn}(p, v) =
+      \select_{\setcharmt}(\varphi(p), v) .
+\end{eqnarray*}
+\end{St}
+
+The idea underlying~$\varphi$ is quite obvious whereas technical details of the
+proof would not contribute much to our current goal.
+
+%todo: stopped here
 
 %todo: cartesian product
 
