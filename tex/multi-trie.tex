@@ -289,10 +289,6 @@ In other words, if $\select(p,v) = (s,f)$, then $\deref{p}{v} = s$. To
 dereference a name in a multitrie, one needs to follow the compound name
 as a path to a node in the trie and then take the value stored in that node.
 
-It is easy to see that properties identical to
-st.~\ref{st:mvcn-selection-properties} and, therefore,
-st.~\ref{st:mvcn-extreme-deref} hold for multitries.
-
 Union and intersection could be defined for multitries.
 \begin{Df}\label{df:mt-setop}
 Let $\odot \in \{ \cup, \cap \}$, $p, q \in \setmt{V}{D}$,
@@ -302,10 +298,18 @@ $p = (s,f)$, $q = (t, g)$. Then
 \]
 \end{Df}
 
-The counterparts of st.~\ref{st:mvcn-deref-distributivity}
-and~\ref{st:mvcn-neutrals} hold for multitries.
+It is easy to see that properties identical to those of MVCNsets
+hold for multitries, namely counterparts of
+st.~\ref{st:mvcn-deref-distributivity},
+\ref{st:mvcn-extreme-deref},
+\ref{st:mvcn-neutrals}
+and~\ref{st:mvcn-selection-properties}.
 
 %todo: stopped here
+
+%todo: isomorphism
+
+%todo: cartesian product
 
 \begin{Df}
 Let~$v$ be some compound name and~$A$ be some set of values, $v\in V^\ast$,
