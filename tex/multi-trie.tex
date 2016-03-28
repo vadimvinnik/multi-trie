@@ -323,16 +323,21 @@ union, intersection, dereferencing and selection operations:
 \end{St}
 
 The idea underlying~$\varphi$ is quite obvious whereas technical details of the
-proof would not contribute much to our current goal.
+proof are not important for our current goal.
 
-%todo: stopped here
+This isomorphism allows to switch flexibly between MVCNset and multitrie
+languages when describing further notions, choosing every time the most
+appropriate form.
 
-%todo: cartesian product
 
-\begin{Df}
-Let~$v$ be some compound name and~$A$ be some set of values, $v\in V^\ast$,
-$A\subseteq D$.  Then~$p = \singleleaf(v,A)$ is such an SVCNset that~$p(v) =
-A$ and~$p(u) = \varnothing$ for any $u\in V^\ast$, $u\neq v$.
+\section{Cartesian Product}
+
+\begin{Df}\label{df:mvcn-cartesian}
+Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
+\emph{cartesian product} is a $(V,D'\times D'')$-MVCNset
+\[
+  p\times q = \{ (uv, (d',d'')) \mid (u,d')\in p, (v,d'')\in q \} .
+\]
 \end{Df}
 
 \begin{Df}\label{df:cartesian}
