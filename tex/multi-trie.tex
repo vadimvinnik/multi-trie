@@ -340,50 +340,52 @@ Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
 \]
 \end{Df}
 
-\begin{Df}\label{df:cartesian}
-Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-multitries, respectively. Their
-\emph{cartesian product} $p\times q = r$ is a $(V,D'\times D'')$-multitrie
-such that
+Obviously,~$\times$ is distributive against $\cap$ and $\cup$.
+\begin{St}\label{st:cartesian-distributivity}
+For any $p \in \setmvcn{V}{D'}$ and $q, r \in \setmvcn{V}{D''}$,
 \[
-  r(w) = \bigcup_{u,v\in V^\ast: uv = w} p(u) \times q(v)
+  p\times(q\odot r) = (p\times q) \odot (p\times r) .
 \]
-for any~$w\in V^\ast$.\qed
-\end{Df}
+\end{St}
 
-Obviously,~$\times$ is distributive against $\cap$ and $\cup$:
+The main property of this operation is the following.
+\begin{St}\label{st:deref-cartesian}
+For any $p \in \setmvcn{V}{D'}$ and $q \in \setmvcn{V}{D''}$,
 \[
-  p\times(q\odot r) = p\times(q\odot r)
+  \deref{p \times q}{w} =
+      \bigcup_{u,v\in V^\ast: uv = w}
+          \deref{p}{u}
+          \times
+          \deref{q}{v} .
 \]
+\end{St}
+It means that, since an MVCNset is completely defined by values of all names,
+cartesian product can be defined in terms of dereferencing and, therefore,
+is preserved by the mapping~$\varphi$ from st.~\ref{st:isomorph}. Also, this
+property may be taken as a definition of cartesian product for multitries.
 
-Consider a multitrie whose values are, in their turn, multitries.
-Flattening operation formally defined below turns it into a ``plain'' multitrie.
+Consider an MVCNset whose values are, in their turn, MVCNsets.
+Flattening operation formally defined below turns it into a ``plain'' MVCNset.
 \begin{Df}\label{df:flatten}
-\emph{Flattening} is an unary operation $\flatten : \setmt{V}{\setmt{V}{D}}
-\to\setmt{V}{D}$, such that, for any $(V,\setmt{V}{D})$-multitrie~$p$, the
+\emph{Flattening} is an unary operation
+$\flatten : \setmvcn{V}{\setmvcn{V}{D}} \to\setmvcn{V}{D}$,
+such that, for any $(V,\setmvcn{V}{D})$-MVCNset~$p$, the
 corresponding $r=\flatten(p)$ is defined by
 \[
-  r(w) = \bigcup_{u,v\in V^\ast: uv = w} p(u)(v)
+  r = \{ (uv, d) \mid (u, t) \in p, (v, d) \in t \} .
 \]
-for any name~$w\in V^\ast$.\qed
 \end{Df}
 
-It is easy to see that the above definitions are equivalent to the following:
-\begin{eqnarray}
-  \label{eq:alt-cartesian}
-  p\times q =
-    \bigcup_{u,v\in V^\ast} \singleleaf(uv, p(u) \times q(v)) ,\\
-  \label{eq:alt-flatten}
-  \flatten(p) =
-    \bigcup_{u,v\in V^\ast} \singleleaf(uv, p(u)(v)) .
-\end{eqnarray}
-(note that~$\cup$ in the definitions~\ref{df:cartesian} and~\ref{df:flatten}
-means a set-theoretical union whereas in~(\ref{eq:alt-cartesian})
-and~(\ref{eq:alt-flatten}) it means union of multitries, see
-def.~\ref{df:mvcn-setop}).
-
-The first two formalizations (MVCN- and SVCNsets) were abstract in the sense
-that they only described how do namings look like from outside~-- namely, as a
-correspondence between compound names and their values.
+The following property can be used to define flattening for multitries
+deriving it from dereferencing operation.
+\begin{St}\label{st:deref-flatten}
+For any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
+\[
+  \deref{\flatten(p)}{w} =
+      \bigcup_{u,v\in V^\ast: uv = w}
+        \deref{\deref{p}{u}}{v} .
+\]
+\end{St}
 
 \section{Notes about implementation}
 
