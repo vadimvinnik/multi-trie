@@ -32,8 +32,7 @@
 \newcommand{\flatten}{\mathrm{Fl}}
 \newcommand{\select}{\mathrm{Sel}}
 \newcommand{\proj}[1]{\mathrm{pr}_{#1}}
-\newcommand{\derefsymbol}{\mathrm{Get}}
-\newcommand{\deref}[2]{\derefsymbol(#1, #2)}
+\newcommand{\deref}{\mathrm{Get}}
 
 \title{Compound names with multiple values: formalisation, properties and implementation}
 \author{Vadim Vinnik}
@@ -139,7 +138,7 @@ an only (if any) value~$d$ associated with the name~$v$ in a certain naming
 set~$s$.  Depending on the goals and abstraction level of any particular
 context, it could be regarded either as~$s(v)=d$, i.e. applying a function~$s$
 to an argument~$v$, or as an operation whose arguments are the naming set and
-the name, i.e.~$\deref{s}{v}=d$. Its counterpart in MVCNset world that
+the name, i.e.~$\deref(s, v)=d$. Its counterpart in MVCNset world that
 retrieves all values of a name, no matter how many, obviously cannot be denoted
 using the first style because MVCNsets are general binary relations, not
 functional ones.
@@ -148,11 +147,11 @@ functional ones.
 \emph{Dereferencing} is an operation, such that for
 a $(V,D)$-MVCNset~$p$ and a name~$v\in V^\ast$,
 \[
-  \deref{p}{v} = \{ d \mid (v, d) \in p \} .
+  \deref(p, v) = \{ d \mid (v, d) \in p \} .
 \]
 \end{Df}
 
-Unlike the univalued case, here~$\derefsymbol$ is a total operation: even if a
+Unlike the univalued case, here~$\deref$ is a total operation: even if a
 name~$v$ does not have any associated value in an MVCNset~$p$, dereferencing
 just yields an empty list of values.  Dereferencing distributes over
 set-theoretical operations:
@@ -160,7 +159,7 @@ set-theoretical operations:
 Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$p$ and~$q$ be
 $(V,D)$-MVCNsets. Then
 \[
-  \deref{p\odot q}{v} = \deref{p}{v} \odot \deref{q}{v} ,
+  \deref(p\odot q, v) = \deref(p, v) \odot \deref(q, v) ,
 \]
 for every~$v\in V^\ast$.
 \end{St}
@@ -178,8 +177,8 @@ MVCNsets $\bot$ called \emph{empty} and $\top$ called \emph{full} are defined by
 \begin{St}\label{st:mvcn-extreme-deref}
 For any~$v\in V^\ast$,
 \begin{eqnarray*}
-  \deref{\bot}{v} & = & \varnothing, \\
-  \deref{\top}{v} & = & D .
+  \deref(\bot, v) & = & \varnothing, \\
+  \deref(\top, v) & = & D .
 \end{eqnarray*}
 \end{St}
 
@@ -275,11 +274,11 @@ Then dereferencing could be defined as follows:
 Given a $(V,D)$-multitrie~$p$ and a name~$v\in V^\ast$, \emph{dereferencing}
 of~$v$ in~$p$ is
 \[
-  \deref{p}{v} = \proj{1}(\select(p, v)) .
+  \deref(p, v) = \proj{1}(\select(p, v)) .
 \]
 \end{Df}
 
-In other words, if $\select(p,v) = (s,f)$, then $\deref{p}{v} = s$. To
+In other words, if $\select(p,v) = (s,f)$, then $\deref(p, v) = s$. To
 dereference a name in a multitrie, one needs to follow the compound name
 as a path to a node in the trie and then take the value stored in that node.
 
@@ -309,8 +308,8 @@ union, intersection, dereferencing and selection operations:
 \begin{eqnarray*}
   & \varphi(p \mathbin{\odot_{\setcharmvcn}} q) =
       \varphi(p) \mathbin{\odot_{\setcharmt}} \varphi(q) , \\
-  & \derefsymbol_{\setcharmvcn}(p, v) =
-      \derefsymbol_{\setcharmt}(\varphi(p), v) , \\
+  & \deref_{\setcharmvcn}(p, v) =
+      \deref_{\setcharmt}(\varphi(p), v) , \\
   & \select_{\setcharmvcn}(p, v) =
       \select_{\setcharmt}(\varphi(p), v) .
 \end{eqnarray*}
@@ -346,11 +345,11 @@ The main property of this operation is the following.
 \begin{St}\label{st:deref-cartesian}
 For any $p \in \setmvcn{V}{D'}$ and $q \in \setmvcn{V}{D''}$,
 \[
-  \deref{p \times q}{w} =
+  \deref(p \times q, w) =
       \bigcup_{u,v\in V^\ast: uv = w}
-          \deref{p}{u}
+          \deref(p, u)
           \times
-          \deref{q}{v} .
+          \deref(q, v) .
 \]
 \end{St}
 It means that, since an MVCNset is completely defined by values of all names,
@@ -375,9 +374,9 @@ deriving it from dereferencing operation.
 \begin{St}\label{st:deref-flatten}
 For any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
 \[
-  \deref{\flatten(p)}{w} =
+  \deref(\flatten(p), w) =
       \bigcup_{u,v\in V^\ast: uv = w}
-        \deref{\deref{p}{u}}{v} .
+        \deref(\deref(p, u), v) .
 \]
 \end{St}
 
