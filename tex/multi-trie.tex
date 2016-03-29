@@ -13,6 +13,7 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{amsmath}
 
 \theoremstyle{definition}
 \newtheorem{Df}{Definition}
@@ -29,14 +30,14 @@
 \newcommand{\setmvcn}[2]{\setsymbol{\setcharmvcn}{#1}{#2}}
 \newcommand{\setmt}[2]{\setsymbol{\setcharmt}{#1}{#2}}
 
-\newcommand{\flatten}{\mathrm{Fl}}
-\newcommand{\select}{\mathrm{Sel}}
-\newcommand{\proj}[1]{\mathrm{pr}_{#1}}
-\newcommand{\deref}{\mathrm{Get}}
+\newcommand{\flatten}{\operatorname{Fl}}
+\newcommand{\select}{\operatorname{Sel}}
+\newcommand{\deref}{\operatorname{Get}}
+\newcommand{\proj}[1]{\operatorname{pr}_{#1}}
 
 \title{Compound names with multiple values: formalisation, properties and implementation}
 \author{Vadim Vinnik}
-\date{2015}
+\date{2016}
 
 \begin{document}
 
