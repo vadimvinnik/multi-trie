@@ -141,6 +141,10 @@ and intersection:
 If~$p$ and~$q$ are $(V,D)$-MVCNsets, so are~$p\cup q$ and~$p\cap q$.
 \end{St}
 
+When it is important to emphasise that union and intersection are operations
+on MVCNsets rather than on general case of sets, we will
+write~$\cup_\setcharmvcn$ and~$\cap_\setcharmvcn$.
+
 One of the fundamental operations on (univalued) naming sets is retrieving
 an only (if any) value~$d$ associated with the name~$v$ in a certain naming
 set~$s$.  Depending on the goals and abstraction level of a particular
@@ -152,10 +156,11 @@ using the first style because MVCNsets, as general binary relations, need not
 to be functional.
 
 \begin{Df}\label{df:mvcn-dereferencing}
-\emph{Dereferencing} is an operation, such that for
+\emph{Dereferencing} is an operation~$\deref_\setcharmvcn$ (or, whenever
+possible, omiting the subscript simply~$\deref$), such that for
 a $(V,D)$-MVCNset~$p$ and a name~$v\in V^\ast$,
 \[
-  \deref(p, v) = \{ d \mid (v, d) \in p \} .
+  \deref_\setcharmvcn(p, v) = \{ d \mid (v, d) \in p \} .
 \]
 \end{Df}
 
@@ -175,11 +180,13 @@ for every~$v\in V^\ast$.
 Let us introduce special terms and symbols for the two extreme cases of
 MVCNsets, namely:
 \begin{Df}\label{df:mvcn-extremes}
-MVCNsets $\bot$ called \emph{empty} and $\top$ called \emph{full} are defined by
+MVCNsets $\bot_\setcharmvcn$ called \emph{empty} and $\top_\setcharmvcn$ called
+\emph{full} are defined by
 \begin{eqnarray*}
-  \bot &  = &  \varnothing ; \\
-  \top &  = &  V^\ast \times D .
+  \bot_\setcharmvcn &  = &  \varnothing ; \\
+  \top_\setcharmvcn &  = &  V^\ast \times D .
 \end{eqnarray*}
+Further, we'll omit the subscript when it does not lead to confusion.
 \end{Df}
 
 \begin{St}\label{st:mvcn-extreme-deref}
@@ -208,8 +215,9 @@ defined as follows
 Let~$p\in\setmvcn{V}{D}$, $v\in V^\ast$, then \emph{selection} from~$p$
 under~$v$ is
 \[
-  \select(p,v) = \{ (w, d) \mid (vw, d)\in p \} .
+  \select_\setcharmvcn(p,v) = \{ (w, d) \mid (vw, d)\in p \} .
 \]
+As always, the subscript will be omited if possible.
 \end{Df}
 
 The followig properties of selection are obvious:
@@ -255,9 +263,12 @@ Extreme multitries have the following recurrent definitions.
 \begin{Df}\label{df:mt-extreme}
 \emph{Empty} and \emph{full} $(V,D)$-multitries:
 \begin{eqnarray*}
-  \bot & = & ( \varnothing, \{ v \mapsto \bot \mid v\in V \} ) , \\
-  \top & = & ( D,           \{ v \mapsto \top \mid v\in V \} ) .
+  \bot_\setcharmt & = &
+      ( \varnothing, \{ v \mapsto \bot_\setcharmt \mid v\in V \} ) , \\
+  \top_\setcharmt & = &
+      ( D,           \{ v \mapsto \top_\setcharmt \mid v\in V \} ) .
 \end{eqnarray*}
+Subscripts will be further omited whenever possible.
 \end{Df}
 In other words, empty (full) multitrie is a multitrie that has an empty
 (full) set of values and whose children under all atomic names are, in their
@@ -268,9 +279,10 @@ The following is the basic operation on multitries.
 \emph{Selection} operation. Let $p=(s,f) \in \setmt{V}{D}$, $u\in V$,
 $v\in V^\ast$, then
 \begin{eqnarray*}
-  \select(p, \varepsilon) & = & p , \\
-  \select(p, u v) & = & \select(f(u), v) .
+  \select_\setcharmt(p, \varepsilon) & = & p , \\
+  \select_\setcharmt(p, u v) & = & \select_\setcharmt(f(u), v) .
 \end{eqnarray*}
+Subscripts will be omited if possible.
 \end{Df}
 
 In other words, selection operation finds a node pointed to by the
@@ -281,8 +293,9 @@ Then dereferencing could be defined as follows:
 Given a $(V,D)$-multitrie~$p$ and a name~$v\in V^\ast$, \emph{dereferencing}
 of~$v$ in~$p$ is
 \[
-  \deref(p, v) = \proj{2}{1}(\select(p, v)) .
+  \deref_\setcharmt(p, v) = \proj{2}{1}(\select(p, v)) .
 \]
+As always, we'll not write the subscript if it is obvious from the context.
 \end{Df}
 
 In other words, if $\select(p,v) = (s,f)$, then $\deref(p, v) = s$. To
@@ -294,8 +307,11 @@ Union and intersection could be defined for multitries.
 Let $\odot \in \{ \cup, \cap \}$, $p, q \in \setmt{V}{D}$,
 $p = (s,f)$, $q = (t, g)$. Then
 \[
-  p \odot q = (s \odot t, \{ v \mapsto f(v) \odot g(v) \mid v \in V \}) .
+  p \odot_\setcharmt  q = (s \odot t, \{ v \mapsto f(v) \odot_\setcharmt  g(v) \mid v \in V \}) .
 \]
+Note that subscripts in this definition help to distinguish between
+set-theoretical operations on sets of values and corresponding operations
+on multitries.
 \end{Df}
 
 It is easy to see that properties identical to those of MVCNsets
@@ -304,30 +320,38 @@ st.~\ref{st:mvcn-deref-distributivity},
 \ref{st:mvcn-extreme-deref},
 \ref{st:mvcn-neutrals}
 and~\ref{st:mvcn-selection-properties}.
-
 Moreover, all properties of MVCNsets and multitries are identical, and these
-two kinds of objects should be regarded as essentially the same thing because
+two kinds of objects should be regarded as essentially equivalent because
 of the following.
 
 \begin{St}\label{st:isomorph}
-There is a bijection~$\varphi: \setmvcn{V}{D} \to \setmt{V}{D}$ that preserves
-union, intersection, dereferencing and selection operations:
+Consider a mapping~$\varphi: \setmvcn{V}{D} \to \setmt{V}{D}$, such that,
+for any~$p\in \setmvcn{V}{D}$,
+\[
+  \varphi(p) = (
+    \deref_\setcharmvcn(p, \varepsilon) ,
+    \{ u \mapsto \select_\setcharmvcn(p, u) \mid u\in V \}
+  ) .
+\]
+Then~$\varphi$ is a bijection that preserves
+extreme elements, union, intersection, dereferencing and selection operations:
 \begin{eqnarray*}
+  & \varphi(\bot_{\setcharmvcn}) = \bot_{\setcharmt}, \\
+  & \varphi(\top_{\setcharmvcn}) = \top_{\setcharmt}, \\
   & \varphi(p \mathbin{\odot_{\setcharmvcn}} q) =
       \varphi(p) \mathbin{\odot_{\setcharmt}} \varphi(q) , \\
   & \deref_{\setcharmvcn}(p, v) =
       \deref_{\setcharmt}(\varphi(p), v) , \\
-  & \select_{\setcharmvcn}(p, v) =
+  & \varphi(\select_{\setcharmvcn}(p, v)) =
       \select_{\setcharmt}(\varphi(p), v) .
 \end{eqnarray*}
 \end{St}
 
-The idea underlying~$\varphi$ is quite obvious whereas technical details of the
-proof are not important for our current goal.
-
-This isomorphism allows to switch flexibly between MVCNset and multitrie
-languages when describing further notions, choosing every time the most
-appropriate form.
+In other words, $\varphi$~is an isomorphism from many-sorted algebra of
+MVCNsets to an algebra of multitries.
+This allows us to switch flexibly between MVCNset and multitrie
+languages when describing further notions, choosing the most
+appropriate form in each particular case.
 
 
 \section{Cartesian Product}
