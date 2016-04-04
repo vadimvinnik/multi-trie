@@ -21,6 +21,7 @@
 \newtheorem{St}{Statement}
 \newtheorem{Pf}{Proof}
 \newtheorem{Rm}{Remark}
+\newtheorem{Ex}{Example}
 
 \newcommand{\setcharmvcn}{M}
 \newcommand{\setcharmt}{T}
@@ -78,6 +79,22 @@ In other words, a naming set is an object of the form
 where $v_i\in V$, $d_i\in D$, and all~$v_i$ are pairwise distinct. The
 latter requirement formalizes \emph{unambiguity}, or \emph{univaluedness}: a
 name cannot have different values in a given context.
+
+\begin{Ex}\label{ex:naming-set}
+A naming set $s = \{ (a, 1), (t, 7), (w, 1) \}$ represents a context where
+the name~$a$ has a value~1, the name~$b$ refers to a value~7 and the name~$w$
+denotes~1, no other names have values. It is convenient to depict namings
+in a tabular form as follows:
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Name	&  $a$  &  $t$  &  $w$  \\
+\hline
+Value	&  $1$  &  $7$  &  $1$  \\
+\hline
+\end{tabular}
+\end{center}
+\end{Ex}
 
 Naming mappings defined as above are widely used in theoretical computer
 science for syntactical as well as semantical tasks.
