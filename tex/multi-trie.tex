@@ -31,6 +31,9 @@
 \newcommand{\setmvcn}[2]{\setsymbol{\setcharmvcn}{#1}{#2}}
 \newcommand{\setmt}[2]{\setsymbol{\setcharmt}{#1}{#2}}
 
+\newcommand{\seta}{\mathcal{A}}
+\newcommand{\setn}{\mathcal{N}}
+
 \newcommand{\flatten}{\operatorname{Fl}}
 \newcommand{\select}{\operatorname{Sel}}
 \newcommand{\deref}{\operatorname{Get}}
@@ -83,17 +86,7 @@ name cannot have different values in a given context.
 \begin{Ex}\label{ex:naming-set}
 A naming set $s = \{ (a, 1), (t, 7), (w, 1) \}$ represents a context where
 the name~$a$ has a value~1, the name~$b$ refers to a value~7 and the name~$w$
-denotes~1, no other names have values. It is convenient to depict namings
-in a tabular form as follows:
-\begin{center}
-\begin{tabular}{|c|c|c|c|}
-\hline
-Name	&  $a$  &  $t$  &  $w$  \\
-\hline
-Value	&  $1$  &  $7$  &  $1$  \\
-\hline
-\end{tabular}
-\end{center}
+denotes~1, no other names have values.
 \end{Ex}
 
 Naming mappings defined as above are widely used in theoretical computer
@@ -132,6 +125,10 @@ If~$a,b\in X^\ast$ are two chains, their concatenation will be denoted simply
 as~$ab$. Let~$\varepsilon$ stand for the empty chain.
 Let $\proj{n}{k}$ be a function that maps an $n$-tuple to its $k$-th component.
 
+A set of lower-case Latin letters (the alphabet) is denoted as~$\seta$,
+and~$\setn$ will denote a set of natural numbers~-- these two sets will be
+used in examples.
+
 
 \section{Relation-based definition and basic properties}
 
@@ -150,10 +147,31 @@ prefix and write simply ``MVCNset''. A set of $(V,D)$-MVCNsets will be
 denoted~$\setmvcn{V}{D}$.
 \end{Df}
 
+\begin{Ex}\label{ex:mvcn}
+The following is a $(\seta, \setn)$-MVCNset:
+\[
+  p = \{
+    (\varepsilon, 0),
+    (\varepsilon, 1),
+    (a,           2),
+    (a,           3),
+    (a,           4),
+    (aa,          5),
+    (ab,          6),
+    (b,           7),
+    (baaa,        8)
+  \} .
+\]
+Here the empty name has two values (0 and~1), name~$a$ has three (2, 3 and~4),
+comound names~$aa$ and~$ab$ have each a single value (5 and~6, respectively),
+name~$b$ has a value~7 and, finally, a name~$baaa$ has one value~8. All other
+names from~$\seta$ have no values.
+\end{Ex}
+
 Note that, in contrast with naming sets, no special conditions are imposed
 on an MVCNset~--- it is just an arbitrary set of name-value pairs.
 Therefore, $\setmvcn{V}{D}$ is closed against set-theoretical union
-and intersection:
+and intersection.
 \begin{St}\label{st:mvcn-setop}
 If~$p$ and~$q$ are $(V,D)$-MVCNsets, so are~$p\cup q$ and~$p\cap q$.
 \end{St}
@@ -183,8 +201,19 @@ a $(V,D)$-MVCNset~$p$ and a name~$v\in V^\ast$,
 
 Unlike the univalued case, here~$\deref$ is a total operation: even if a
 name~$v$ does not have any associated value in an MVCNset~$p$, dereferencing
-just yields an empty set of values.  Dereferencing distributes over
-set-theoretical operations:
+just yields an empty set of values.
+
+\begin{Ex}\label{ex:mvcn-dereferencing}
+Consider an MVCNset~$p$ from ex.~\ref{ex:mvcn}. Then
+\begin{eqnarray*}
+  \deref(p, \varepsilon) & = & \{ 0, 1 \}, \\
+  \deref(p, baaa)        & = & \{ 8 \}, \\
+  \deref(p, bbab)        & = & \varnothing .
+\end{eqnarray*}
+
+\end{Ex}
+
+Dereferencing distributes over set-theoretical operations.
 \begin{St}\label{st:mvcn-deref-distributivity}
 Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$p$ and~$q$ be
 $(V,D)$-MVCNsets. Then
@@ -205,6 +234,9 @@ MVCNsets $\bot_\setcharmvcn$ called \emph{empty} and $\top_\setcharmvcn$ called
 \end{eqnarray*}
 Further, we'll omit the subscript when it does not lead to confusion.
 \end{Df}
+
+In other words, each name in the empty MVCNset has no value whereas in the
+full MVCNset every name has all possible values.
 
 \begin{St}\label{st:mvcn-extreme-deref}
 For any~$v\in V^\ast$,
@@ -237,7 +269,23 @@ under~$v$ is
 As always, the subscript will be omited if possible.
 \end{Df}
 
-The followig properties of selection are obvious:
+\begin{Ex}\label{ex:mvcn-select}
+Let~$p$ be an MVCNset from ex.~\ref{ex:mvcn}, then
+\begin{eqnarray*}
+  \select(p, a) & = & \{
+    (\varepsilon, 2),
+    (\varepsilon, 3),
+    (\varepsilon, 4),
+    (a,           5),
+    (b,           6)
+  \} , \\
+  \select(p, b) & = & \{
+    (\varepsilon, 7),
+    (aaa,         8)
+  \} .
+\end{eqnarray*}
+\end{Ex}
+
 \begin{St}\label{st:mvcn-selection-properties}
 For any~$p,q\in\setmvcn{V}{D}$, $u, v\in V^\ast$, $\odot\in\{\cup, \cap\}$,
 \begin{eqnarray*}
@@ -248,6 +296,13 @@ For any~$p,q\in\setmvcn{V}{D}$, $u, v\in V^\ast$, $\odot\in\{\cup, \cap\}$,
   & \select(p\odot q, u) = \select(p,u)\odot \select(q,u).
 \end{eqnarray*}
 \end{St}
+In other words,
+\begin{itemize}
+\item $\select$~preserves empty and full MVCNset;
+\item selection under an empty name is an identity over MVCNsets;
+\item selection under a compound name can be performed by parts;
+\item selection is distributive over union and intersection.
+\end{itemize}
 
 It is interesting to note that there is another formalization of the
 multivalued naming that is, however, equivalent to the above definitions.  It
