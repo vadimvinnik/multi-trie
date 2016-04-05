@@ -14,6 +14,9 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{amsmath}
+\usepackage{dirtree}
+
+\DTsetlength{0.2em}{2em}{0.2em}{0.4pt}{1pt}
 
 \theoremstyle{definition}
 \newtheorem{Df}{Definition}
@@ -310,6 +313,24 @@ is described in the next section.
 
 
 \section{Trie-based definition}
+
+\begin{figure}[ht]
+\begin{center}
+\begin{minipage}{17em}
+\dirtree{%
+  .1 $\varepsilon$\DTcomment{$\{0, 1\}$} .
+    .2 $a$\DTcomment{$\{2, 3, 4\}$} .
+      .3 $a$\DTcomment{$\{5\}$} .
+      .3 $b$\DTcomment{$\{6\}$} .
+    .2 $b$\DTcomment{$\{7\}$} .
+      .3 $a$\DTcomment{$\varnothing$} .
+        .4 $a$\DTcomment{$\varnothing$} .
+          .5 $a$\DTcomment{$\{8\}$} .
+}
+\end{minipage}
+\end{center}
+\caption{Example of a trie corresponding to an MVCNset}\label{fig:trie}
+\end{figure}
 
 \begin{Df}\label{df:mt}
 A class of \emph{$(V,D)$-multitries} (or simply \emph{multitries} when~$V$
