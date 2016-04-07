@@ -211,7 +211,7 @@ Consider an MVCNset~$p$ from ex.~\ref{ex:mvcn}. Then
 \begin{eqnarray*}
   \deref(p, \varepsilon) & = & \{ 0, 1 \}, \\
   \deref(p, baaa)        & = & \{ 8 \}, \\
-  \deref(p, bbab)        & = & \varnothing .
+  \deref(p, cdcd)        & = & \varnothing .
 \end{eqnarray*}
 
 \end{Ex}
@@ -285,7 +285,8 @@ Let~$p$ be an MVCNset from ex.~\ref{ex:mvcn}, then
   \select(p, b) & = & \{
     (\varepsilon, 7),
     (aaa,         8)
-  \} .
+  \} , \\
+  \select(p, cdcd) & = & \bot .
 \end{eqnarray*}
 \end{Ex}
 
@@ -314,6 +315,30 @@ is described in the next section.
 
 \section{Trie-based definition}
 
+Take a closer look at the MVCNset~$p$ from ex.~\ref{ex:mvcn}.
+Recall the
+idea underlying selection operation: that any name~$u$ identifies a bunch of
+names that have~$u$ as its common prefix. Except this, take into account that
+the empty name~$\varepsilon$ is a common prefix for all names.
+
+The name~$\varepsilon$, the simplest name ever, refers in~$p$ to a set of
+values~$\{0,1\}$. Name~$a=\varepsilon a$ is an extension of~$\varepsilon$ by
+one atomic name and refers to values~$\{2,3,4\}$. In its turn, name~$a$ can
+be extended by one atomic name to~$aa$, $ab$, \ldots, $az$, from which only the
+former two are of intrest because their sets of values are non-empty.
+Now return to the empty name and compose another its continuation, namely~$b$.
+This name is a prefix for~$ba$ that, in its turn, can be extended to~$baa$ and
+then to~$baaa$.
+
+All this gives a hierarchical view of~$V^\ast$ where
+\begin{itemize}
+\item the highest member of the hierarchy is the empty name;
+\item appending an atomic component to a name moves one level deeper;
+\item having a common prefix means having a common ancestor.
+\end{itemize}
+The hierarchical representation of the MVCNset~$p$ is shown on the
+fig.~\ref{fig:trie}.
+
 \begin{figure}[ht]
 \begin{center}
 \begin{minipage}{17em}
@@ -329,8 +354,14 @@ is described in the next section.
 }
 \end{minipage}
 \end{center}
-\caption{Example of a trie corresponding to an MVCNset}\label{fig:trie}
+\caption{A multitrie corresponding to the MVCNset~$p$}\label{fig:trie}
 \end{figure}
+
+To grasp this informal consideration in a definition, it would be convenient to
+assume that every node in the hierarchy has \emph{all} possible children (i.e.
+that the hieraarchy includes all names from~$V^\ast$ regardless of whether they
+have values): otherwise we needed a special treatment for missing names in
+every subsequent definition or statement. This leads to the following
 
 \begin{Df}\label{df:mt}
 A class of \emph{$(V,D)$-multitries} (or simply \emph{multitries} when~$V$
@@ -343,14 +374,17 @@ and~$D$ are known from the context or irrelevant):
 In other words, a $(V,D)$-multitrie is a pair $p = (s, f)$ where~$s\subseteq D$
 is a set of values and $f: V \to \setmt{V}{D}$ is a function that maps any
 atomic name to some $(V,D)$-multitrie. Note that this recursive definition does
-not have any basic case: every multitrie contains named sub-multitries that, in
-their turn, have the same structure.
+not have any basic case: every multitrie contains sub-multitries (that, in
+their turn, have the same structure) under all atomic names.
 
 The definition means that a $(V,D)$-multitrie is a \emph{trie} also known as
 a prefx tree, where every node stores a subset of~$D$ as a value, and has
 children labelled with all atomic names from~$V$. This means that such a trie
 is infinite and has no leaf nodes.
 %todo: reference about trie
+Depicting multitries graphically, as on fig.~\ref{fig:trie}, we will however
+only draw nodes of interest assuning that all other nodes have empty sets of
+values.
 
 Extreme multitries have the following recurrent definitions.
 \begin{Df}\label{df:mt-extreme}
@@ -367,7 +401,6 @@ In other words, empty (full) multitrie is a multitrie that has an empty
 (full) set of values and whose children under all atomic names are, in their
 turn, empty (full) multitries.
 
-The following is the basic operation on multitries.
 \begin{Df}\label{df:mt-select}
 \emph{Selection} operation. Let $p=(s,f) \in \setmt{V}{D}$, $u\in V$,
 $v\in V^\ast$, then
@@ -380,6 +413,7 @@ Subscripts will be omited if possible.
 
 In other words, selection operation finds a node pointed to by the
 compound name as a path in the trie.
+Selection is the basic operation on multitries.
 
 Then dereferencing could be defined as follows:
 \begin{Df}\label{df:mt-deref}
