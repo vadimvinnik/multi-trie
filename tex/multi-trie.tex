@@ -415,7 +415,25 @@ In other words, selection operation finds a node pointed to by the
 compound name as a path in the trie.
 Selection is the basic operation on multitries.
 
-Then dereferencing could be defined as follows:
+\begin{Ex}\label{ex:mt-select}
+Consider a multitrie~$p$ depicted on fig.~\ref{fig:trie}. Selection under a
+name~$a$ results in a multitrie~$\select(p,a)$ shown on
+fig.~\ref{fig:mt-select}.
+\end{Ex}
+
+\begin{figure}[ht]
+\begin{center}
+\begin{minipage}{17em}
+\dirtree{%
+  .1 $\varepsilon$\DTcomment{$\{2, 3, 4\}$} .
+    .2 $a$\DTcomment{$\{5\}$} .
+    .2 $b$\DTcomment{$\{6\}$} .
+}
+\end{minipage}
+\end{center}
+\caption{Selection of a multitrie}\label{fig:mt-select}
+\end{figure}
+
 \begin{Df}\label{df:mt-deref}
 Given a $(V,D)$-multitrie~$p$ and a name~$v\in V^\ast$, \emph{dereferencing}
 of~$v$ in~$p$ is
@@ -454,6 +472,7 @@ of the following.
 \begin{St}\label{st:isomorph}
 Consider a mapping~$\varphi: \setmvcn{V}{D} \to \setmt{V}{D}$, such that,
 for any~$p\in \setmvcn{V}{D}$,
+%TODO
 \[
   \varphi(p) = (
     \deref_\setcharmvcn(p, \varepsilon) ,
