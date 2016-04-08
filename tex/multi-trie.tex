@@ -216,7 +216,8 @@ Consider an MVCNset~$p$ from ex.~\ref{ex:mvcn}. Then
 
 \end{Ex}
 
-Dereferencing distributes over set-theoretical operations.
+It folllows immediately from the definition that dereferencing distributes
+over set-theoretical operations.
 \begin{St}\label{st:mvcn-deref-distributivity}
 Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$p$ and~$q$ be
 $(V,D)$-MVCNsets. Then
@@ -239,8 +240,8 @@ Further, we'll omit the subscript when it does not lead to confusion.
 \end{Df}
 
 In other words, each name in the empty MVCNset has no value whereas in the
-full MVCNset every name has all possible values.
-
+full MVCNset every name has all possible values. Let us formalize this
+elementary fact for the further use.
 \begin{St}\label{st:mvcn-extreme-deref}
 For any~$v\in V^\ast$,
 \begin{eqnarray*}
@@ -249,8 +250,8 @@ For any~$v\in V^\ast$,
 \end{eqnarray*}
 \end{St}
 
-It is easy to see that~$\bot$ and~$\top$ are neutral elements
-of~$\cup$ and~$\cap$, respectively:
+The next property is also just a trivial consequence of the definition:~$\bot$
+and~$\top$ are neutral elements of~$\cup$ and~$\cap$, respectively.
 \begin{St}\label{st:mvcn-neutrals}
 For any MVCNset~$p$,
 \begin{eqnarray*}
@@ -261,8 +262,8 @@ For any MVCNset~$p$,
 
 Note that a compound name~$v$ in a MVCNset~$p$ not only is a reference to
 multiple values but also is a common prefix for a ``bunch'' of names starting
-with~$v$. In this sence,~$v$ is a name for a sub-object of~$p$ that is
-defined as follows
+with~$v$. In this sence,~$v$ is a name for an entire sub-object of~$p$ that is
+defined as follows.
 \begin{Df}\label{df:mvcn-select}
 Let~$p\in\setmvcn{V}{D}$, $v\in V^\ast$, then \emph{selection} from~$p$
 under~$v$ is
@@ -459,20 +460,20 @@ set-theoretical operations on sets of values and corresponding operations
 on multitries.
 \end{Df}
 
+In other words, to build $r = p \cup q$, one needs to build the union of the
+value sets contained in both operands under the same path.
 It is easy to see that properties identical to those of MVCNsets
 hold for multitries, namely counterparts of
 st.~\ref{st:mvcn-deref-distributivity},
 \ref{st:mvcn-extreme-deref},
 \ref{st:mvcn-neutrals}
 and~\ref{st:mvcn-selection-properties}.
-Moreover, all properties of MVCNsets and multitries are identical, and these
-two kinds of objects should be regarded as essentially equivalent because
+Moreover, all properties of MVCNsets and multitries are identical because
 of the following.
 
 \begin{St}\label{st:isomorph}
 Consider a mapping~$\varphi: \setmvcn{V}{D} \to \setmt{V}{D}$, such that,
 for any~$p\in \setmvcn{V}{D}$,
-%TODO
 \[
   \varphi(p) = (
     \deref_\setcharmvcn(p, \varepsilon) ,
@@ -500,7 +501,20 @@ languages when describing further notions, choosing the most
 appropriate form in each particular case.
 
 
-\section{Cartesian Product}
+\section{Cartesian product and flattening}
+
+This section describes two more complicated operations that change structure of
+their operands. Before giving a formal definition for a cartesian product of
+MVCNsets or multitries, let us informally describe how should an operation
+look like to deserve this name.
+
+Let~$p$ and~$q$ be two multitries. Their cartesian product should consist of
+values of the form~$(d',d'')$ where $d'$~is a value from~$p$ and $d''$~is taken
+from~$q$. But values are contained in multitries not on their own, they are
+attached to some names~-- say, $u$~and~$v$, respectively. As the product's
+value~$(d',d'')$ is combined from the values taken from operands, the name of
+this combined value must be combined from~$u$ and~$v$, and the only combining
+operation defined for names is concatenation.
 
 \begin{Df}\label{df:mvcn-cartesian}
 Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
@@ -510,7 +524,9 @@ Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
 \]
 \end{Df}
 
-Obviously,~$\times$ distributes through $\cap$ and $\cup$.
+%TODO: example
+
+Obviously,~$\times$ distributes over $\cap$ and $\cup$.
 \begin{St}\label{st:cartesian-distributivity}
 For any $p \in \setmvcn{V}{D'}$ and $q, r \in \setmvcn{V}{D''}$,
 \[
