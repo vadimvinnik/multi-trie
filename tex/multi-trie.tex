@@ -524,7 +524,21 @@ Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
 \]
 \end{Df}
 
-%TODO: example
+\begin{Ex}\label{ex:cartesian}
+Consider the following MVCNsets:
+\begin{eqnarray*}
+  p & = & \{ (\varepsilon, 0), (a, 1), (a, 2) \} , \\
+  q & = & \{ (\varepsilon, 3), (\varepsilon, 4), (c, 5) \} .
+\end{eqnarray*}
+Then their cartesian product is
+\begin{eqnarray*}
+  p \times q & = &  \{ (\varepsilon, (0, 3)), (\varepsilon, (0, 4)) \} \cup \\
+    & \cup & \{ (c, (0, 5)) \} \cup \\
+    & \cup & \{ (a, (1, 3)), (a, (1, 4)), (a, (2, 3)), (a, (2, 4)) \} \cup \\
+    & \cup & \{ (ac, (1, 5)), (ac, (2, 5)) \} .
+\end{eqnarray*}
+%TODO: $q \times p$
+\end{Ex}
 
 Obviously,~$\times$ distributes over $\cap$ and $\cup$.
 \begin{St}\label{st:cartesian-distributivity}
