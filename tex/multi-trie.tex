@@ -508,7 +508,7 @@ their operands. Before giving a formal definition for a cartesian product of
 MVCNsets or multitries, let us informally describe how should an operation
 look like to deserve this name.
 
-Let~$p$ and~$q$ be two multitries. Their cartesian product should consist of
+Let~$p$ and~$q$ be two MVCNsets. Their cartesian product should consist of
 values of the form~$(d',d'')$ where $d'$~is a value from~$p$ and $d''$~is taken
 from~$q$. But values are contained in multitries not on their own, they are
 attached to some names~-- say, $u$~and~$v$, respectively. As the product's
@@ -528,16 +528,15 @@ Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
 Consider the following MVCNsets:
 \begin{eqnarray*}
   p & = & \{ (\varepsilon, 0), (a, 1), (a, 2) \} , \\
-  q & = & \{ (\varepsilon, 3), (\varepsilon, 4), (c, 5) \} .
+  q & = & \{ (\varepsilon, 3), (\varepsilon, 4), (b, 5) \} .
 \end{eqnarray*}
 Then their cartesian product is
 \begin{eqnarray*}
   p \times q & = &  \{ (\varepsilon, (0, 3)), (\varepsilon, (0, 4)) \} \cup \\
-    & \cup & \{ (c, (0, 5)) \} \cup \\
+    & \cup & \{ (b, (0, 5)) \} \cup \\
     & \cup & \{ (a, (1, 3)), (a, (1, 4)), (a, (2, 3)), (a, (2, 4)) \} \cup \\
-    & \cup & \{ (ac, (1, 5)), (ac, (2, 5)) \} .
+    & \cup & \{ (ab, (1, 5)), (ab, (2, 5)) \} .
 \end{eqnarray*}
-%TODO: $q \times p$
 \end{Ex}
 
 Obviously,~$\times$ distributes over $\cap$ and $\cup$.
@@ -564,15 +563,20 @@ cartesian product can be defined in terms of dereferencing and, therefore,
 is preserved by the mapping~$\varphi$ from st.~\ref{st:isomorph}. Also, this
 property may be taken as a definition of cartesian product for multitries.
 
-Consider an MVCNset whose values are, in their turn, MVCNsets.
+Consider an MVCNset~$p$ whose values are, in their turn, MVCNsets.
 Flattening operation formally defined below turns it into a ``plain'' MVCNset.
+First, let us describe the underlying idea. Supose a name~$u$ in~$p$ has a
+value~$q$ (and, maybe, some other values) that, by precondition, is an
+MVCNset.  Then take a name~$v$ that has a value~$d$ in~$q$. In sum, to
+reach~$d$ from~$p$, one has to dereference the name~$u$ (obtaining~$q$) and
+then (in~$q$) dereference~$v$. Therefore, flattening should turn~$p$ into
+such an MVCNset~$r$, where~$d$ is a value of the name~$uv$.
 \begin{Df}\label{df:flatten}
 \emph{Flattening} is an unary operation
 $\flatten : \setmvcn{V}{\setmvcn{V}{D}} \to\setmvcn{V}{D}$,
-such that, for any $(V,\setmvcn{V}{D})$-MVCNset~$p$, the
-corresponding $r=\flatten(p)$ is defined by
+such that, for any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
 \[
-  r = \{ (uv, d) \mid (u, t) \in p, (v, d) \in t \} .
+  \flatten(p) = \{ (uv, d) \mid (u, q) \in p, (v, d) \in q \} .
 \]
 \end{Df}
 
@@ -586,6 +590,8 @@ For any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
         \deref(\deref(p, u), v) .
 \]
 \end{St}
+
+
 
 \section{Notes about implementation}
 
