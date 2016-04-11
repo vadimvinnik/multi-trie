@@ -580,6 +580,34 @@ such that, for any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
 \]
 \end{Df}
 
+\begin{Ex}\label{ex:flatten}
+Let
+\begin{eqnarray*}
+  q_1 & = & \{ (\varepsilon, 0), (a, 1) \} ,\\
+  q_2 & = & \{ (a, 2), (aa, 3) \} ,\\
+  q_3 & = & \{ (\varepsilon, 4), (a, 5) \} ,\\
+  p   & = & \{ (\varepsilon, q_1), (\varepsilon, q_2), (a, q_3) \} .\\
+\end{eqnarray*}
+Then
+\[
+  \flatten(p) = \{
+      (\varepsilon, 0), (a, 1), (a, 2), (a, 4), (aa, 3), (aa, 5)
+  \} .
+\]
+The empty name~$\varepsilon$ has in~$p$ two values, namely~$q_1$ and~$q_2$.
+In~$q_1$, in its turn, the only value of~$\varepsilon$ is~0, whereas in~$q_2$
+it does not have any value. Therefore, 0~is the only value of $\varepsilon
+\varepsilon = \varepsilon$ in~$\flatten(p)$.  A name~$a$ has one value in~$q_1$
+and one value in~$q_2$, it is~1 and~2, respectively.  Then $a = \varepsilon a$
+has values~1 and~2 in $\flatten(p)$.  The name~$a$ in~$p$ has a value~$q_3$
+where the empty name's value is~4. Thus, 4~is also a value of $a \varepsilon =
+a$ in~$\flatten(p)$.
+
+Now look at the name~$aa$. Its value~3 is inherited from~$q_1$. Name~$a$
+in~$p$ has a valaue~$q_3$ that, in its turn, contains a name~$a$ with a
+value~5. Hence, the name~$aa$ has in $\flatten(p)$ the second value~5.
+\end{Ex}
+
 The following property can be used to define flattening for multitries
 deriving it from dereferencing operation.
 \begin{St}\label{st:deref-flatten}
