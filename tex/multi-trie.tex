@@ -40,6 +40,8 @@
 \newcommand{\flatten}{\operatorname{Fl}}
 \newcommand{\select}{\operatorname{Sel}}
 \newcommand{\deref}{\operatorname{Get}}
+\newcommand{\imbed}{\operatorname{Imb}}
+\newcommand{\putval}{\operatorname{Put}}
 \newcommand{\proj}[2]{\operatorname{pr}^{#1}_{#2}}
 
 \title{Compound names with multiple values: formalisation, properties and implementation}
@@ -63,6 +65,8 @@ functor, applicative functor and monad classes.
 \end{abstract}
 
 \tableofcontents
+
+
 
 \section{Introduction}
 
@@ -131,6 +135,7 @@ Let $\proj{n}{k}$ be a function that maps an $n$-tuple to its $k$-th component.
 A set of lower-case Latin letters (the alphabet) is denoted as~$\seta$,
 and~$\setn$ will denote a set of natural numbers~-- these two sets will be
 used in examples.
+
 
 
 \section{Relation-based definition and basic properties}
@@ -312,6 +317,7 @@ In other words,
 It is interesting to note that there is another formalization of the
 multivalued naming that is, however, equivalent to the above definitions.  It
 is described in the next section.
+
 
 
 \section{Trie-based definition}
@@ -501,6 +507,7 @@ languages when describing further notions, choosing the most
 appropriate form in each particular case.
 
 
+
 \section{Cartesian product and flattening}
 
 This section describes two more complicated operations that change structure of
@@ -594,22 +601,22 @@ Then
       (\varepsilon, 0), (a, 1), (a, 2), (a, 4), (aa, 3), (aa, 5)
   \} .
 \]
-The empty name~$\varepsilon$ has in~$p$ two values, namely~$q_1$ and~$q_2$.
+The empty name~$\varepsilon$ has two values in~$p$, namely~$q_1$ and~$q_2$.
 In~$q_1$, in its turn, the only value of~$\varepsilon$ is~0, whereas in~$q_2$
 it does not have any value. Therefore, 0~is the only value of $\varepsilon
-\varepsilon = \varepsilon$ in~$\flatten(p)$.  A name~$a$ has one value in~$q_1$
+\varepsilon = \varepsilon$ in~$\flatten(p)$.  The name~$a$ has one value in~$q_1$
 and one value in~$q_2$, it is~1 and~2, respectively.  Then $a = \varepsilon a$
 has values~1 and~2 in $\flatten(p)$.  The name~$a$ in~$p$ has a value~$q_3$
 where the empty name's value is~4. Thus, 4~is also a value of $a \varepsilon =
 a$ in~$\flatten(p)$.
 
-Now look at the name~$aa$. Its value~3 is inherited from~$q_1$. Name~$a$
-in~$p$ has a valaue~$q_3$ that, in its turn, contains a name~$a$ with a
-value~5. Hence, the name~$aa$ has in $\flatten(p)$ the second value~5.
+Now look at the name~$aa$. Its value~3 is inherited from~$q_2$. Except this,
+name~$a$ in~$p$ has a valaue~$q_3$ that, in its turn, contains a name~$a$ with
+a value~5. Hence, the name~$aa$ has in $\flatten(p)$ the second value~5.
 \end{Ex}
 
-The following property can be used to define flattening for multitries
-deriving it from dereferencing operation.
+The following property can be used to define flattening for multitries~--
+in terms of dereferencing operation.
 \begin{St}\label{st:deref-flatten}
 For any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
 \[
@@ -621,9 +628,37 @@ For any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
 
 
 
-\section{Notes about implementation}
+\section{Abstract characterisation of naming}
 
-\section{Application}
+In the previous sections, the idea of compound names with multiple values was
+shown on two concrete models, isomorph though differently constructed: one is a
+many-to-many relation between compound names and values, the second is a trie
+organising all possible names in a lexicographical order.  The purpose of this
+section is to describe this kind of naming on a higher abstraction level,
+based entirely on the required properties (one could say behaviour), without
+any assumptions about a possible structure of the objects obeying these
+properties (programmers would say implementation).
+
+The only essential property of a naming is its ability to retrieve values
+assigned to names. All differences between specific kinds of naming are,
+therefore, differences between specific kinds of \emph{values},
+\emph{assignment}, \emph{names} and \emph{retrieving}.  In our case, multiple
+values of the same name form sets, names are sequences of atoms, assignment and
+retrieval operations can be decomposed according to the compositional structure
+of names.
+
+\begin{eqnarray*}
+  & \deref(\putval(p, u, s), u) = s, \\
+  & \putval(\bot, u, \varnothing) = \bot , \\
+  & \putval(\putval(p, u, s), u, t) = \putval(p, u, t), \\
+  & u \neq v \implies \putval(\putval(p, u, s), v, t) = \putval(\putval(p, v, t), u, s).
+\end{eqnarray*}
+
+\[
+  u \neq v \implies \deref(\putval(p, v, s), u) = \deref(p, u),
+\]
+
+\section{Notes about implementation}
 
 \end{document}
 
