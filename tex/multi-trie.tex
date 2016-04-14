@@ -232,6 +232,18 @@ $(V,D)$-MVCNsets. Then
 for every~$v\in V^\ast$.
 \end{St}
 
+The following important property means, in fact, that any MVCNset is completely
+defined by the vlues of all its names.
+\begin{St}\label{st:mvcn-deref-equality}
+Let $p, q \in \setmvcn{V}{D}$. Then
+\[
+  (\forall u\in V^\ast . \deref(p,u) = \deref(q,u)) \implies (p = q) .
+\]
+\end{St}
+If one regards MVCNsets in the sense of programming, as a data container, this
+property means that two such containers with indiscernible behaviour
+(observed via a selector operation) are equal.
+
 The following operation is, in a reasonable sense, an opposite to
 dereferencing.  It replaces all values associated with some name with a new
 set. Thus, it is similar to assignment in the sense of imperative programming.
