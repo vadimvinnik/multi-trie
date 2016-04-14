@@ -266,12 +266,15 @@ Let~$p$ be an MVCNset from ex.~\ref{ex:mvcn}. Then
 
 The main property of replacement is obvious and immediately follows from the
 definition: it changes the values of one name and does not influence the other
-names.
+names. Except this, two subsequent replacement operations commute if they
+relate to different names, otherwise the outer operation absorbs the inner one.
 \begin{St}\label{st:mvcn-replace-deref}
 Let~$p \in \setmvcn{V}{D}$, $u, v \in V^\ast$, $s \in 2^D$. Then
 \begin{eqnarray*}
-  & \deref(\putval(p, u, s), u) = s, \\
-  & u \neq v \implies \deref(\putval(p, u, s), v) = \deref(p, v) .
+  & \deref(\putval(p, u, s), u) = s , \\
+  & u \neq v \implies \deref(\putval(p, u, s), v) = \deref(p, v) , \\
+  & \putval(\putval(p, u, s), u, t) = \putval(p, u, t) , \\
+  & u \neq v \implies \putval(\putval(p, u, s), v, t) = \putval(\putval(p, v, t), u, s) .
 \end{eqnarray*}
 \end{St}
 
@@ -294,7 +297,9 @@ elementary fact for the further use.
 For any~$v\in V^\ast$,
 \begin{eqnarray*}
   \deref(\bot, v) & = & \varnothing, \\
-  \deref(\top, v) & = & D .
+  \putval(\bot, v, \varnothing) & = & \bot , \\
+  \deref(\top, v) & = & D , \\
+  \putval(\top, v, D) & = & \top .
 \end{eqnarray*}
 \end{St}
 
