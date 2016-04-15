@@ -245,14 +245,15 @@ property means that two such containers with indiscernible behaviour
 (observed via a selector operation) are equal.
 
 The following operation is, in a reasonable sense, an opposite to
-dereferencing.  It replaces all values associated with some name with a new
-set. Thus, it is similar to assignment in the sense of imperative programming.
+dereferencing.  It replaces all values of some name with a new set of values.
+Thus, it is similar to assignment in the sense of imperative programming.
 \begin{Df}\label{df:mvcn-replace}
 \emph{Replacement} is an operation $\putval_\setcharmvcn : \setmvcn{V}{D}
 \times V^\ast \times 2^D \to \setmvcn{V}{D}$, such that
 \[
-  \putval(p, u, s) = \{ (v, x) \mid (v, x) \in p, v \neq u \}
-      \cup \{ (u, y) \mid y \in s \} .
+  \putval_\setcharmvcn(p, u, s) =
+      \{ (v, x) \mid (v, x) \in p, v \neq u \} \cup
+      \{ (u, y) \mid y \in s \} .
 \]
 The subscript will be omitted further whenever possible.
 \end{Df}
@@ -528,9 +529,35 @@ on multitries.
 
 In other words, to build $r = p \cup q$, one needs to build the union of the
 value sets contained in both operands under the same path.
+
+Let us also define for multitries an operation that corresponds to replacement
+defined for MVCNsets (see def.~\ref{df:mvcn-replace}. Like other multitrie
+operations, the most natural way of defining it is recursive.
+\begin{Df}\label{df:mt-replace}
+\emph{Replacement} is an operation $\putval_\setcharmt : \setmt{V}{D}
+\times V^\ast \times 2^D \to \setmt{V}{D}$, such that, for any
+$p = (s, f) \in \setmt{V}{D}$, $t \in 2^D$, $u \in V$, $v \in V^\ast$,
+\begin{eqnarray*}
+  \putval_\setcharmt(p, \varepsilon, t) & = & (t, f) , \\
+  \putval_\setcharmt(p, u v, t) & = & (p, f') ,
+\end{eqnarray*}
+where $f' : V \to \setmt{V}{D}$ is such a function that $f'(w) = f(w)$ for any
+$w\neq u$, and $f'(u) = \putval_\setcharmt(f(u), v, t)$.
+The subscript after the operation will be omited whenever it does not lead to
+confusion.
+\end{Df}
+
+In other words, to perform a replacement in a multitrie, one has to distunguish
+between two cases. If the name to be replaced is empty, just replase the set of
+values in the root node of the trie. Otherwise, take the first atomic component
+of the name, go to the child node associated with that atom, and perform a
+replacement under a remainder of the name.
+
 It is easy to see that properties identical to those of MVCNsets
 hold for multitries, namely counterparts of
 st.~\ref{st:mvcn-deref-distributivity},
+\ref{st:mvcn-deref-equality},
+\ref{st:mvcn-replace-deref},
 \ref{st:mvcn-extreme-deref},
 \ref{st:mvcn-neutrals}
 and~\ref{st:mvcn-selection-properties}.
@@ -547,7 +574,8 @@ for any~$p\in \setmvcn{V}{D}$,
   ) .
 \]
 Then~$\varphi$ is a bijection that preserves
-extreme elements, union, intersection, dereferencing and selection operations:
+extreme elements, union, intersection, dereferencing, replacement and selection
+operations:
 \begin{eqnarray*}
   & \varphi(\bot_{\setcharmvcn}) = \bot_{\setcharmt}, \\
   & \varphi(\top_{\setcharmvcn}) = \top_{\setcharmt}, \\
@@ -555,6 +583,8 @@ extreme elements, union, intersection, dereferencing and selection operations:
       \varphi(p) \mathbin{\odot_{\setcharmt}} \varphi(q) , \\
   & \deref_{\setcharmvcn}(p, v) =
       \deref_{\setcharmt}(\varphi(p), v) , \\
+  & \putval_{\setcharmvcn}(p, v, s) =
+      \putval_{\setcharmt}(\varphi(p), v, s) , \\
   & \varphi(\select_{\setcharmvcn}(p, v)) =
       \select_{\setcharmt}(\varphi(p), v) .
 \end{eqnarray*}
