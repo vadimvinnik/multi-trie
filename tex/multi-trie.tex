@@ -718,39 +718,16 @@ For any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
 
 
 
-\section{Abstract characterisation of naming}
-
-In the previous sections, the idea of compound names with multiple values was
-shown on two concrete models, isomorph though differently constructed: one is a
-many-to-many relation between compound names and values, the second is a trie
-organising all possible names in a lexicographical order.  The purpose of this
-section is to describe this kind of naming on a higher abstraction level,
-based entirely on the required properties (one could say behaviour), without
-any assumptions about a possible structure of the objects obeying these
-properties (programmers would say implementation).
-
-The only essential property of a naming is its ability to retrieve values
-assigned to names. All differences between specific kinds of naming are,
-therefore, differences between specific kinds of \emph{values},
-\emph{assignment}, \emph{names} and \emph{retrieving}.  In our case, multiple
-values of the same name form sets, names are sequences of atoms, assignment and
-retrieval operations can be decomposed according to the compositional structure
-of names.
-
-%TODO: define Put for sets and mts
-
-\begin{eqnarray*}
-  & \deref(\putval(p, u, s), u) = s, \\
-  & \putval(\bot, u, \varnothing) = \bot , \\
-  & \putval(\putval(p, u, s), u, t) = \putval(p, u, t), \\
-  & u \neq v \implies \putval(\putval(p, u, s), v, t) = \putval(\putval(p, v, t), u, s).
-\end{eqnarray*}
-
-\[
-  u \neq v \implies \deref(\putval(p, v, s), u) = \deref(p, u),
-\]
-
 \section{Notes about implementation}
+
+A container type implementing the multivalued naming with compound names has
+been defined in Haskell programming language. Some trade-offs between the
+mathematical purity and implementability could hardly be avoided. On the other
+hand, the framework of fundamental concepts provided by Haskell gave a
+direction towards some additional features that turn an abstract mathematical
+object into a potentially useful member of Haskell programming world.
+
+
 
 \end{document}
 
