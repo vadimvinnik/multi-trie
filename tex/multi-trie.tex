@@ -2,7 +2,7 @@
 %
 % Author    : Vadim Vinnik
 % E-mail    : vadim.vinnik@gmail.com
-% Date      : 2016-03-29
+% Date      : 2016-04-16
 % Status    : Draft
 % License   : Creative commons
 %
@@ -15,6 +15,13 @@
 \usepackage{amsthm}
 \usepackage{amsmath}
 \usepackage{dirtree}
+\usepackage{listings}
+
+\lstloadlanguages{Haskell}
+\lstset{%
+  language=Haskell, %
+  frame=trBL %
+}
 
 \DTsetlength{0.2em}{2em}{0.2em}{0.4pt}{1pt}
 
@@ -727,7 +734,10 @@ hand, the framework of fundamental concepts provided by Haskell gave a
 direction towards some additional features that turn an abstract mathematical
 object into a potentially useful member of Haskell programming world.
 
-
+\begin{lstlisting}
+-- some sample Haskell code
+class Functor f => Applicative f where
+\end{lstlisting}
 
 \end{document}
 
