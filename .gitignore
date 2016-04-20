@@ -6,6 +6,10 @@ cabal-dev
 *.chs.h
 *.dyn_o
 *.dyn_hi
+*.log
+*.toc
+*.dvi
+*.pdf
 .virtualenv
 .hpc
 .hsenv
