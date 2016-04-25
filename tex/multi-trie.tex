@@ -60,7 +60,7 @@
 \maketitle
 
 \begin{abstract}
-Naming is one of the most fundamental phenomena for programming.  In most
+Naming is one of the most fundamental concepts in programming.  In most
 cases, a name is considered to be atomic and to have a unique value.  This
 paper describes a kind of naming with both these principles negated: names form
 a monoid under concatenation, and each name can be associated with multiple
@@ -98,8 +98,21 @@ union.
 
 \section{Introduction}
 
-%todo:
-Why naming is so important. Why its formalisation is needed.
+A trilateral relation between a \emph{name}, its \emph{value} and
+\emph{meaning} has been in the focus of philosophical and mathematical logic,
+metamathematics, semiotics and epistemology.  For example, important questions
+were raised and deeply investigated in fundamental works by
+G.\,Frege~\cite{bib:frege},
+L.\,Wittgenstein~\cite{bib:wittgenstein},
+W.\,Quine~\cite{bib:quine}.
+Since arising of computer science, naming gained a special significance~-- for
+example, \emph{a name that refers to a name that, finally, relates to an
+entity} is not a purely philosophical excercise anymore but a working tool for
+everyday~-- \emph{indirect pointer}; a question \emph{does every name
+necessarily have a value} turned into a \emph{null reference} with both its
+power and danger; \emph{names changing their values depeding on the context}
+became \emph{variables} in the sense of imperative programming.
+%todo: Why naming is so important. Why its formalisation is needed.
 
 Suppose there is a given set~$D$ whose elements are called \emph{values}, or
 \emph{denotata}, and a set~$V$ of objects called \emph{names}.
@@ -779,6 +792,30 @@ approximation.
 -- some sample Haskell code
 class Functor f => Applicative f where
 \end{lstlisting}
+
+\begin{thebibliography}{00}
+
+\bibitem{bib:frege}
+  Gottlob Frege,
+  Ueber Sinn und Bedeutung,
+  TODO.
+
+\bibitem{bib:wittgenstein}
+  Ludwig Wittgenstein,
+  Tractatus logico-philosophicus, Logisch-philosophische Abhandlung.
+  Suhrkamp,
+  Frankfurt am Main,
+  2003
+
+\bibitem{bib:quine}
+  Quine, Willard Van Orman,
+  Word and Object [1960].
+  New edition, with a foreword by Patricia Churchland,
+  Cambridge,
+  Mass.: MIT Press,
+  2015
+
+\end{thebibliography}
 
 \end{document}
 
