@@ -112,6 +112,27 @@ everyday~-- \emph{indirect pointer}; a question \emph{does every name
 necessarily have a value} turned into a \emph{null reference} with both its
 power and danger; \emph{names changing their values depeding on the context}
 became \emph{variables} in the sense of imperative programming.
+
+Therefore, every comprehensive theory of programming must give a special
+explication of naming and include a mathematical model that reflects its
+properties and behaviour.  Approaches and formal techniques could be very
+different.  For example, \emph{A Practical Theory of
+Programming}~\cite{bib:ptop} as well as a much earlier book \emph{Unifying
+Theories of Programming}~\cite{bib:utp} represent a variable declaration by
+means of a quantifier.  It is well-known that, in the first-order logic, a name
+bound by a quantifier refers to an unspecified object of the semantic domain;
+the formula tells something about these objects and uses names to represent
+them.  Objects belong to a semantic level and names to the syntactical level
+that do not intersect.  Therefore, this formalism works fine for the wide class
+of programs that have a predefined list of variables but hardly can describe
+programs that dynamically allocate memory blocks whose size is not known
+\emph{a priori}.  In general, it is natural for high-level theories that
+deliberately distantiate from hardware and OS details.
+
+On the contrast to above, low-level theories, that could be applied to formal
+verification of compilers, explicitly describe memory model, allocation
+operations and memory block references~\cite{bib:leroy}. 
+
 %todo: Why naming is so important. Why its formalisation is needed.
 
 Suppose there is a given set~$D$ whose elements are called \emph{values}, or
@@ -802,10 +823,10 @@ class Functor f => Applicative f where
 
 \bibitem{bib:wittgenstein}
   Ludwig Wittgenstein,
-  Tractatus logico-philosophicus, Logisch-philosophische Abhandlung.
+  Tractatus logico-philosophicus, Logisch-phi\-lo\-so\-phi\-sche Abhandlung.
   Suhrkamp,
   Frankfurt am Main,
-  2003
+  2003.
 
 \bibitem{bib:quine}
   Quine, Willard Van Orman,
@@ -813,7 +834,25 @@ class Functor f => Applicative f where
   New edition, with a foreword by Patricia Churchland,
   Cambridge,
   Mass.: MIT Press,
-  2015
+  2015.
+
+\bibitem{bib:ptop}
+  Eric C.R. Hehner,
+  A Practical Theory of Programming,
+  2016-4-14 edition,
+  http://www.cs.utoronto.ca/~hehner/aPToP/aPToP.pdf.
+
+\bibitem{bib:utp}
+  C.\,A.\,R.\,Hoare, He Jifeng,
+  Unifying Theories of Programming,
+  Prentice-Hall,
+  1998.
+
+\bibitem{bib:leroy}
+  Xavier Leroy, Sandrine Blazy.
+  Formal verification of a C-like memory model and its uses for verifying program transformations.
+  Journal of Automated Reasoning.
+  41(1), pp.1-31, July 2008.
 
 \end{thebibliography}
 
