@@ -119,19 +119,37 @@ properties and behaviour.  Approaches and formal techniques could be very
 different.  For example, \emph{A Practical Theory of
 Programming}~\cite{bib:ptop} as well as a much earlier book \emph{Unifying
 Theories of Programming}~\cite{bib:utp} represent a variable declaration by
-means of a quantifier.  It is well-known that, in the first-order logic, a name
-bound by a quantifier refers to an unspecified object of the semantic domain;
-the formula tells something about these objects and uses names to represent
-them.  Objects belong to a semantic level and names to the syntactical level
-that do not intersect.  Therefore, this formalism works fine for the wide class
-of programs that have a predefined list of variables but hardly can describe
-programs that dynamically allocate memory blocks whose size is not known
-\emph{a priori}.  In general, it is natural for high-level theories that
-deliberately distantiate from hardware and OS details.
+means of a quantifier.
 
-On the contrast to above, low-level theories, that could be applied to formal
-verification of compilers, explicitly describe memory model, allocation
-operations and memory block references~\cite{bib:leroy}. 
+As always in the first-order logic, a name bound by a quantifier refers to an
+unspecified object of the semantic domain; the formula tells something about
+these objects and uses names to represent them.  Objects belong to a semantic
+level and names to the syntactical level that do not intersect.  Therefore,
+this formalism works fine for the wide class of programs that have a predefined
+list of variables but hardly can describe programs that dynamically allocate
+memory blocks whose size is not known \emph{a priori}.  In general, it is
+natural for high-level theories that deliberately distantiate from hardware and
+OS details.
+
+On the contrast to above, there are theories that explicitly describe memory
+model and allocation operations in terms of memory block
+references~\cite{bib:leroy}.  These theories reflect semantics of programs on a
+relatively low, implementation-aware level, and their primary application is
+formal specification and verification of compilers.
+
+There is yet another option between these two extremes. Imagine an algorithm
+that does not work on a level of OS or hardware resources (and, therefore, it
+would be redundant to take memory addresses into account) but nevertheallocless
+computes the names of variables to get values from or to assign values to. A
+typical example could be any array processing program written in~C:
+\lstinline{a[i]} is a computable name because this expression, depending on the
+value of an integer variable~\lstinline{i}, can evaluate to any of individual
+elements' names.
+
+An elegant formalism that liberates names from cumbersome specifics of
+\emph{being addresses} but allows any specifics to be added if needed,
+is a notion of \emph{naming set} introduced by V.\,N.\,Redko in a
+comprehensive conception of \emph{compositional programming}~\ref{bib:redko}.
 
 %todo: Why naming is so important. Why its formalisation is needed.
 
