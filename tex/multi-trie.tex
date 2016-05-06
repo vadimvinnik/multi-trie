@@ -19,8 +19,9 @@
 
 \lstloadlanguages{Haskell}
 \lstset{%
-  language=Haskell, %
-  frame=trBL %
+  basicstyle={\small\ttfamily},%
+  language=Haskell,%
+  frame=trBL%
 }
 
 \DTsetlength{0.2em}{2em}{0.2em}{0.4pt}{1pt}
@@ -846,58 +847,62 @@ data MultiTrie n v = MultiTrie {
 The most important functions defined in the module are listed below. Let us
 omit class constraints to avoid redundant detalisation.
 
-\lstinline{empty :: MultiTrie n v}~-- a constant, the empty multi-trie~$\bot$.
+\begin{lstlisting}
+empty :: MultiTrie n v
+top :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) =>
+    MultiTrie n v
+leaf :: [v] -> MultiTrie n v
+add :: v -> MultiTrie n v -> MultiTrie n v
 
-\lstinline{top :: MultiTrie n v}~-- a constant, the full multi-trie~$\top$.
+values :: MultiTrie n v -> [v]
+children :: MultiTrie n v -> MultiTrieMap n v
+null :: MultiTrie n v -> Bool
+size :: MultiTrie n v -> Int
 
-\lstinline{leaf :: [v] -> MultiTrie n v}~-- create a multi-trie with the given
-list of values in its root node and no other values.
+isEqualStrict :: (Ord n, Eq v) =>
+    MultiTrie n v -> MultiTrie n v -> Bool
 
-\lstinline{values :: MultiTrie n v -> [v]}~-- gets a list of values from the
-root node.
+subnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
 
-\lstinline{children :: MultiTrie n v -> MultiTrieMap n v}~-- gets a mapping
-of atomic names to child nodes from the root node.
+mtmap :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
+cartesianProduct :: Ord n =>
+    MultiTrie n v -> MultiTrie n w -> MultiTrie n (v, w)
+union :: Ord n =>
+    MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+flatten :: Ord n =>
+    MultiTrie n (MultiTrie n v) -> MultiTrie n v
 
-\lstinline{null :: MultiTrie n v -> Bool}~-- check whether a multi-trie is
-empty.
+applyCartesian :: Ord n =>
+    MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
+applyUniting :: Ord n =>
+    MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 
-\lstinline{size :: MultiTrie n v -> Int}~-- get the total number of values in
-the multi-trie.
+toMap :: Ord n => MultiTrie n v -> Map [n] [v]
+toList :: Ord n => MultiTrie n v -> [([n], v)]
+fromList :: Ord n => [([n], v)] -> MultiTrie n v
+\end{lstlisting}
 
-\lstinline{isEqualStrict :: MultiTrie n v -> MultiTrie n v -> Bool}~--
-
-\lstinline{isEqualWeak :: MultiTrie n v -> MultiTrie n v -> Bool}~--
-
-\lstinline{subnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v}~--
-
-\lstinline{addToSubnode :: [n] -> v -> MultiTrie n v -> MultiTrie n v}~--
-
-\lstinline{deleteSubnode :: [n] -> MultiTrie n v -> MultiTrie n v}~--
-
-\lstinline{mtmap :: (v -> w) -> MultiTrie n v -> MultiTrie n w}~--
-
-\lstinline{}~--
-
-\lstinline{}~--
-
-\lstinline{}~--
-
-\lstinline{}~--
-
-\lstinline{}~--
-
-\lstinline{}~--
-
-\lstinline{}~--
-
-\lstinline{}~--
-
-\lstinline{}~--
-
-\lstinline{}~--
-
-\lstinline{}~--
+\begin{description}
+\item [empty]
+\item [top]
+\item [leaf]
+\item [add]
+\item [values]
+\item [children]
+\item [null]
+\item [size]
+\item [isEqualStrict]
+\item [subnode]
+\item [mtmap]
+\item [cartesianProduct]
+\item [union]
+\item [flatten]
+\item [applyCartesian]
+\item [applyUniting]
+\item [toMap]
+\item [toList]
+\item [fromList]
+\end{description}
 
 \begin{thebibliography}{00}
 
