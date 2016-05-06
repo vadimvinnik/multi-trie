@@ -369,7 +369,7 @@ Let~$p \in \setmvcn{V}{D}$, $u, v \in V^\ast$, $s \in 2^D$. Then
 
 Let us introduce special terms and symbols for the two extreme cases of
 MVCNsets, namely:
-\begin{Df}\label{df:mvcn-extremes}
+\begin{Df}\label{df:mvcn-extreme}
 MVCNsets $\bot_\setcharmvcn$ called \emph{empty} and $\top_\setcharmvcn$ called
 \emph{full} are defined by
 \begin{eqnarray*}
@@ -844,8 +844,7 @@ data MultiTrie n v = MultiTrie {
         children :: MultiTrieMap n v }
 \end{lstlisting}
 
-The most important functions defined in the module are listed below. Let us
-omit class constraints to avoid redundant detalisation.
+The most important functions defined in the module are listed below.
 
 \begin{lstlisting}
 empty :: MultiTrie n v
@@ -882,26 +881,73 @@ toList :: Ord n => MultiTrie n v -> [([n], v)]
 fromList :: Ord n => [([n], v)] -> MultiTrie n v
 \end{lstlisting}
 
+Here is a shorh explanation of their semantics.
 \begin{description}
 \item [empty]
+  A constant for the empty multi-trie~$\bot$, see def.~\ref{df:mvcn-extreme}
+  and~\ref{df:mt-extreme}.
 \item [top]
-\item [leaf]
+  A constant for the full multi-trie~$\bot$, see def.~\ref{df:mvcn-extreme}
+  and~\ref{df:mt-extreme}.  The long class constraint is needed because the
+  function must construct a (lazy) list of all names and a list of all possible
+  values.
+\item [leaf] Given a list of values, constructs a multi-trie that has this list
+  in its root node and no other valies (i.e. all other names yield to an empty
+  list of values).
 \item [add]
+  Given a value and a multi-trie, prepends the value to the list stored in the
+  root node.
 \item [values]
+  Get a list of values from the root node of a multi-trie.
 \item [children]
+  From the root node of a multi-trie, get a mapping of atomic names to the
+  child nodes.
 \item [null]
+  Check whether the argument multi-trie is empty.
 \item [size]
+  Get the total number of values in the multi-trie.
 \item [isEqualStrict]
+  Compare two multi-tries: they are considered equal if equal are lists of
+  values under all compound names. I.e. if the multi-tries have equal lists
+  of values in their root nodes and, for every atomic name, the corresponding
+  child multi-tries are equal in this sense, in their turn. There is another
+  function for weak comparison~-- it ignores order of elements in the lists
+  treating them as multisets.
 \item [subnode]
+  Get a node pointed to by a compound name. If the name is not present in the
+  underlying data structure, the function anyway yields a correct value, the
+  empty multi-trie. This function implements selection operation from
+  def.~\ref{df:mvcn-select} and~\ref{df:mt-select}.
 \item [mtmap]
+  Applies a function to each value in a multi-trie and combines results into
+  a new multi-trie preserving the names (and, therefore, the trie structure).
 \item [cartesianProduct]
+  Constructs a cartesian product of two multi-tries in the sense of
+  def.~\ref{df:mvcn-cartesian} and st.~\ref{st:deref-cartesian}.
 \item [union]
+  Constructs a union of two multi-tries, see st.~\ref{st:mvcn-setop} and
+  def.~\ref{df:mt-setop}. There is another function for intersection.
 \item [flatten]
+  Given a multi-tries whose values are, in their turn, multi-tries, construct
+  a flattened multi-trie.
 \item [applyCartesian]
+  Given a multi-trie of functions and a multi-trie of some objects, apply the
+  functions to the objects and combine results into a multi-trie in the same
+  way as cartesian product does.
 \item [applyUniting]
+  % todo
+  Given a multi-trie~$p$ of functions and a multi-trie~$q$ of some objects,
+  apply each function from~$p$ to each value from~$q$, associate results with
+  the concatenation of respective names.
+  There is also a dual function for intersection.
 \item [toMap]
+  Convert a multi-trie to a \lstinline{Data.Map} that maps compound names to
+  lists of values. Corresponds to an inverse of the isomorphism~$\varphi$
+  from st.~\ref{st:isomorph}.
 \item [toList]
+  Convert a multi-trie to a list of name--value pairs.
 \item [fromList]
+  Convert a list of name--value pairs to a multi-trie.
 \end{description}
 
 \begin{thebibliography}{00}
