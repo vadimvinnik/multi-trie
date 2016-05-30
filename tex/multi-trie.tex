@@ -828,6 +828,14 @@ $f_X(x) = x$ for any $x\in X$,
 \end{eqnarray*}
 \end{St}
 
+Mapping function distributes over set-theoretical operations.
+\begin{St}\label{st:map-distributivity}
+Let $f: D \to D'$, $p, q \in \setmvcn{V}{D}$, $\odot \in \{\cup, \cap \}$. Then
+\[
+  (\fmap f) (p \odot q) = (\fmap f)(p) \odot (\fmap f)(q) .
+\]
+\end{St}
+
 Thus, $\fmap$ operation can apply a single unary function to an MVCNset of
 values. It is easy to define an operation $\fpam$ that does the opposite:
 applies an MVCNset of unary functions to a single value. For this purpose,
@@ -844,25 +852,42 @@ equation
 for every $f: X\to Y$.
 \end{Df}
 
-Then
+Then the reverse mapping operation gets a concise definition.
 
 \begin{Df}\label{df:mvcn-pam}
 \emph{Reverse mapping} is an operation
-$\fpam_{\setcharmvcn} : D \to (\setmvcn{V}{D \to D'} \to \setmvcn{V}{D'})$,
+$\fpam_{\setcharmvcn} : \setmvcn{V}{D \to D'} \to (D \to \setmvcn{V}{D'})$,
+such that
 \[
-  \fpam d = \fmap (\ylppa d) .
+  (\fpam p)(d) = (\fmap (\ylppa d))(p) .
 \]
+for any $p\in \setmvcn{V}{D}$, $d\in D$.
 \end{Df}
 
 It is easy to see from the definitions of $\fmap$ and $\ylppa$ that $\fpam$
 really does what was intended:
 
 \begin{St}\label{st:mvcn-pam}
-If $p$ is a $(V, D\to D')$, $d\in D$,
+If $p$ is a $(V, D\to D')$-MVCNset, $d\in D$,
 \[
-  (\fpam d)(p) = \{ (v, f(d)) \mid (v, f) \in p \} .
+  (\fpam p)(d) = \{ (v, f(d)) \mid (v, f) \in p \} .
 \]
 \end{St}
+
+Since reverse mapping is defined as a special case of mapping, it inherits
+distributivity, see st.~\ref{st:map-distributivity}.
+
+\begin{St}\label{st:pam-distributivity}
+Let $d\in D$, $p, q \in \setmvcn{V}{D \to D'}$, $\odot \in \{\cup, \cap \}$. Then
+\[
+  (\fpam (p \odot q))(d) = (\fpam p)(d) \odot (\fpam q)(d) .
+\]
+\end{St}
+
+
+Having defined operations that apply a single function to an MVCNset of values
+and an MVCNset of functions to a single value, let us finally define an
+operation that applies an MVCNset of functions to an MVCNset of values. 
 
  
 \section{Notes about implementation}
