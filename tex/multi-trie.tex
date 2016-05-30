@@ -51,6 +51,10 @@
 \newcommand{\imbed}{\operatorname{Imb}}
 \newcommand{\putval}{\operatorname{Put}}
 \newcommand{\proj}[2]{\operatorname{pr}^{#1}_{#2}}
+\newcommand{\fmap}{\operatorname{Map}}
+\newcommand{\fpam}{\operatorname{Pam}}
+\newcommand{\id}{\operatorname{id}}
+\newcommand{\ylppa}{\operatorname{Ylppa}}
 
 \title{Compound names with multiple values: formalisation, properties and implementation}
 \author{Vadim Vinnik}
@@ -794,6 +798,73 @@ For any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
 
 
 
+\section{Elementwise mappings and applications}
+
+Sections above describe operations on MVCNsets and multi-tries containing some
+`ordinary' values. Now let us consider how do these objects interact with
+functions, including how can a container populated with functions act as a
+function.
+
+\begin{Df}\label{df:mvcn-map}
+Let $f : D \to D'$. Then $\fmap$ operation turns it into a \emph{mapping
+function} $\fmap_{\setcharmvcn} f : \setmvcn{V}{D} \to \setmvcn{V}{D'}$, such
+that
+\[
+  (\fmap_{\setcharmvcn} f)(p) = \{ (v, f(d)) \mid (v, d) \in p \}
+\]
+for any $p \in \setmvcn{V}{D}$.
+\end{Df}
+
+The definition of mapping for multi-tries is straightforward, it can be easily
+obtained from isomorphism. The following properties hold:
+
+\begin{St}\label{st:map-properties}
+If $\circ$ is a composition of unary functions, i.e. $(f\circ g)(x) = f(g(x))$ for
+all $f$, $g$, $x$ of matching types, and $\id_X : X \to X$ is an identity function,
+$f_X(x) = x$ for any $x\in X$,
+\begin{eqnarray*}
+  & \fmap \id_D = \id_{\setmvcn{V}{D}} , \\
+  & \fmap (f \circ g) = (\fmap f) \circ (\fmap g) .
+\end{eqnarray*}
+\end{St}
+
+Thus, $\fmap$ operation can apply a single unary function to an MVCNset of
+values. It is easy to define an operation $\fpam$ that does the opposite:
+applies an MVCNset of unary functions to a single value. For this purpose,
+let us define first an auxiliary function that turns a value~$x$ into a
+high order function applying an argument function to~$x$:
+
+\begin{Df}\label{df:ylppa}
+\emph{Reverse application} is a function $\ylppa : X \to ((X \to Y) \to Y)$,
+such that, for every $x\in X$, $\xi = \ylppa x$ is a function satisfying the
+equation
+\[
+  \xi(f) = f(x)
+\]
+for every $f: X\to Y$.
+\end{Df}
+
+Then
+
+\begin{Df}\label{df:mvcn-pam}
+\emph{Reverse mapping} is an operation
+$\fpam_{\setcharmvcn} : D \to (\setmvcn{V}{D \to D'} \to \setmvcn{V}{D'})$,
+\[
+  \fpam d = \fmap (\ylppa d) .
+\]
+\end{Df}
+
+It is easy to see from the definitions of $\fmap$ and $\ylppa$ that $\fpam$
+really does what was intended:
+
+\begin{St}\label{st:mvcn-pam}
+If $p$ is a $(V, D\to D')$, $d\in D$,
+\[
+  (\fpam d)(p) = \{ (v, f(d)) \mid (v, f) \in p \} .
+\]
+\end{St}
+
+ 
 \section{Notes about implementation}
  
 A container type implementing the multivalued naming with compound names has
