@@ -54,7 +54,9 @@
 \newcommand{\fmap}{\operatorname{Map}}
 \newcommand{\fpam}{\operatorname{Pam}}
 \newcommand{\id}{\operatorname{id}}
+\newcommand{\apply}{\operatorname{Apply}}
 \newcommand{\ylppa}{\operatorname{Ylppa}}
+\newcommand{\eval}{\operatorname{Eval}}
 
 \title{Compound names with multiple values: formalisation, properties and implementation}
 \author{Vadim Vinnik}
@@ -886,12 +888,50 @@ Let $d\in D$, $p, q \in \setmvcn{V}{D \to D'}$, $\odot \in \{\cup, \cap \}$. The
 
 
 Having defined operations that apply a single function to an MVCNset of values
-and an MVCNset of functions to a single value, let us finally define an
-operation that applies an MVCNset of functions to an MVCNset of values. 
+and an MVCNset of functions to a single value, let us define an
+operation that applies an MVCNset of functions to an MVCNset of values. The
+operation must preserve trie-like naming structures of both operands~-- the
+considerations motivating the definition of cartesian product apply here
+as well. To avoid rewriting essentially the same definition twice, let us
+instead introduce an auxiliary operation and reuse a previously defined
+operation.
 
- 
+\begin{Df}\label{df:eval}
+Operation $\eval$ called \emph{(unary) evaluation} has type
+$(X \to Y) \times X \to Y$ and is defined as follows.
+\[
+  \eval (f, x) = f(x) .
+\]
+\end{Df}
+
+In other words, this operation takes a pair whose first element is a unary
+function and the second is an argument, and applies the function to the
+argument. Thus, the application operation over MVCNsets can be defined as
+follows.
+
+\begin{Df}\label{df:mvcn-apply-cartesian}
+Let $p\in \setmvcn{V}{D\to D'}$, $p\in \setmvcn{V}{D}$. Then
+\[
+  \apply_{\setcharmvcn}^{\times} (p, q) = (\fmap \eval) (p \times q)
+\]
+that is a $(V,D')$-MVCNset.
+\end{Df}
+
+Recalling the definitions of cartesian product and evaluation, one can
+obtain the main property of cartesian application.
+
+\begin{St}\label{st:mvcn-apply-cartesian}
+If $p\in \setmvcn{V}{D\to D'}$, $p\in \setmvcn{V}{D}$,
+\[
+  \apply_{\setcharmvcn}^{\times} (p, q) =
+    \{ (uv, f(d)) \mid (u,f) \in p, (v,d) \in q \} .
+\]
+\end{St}
+
+%TODO: other applications 
+
 \section{Notes about implementation}
- 
+
 A container type implementing the multivalued naming with compound names has
 been defined in Haskell programming language. Some trade-offs between the
 mathematical purity and implementability could hardly be avoided. On the other
@@ -1045,6 +1085,24 @@ Here is a shorh explanation of their semantics.
 \item [fromList]
   Convert a list of name--value pairs to a multi-trie.
 \end{description}
+
+
+
+\section{Conclusion}
+
+Having started with an intuitive notion of naming and its most general
+formalisation, we moved to its special case with compound names and multiple
+values. Two formalisations thereof were described: one based on the idea of
+(ambigious) mapping of names to values as a whole and another based on
+decomposing names into atoms. The definitions are shown to be essentially
+equivalent. This equivalence, from the programmer's perspective, means that
+this kind of containers could be used as a `plain' collection of name-value
+pairs or as a hierarchical data structure. The functions implemented in the
+library support both views.
+
+% TODO
+
+
 
 \begin{thebibliography}{00}
 
