@@ -962,6 +962,22 @@ where
 \end{eqnarray*}
 \end{Df}
 
+In other words, to build a uniting or intersecting application of~$p$ to~$q$,
+one should
+\begin{itemize}
+\item apply every function from the root node of~$p$ to every value from
+the root node of~$q$, let the result be~$a$;
+\item for every atomic name~$v\in V$, apply the entire multi-trie~$p$ of
+functions to the $v$-child of the multi-trie~$q$ of values~-- let~$b_1(v)$ be
+the result;
+\item do the same with the $v$-child of~$p$ and the entire~$q$, let the result
+be~$b_2(v)$;
+\item merge $b_1(v)$ and $b_2(w)$ with the respective multi-trie operation
+(union or intersection), let $b_1(v)\odot b_2(v) = b(v)$;
+\item compose the resulting multi-trie from the set~$a$ and a mapping~$b$ that
+maps atomic names to child multi-tries.
+\end{itemize}
+
 %TODO: examples and properties
 
 \section{Notes about implementation}
