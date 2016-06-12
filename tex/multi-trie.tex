@@ -692,18 +692,18 @@ appropriate form in each particular case.
 
 \section{Cartesian product and flattening}
 
-This section describes two more complicated operations that change structure of
-their operands. Before giving a formal definition for a cartesian product of
-MVCNsets or multitries, let us informally describe how should an operation
-look like to deserve this name.
+Operations described in the previous section (union, intersection, selection)
+preserve the type and structure of their operands. This section describes two
+more complicated operations.
 
+Before giving a formal definition for a cartesian product of namings, let us
+informally describe how should an operation look like to deserve this name.
 Let~$p$ and~$q$ be two MVCNsets. Their cartesian product should consist of
 values of the form~$(d',d'')$ where $d'$~is a value from~$p$ and $d''$~is taken
-from~$q$. But values are contained in multitries not on their own, they are
-attached to some names~-- say, $u$~and~$v$, respectively. As the product's
-value~$(d',d'')$ is combined from the values taken from operands, the name of
-this combined value must be combined from~$u$ and~$v$, and the only combining
-operation defined for names is concatenation.
+from~$q$. But values are attached to some names~-- say, $u$~and~$v$,
+respectively. As the product's value~$(d',d'')$ is combined from the values
+taken from operands, the name of this combined value must be combined from~$u$
+and~$v$, and the only combining operation defined for names is concatenation.
 
 \begin{Df}\label{df:mvcn-cartesian}
 Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
@@ -728,15 +728,14 @@ Then their cartesian product is
 \end{eqnarray*}
 \end{Ex}
 
-Obviously,~$\times$ distributes over $\cap$ and $\cup$.
 \begin{St}\label{st:cartesian-distributivity}
-For any $p \in \setmvcn{V}{D'}$ and $q, r \in \setmvcn{V}{D''}$,
+Obviously,~$\times$ distributes over $\cap$ and $\cup$.
+For any $p \in \setmvcn{V}{D}$ and $q, r \in \setmvcn{V}{D'}$,
 \[
   p\times(q\odot r) = (p\times q) \odot (p\times r) .
 \]
 \end{St}
 
-The main property of this operation is the following.
 \begin{St}\label{st:deref-cartesian}
 For any $p \in \setmvcn{V}{D'}$ and $q \in \setmvcn{V}{D''}$,
 \[
@@ -747,7 +746,9 @@ For any $p \in \setmvcn{V}{D'}$ and $q \in \setmvcn{V}{D''}$,
           \deref(q, v) .
 \]
 \end{St}
-It means that, since an MVCNset is completely defined by values of all names,
+
+The latter is the main property of cartesian product. Since an MVCNset is
+completely defined by values of all names (st.~\ref{st:mvcn-deref-equality}),
 cartesian product can be defined in terms of dereferencing and, therefore,
 is preserved by the mapping~$\varphi$ from st.~\ref{st:isomorph}. Also, this
 property may be taken as a definition of cartesian product for multitries.
@@ -812,10 +813,10 @@ For any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
 
 \section{Elementwise mappings and applications}
 
-Sections above describe operations on MVCNsets and multi-tries containing some
+The previous sections described operations on namings containing some
 `ordinary' values. Now let us consider how do these objects interact with
-functions, including how can a container populated with functions act as a
-function.
+functions, including how can a naming populated with functions act itself
+as a function.
 
 \begin{Df}\label{df:mvcn-map}
 Let $f : D \to D'$. Then $\fmap$ operation turns it into a \emph{mapping
@@ -833,15 +834,15 @@ obtained from isomorphism. The following properties hold:
 \begin{St}\label{st:map-properties}
 If $\circ$ is a composition of unary functions, i.e. $(f\circ g)(x) = f(g(x))$ for
 all $f$, $g$, $x$ of matching types, and $\id_X : X \to X$ is an identity function,
-$f_X(x) = x$ for any $x\in X$,
+$\id_X(x) = x$ for any $x\in X$, then
 \begin{eqnarray*}
   & \fmap \id_D = \id_{\setmvcn{V}{D}} , \\
   & \fmap (f \circ g) = (\fmap f) \circ (\fmap g) .
 \end{eqnarray*}
 \end{St}
 
-Mapping function distributes over set-theoretical operations.
 \begin{St}\label{st:map-distributivity}
+Mapping function distributes over set-theoretical operations.
 Let $f: D \to D'$, $p, q \in \setmvcn{V}{D}$, $\odot \in \{\cup, \cap \}$. Then
 \[
   (\fmap f) (p \odot q) = (\fmap f)(p) \odot (\fmap f)(q) .
@@ -896,7 +897,6 @@ Let $d\in D$, $p, q \in \setmvcn{V}{D \to D'}$, $\odot \in \{\cup, \cap \}$. The
 \]
 \end{St}
 
-
 Having defined operations that apply a single function to an MVCNset of values
 and an MVCNset of functions to a single value, let us define an
 operation that applies an MVCNset of functions to an MVCNset of values. The
@@ -920,7 +920,8 @@ argument. Thus, the application operation over MVCNsets can be defined as
 follows.
 
 \begin{Df}\label{df:mvcn-apply-cartesian}
-Let $p\in \setmvcn{V}{D\to D'}$, $p\in \setmvcn{V}{D}$. Then
+Let $p\in \setmvcn{V}{D\to D'}$, $p\in \setmvcn{V}{D}$. Then \emph{cartesian
+application} is sucn an operation that
 \[
   \apply_{\setcharmvcn}^{\times} (p, q) = (\fmap \eval) (p \times q)
 \]
