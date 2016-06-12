@@ -108,6 +108,7 @@ union.
 A trilateral relation between a \emph{name}, its \emph{value} and
 \emph{meaning} has been in the focus of philosophical and mathematical logic,
 metamathematics, semiotics and epistemology.  For example, important questions
+about naming
 were raised and deeply investigated in fundamental works by
 G.\,Frege~\cite{bib:frege},
 L.\,Wittgenstein~\cite{bib:wittgenstein},
@@ -130,13 +131,13 @@ means of a quantifier.
 
 As always in the first-order logic, a name bound by a quantifier refers to an
 unspecified object of the semantic domain; the formula tells something about
-these objects and uses names to represent them.  Objects belong to a semantic
-level and names to the syntactical level that do not intersect.  Therefore,
+the objects and uses names to represent them.  Objects belong to a semantic
+level, and names to the syntactical level that do not intersect.  Therefore,
 this formalism works fine for the wide class of programs that have a predefined
 list of variables but hardly can describe programs that dynamically allocate
 memory blocks whose size is not known \emph{a priori}.  In general, it is
-natural for high-level theories that deliberately distantiate from hardware and
-OS details.
+natural for high-level theories of programming that deliberately distantiate
+from hardware and OS details.
 
 On the contrast to above, there are theories that explicitly describe memory
 model and allocation operations in terms of memory block
@@ -144,14 +145,14 @@ references~\cite{bib:leroy}.  These theories reflect semantics of programs on a
 relatively low, implementation-aware level, and their primary application is
 formal specification and verification of compilers.
 
-There is yet another option between these two extremes. Imagine an algorithm
-that does not work on a level of OS or hardware resources (and, therefore, it
-would be redundant to take memory addresses into account) but nevertheless
-computes the names of variables to get values from or to assign values to. A
-typical example could be any array processing program written in~C:
-\lstinline{a[i]} is a computable name because this expression, depending on the
-value of an integer variable~\lstinline{i}, can evaluate to any of individual
-elements' names.
+There is yet another option between these two extremes. An algorithm could
+operate with high level data abstractions far above OS or hardware level;
+therefore, it would be redundant to take memory addresses into account.
+Nevertheless it can compute names of variables to get values from or to assign
+values to. A typical example could be any array processing algorithm
+implemented in~C: \lstinline{a[i]} is a computable name because this
+expression, depending on the value of an integer variable~\lstinline{i}, can
+evaluate to any of individual elements' names.
 
 An elegant formalism that liberates names from cumbersome specifics of
 \emph{being addresses} but allows any specifics to be added if needed,
@@ -178,10 +179,16 @@ the name~$a$ has a value~1, the name~$b$ refers to a value~7 and the name~$w$
 denotes~1, no other names have values.
 \end{Ex}
 
+A set-theoretical intersection  of naming sets is obviously a naming set
+whereas a union is not because it can violate univaluedness:
+\[
+  \{ (a, 0) \} \cup \{ (a, 1) \} = \{ (a, 0), (a, 1) \} .
+\]
+
 Naming mappings defined as above are widely used in theoretical computer
 science for syntactical as well as semantical tasks.
 %todo: references
-Maps, as direct
+Maps, that are software
 implementations of naming sets, are included into standard libraries of various
 programming languages and platforms and widely used in practice.
 %todo: references
@@ -191,30 +198,31 @@ where names and values are atomic in the sense that their internal structures
 and any non-trivial properties are hidden as irrelevant.  In fact, the only
 special property taken into account by the definition above is equatability of
 names: for any two names it should be possible to decide whether they are
-identical.  Although def.~\ref{df:naming-set} does not \emph{require} atomicity
+identical.
+
+Although def.~\ref{df:naming-set} does not \emph{require} atomicity
 of names and absence of non-trivial properties, it does not \emph{state} any of
 them.
-
 Introducing various properties of names and/or denotata, one can obtain a
 number of interesting and useful specialised formalisations of naming for
 theoretical purposes as well as implementable data structures suitable for
 practical tasks. This article describes a kind of naming with
-two important differences from the definition~\ref{df:naming-set}:
+two important differences from the definition~\ref{df:naming-set}.
 \begin{itemize}
-\item multivaluedness: any name can be related to zero or more values;
-\item compoundness of names: names form a monoid, i.e. compound names could
-be concatenated from simpler ones.
+\item Multivaluedness: any name can be related to zero or more values;
+\item Compoundness of names: compound names could be concatenated from shorter
+ones, i.e. names form a monoid.
 \end{itemize}
 
 \subsection*{Notation}
 
-If~$X$ is a set, let~$X^\ast$ denote a set of all sequences of its elements
+For any set~$X$, let~$X^\ast$ denote a set of all sequences of its elements
 (also known as \emph{chains}), and~$2^X$ be a set of all its subsets.
 If~$a,b\in X^\ast$ are two chains, their concatenation will be denoted simply
 as~$ab$. Let~$\varepsilon$ stand for the empty chain.
 Let $\proj{n}{k}$ be a function that maps an $n$-tuple to its $k$-th component.
 
-A set of lower-case Latin letters (the alphabet) is denoted as~$\seta$,
+A set of Latin letters (the alphabet) is denoted as~$\seta$,
 and~$\setn$ will denote a set of natural numbers~-- these two sets will be
 used in examples.
 
@@ -227,7 +235,7 @@ of~$V^\ast$ are called \emph{compound names}. Let us omit the words ``atomic''
 and ``compound'' if it does not lead to confusion.
 
 \begin{Df}\label{df:mvcn}
-A \emph{$(V,D)$-multi-valued compound-naming set ($(V,D)$-MVCNset)} is a binary
+A \emph{$(V,D)$-multi-valued compound-naming set, or $(V,D)$-MVCNset,} is a binary
 relation
 \[
   p \subseteq V^\ast \times D .
@@ -255,7 +263,7 @@ The following is a $(\seta, \setn)$-MVCNset:
 Here the empty name has two values (0 and~1), name~$a$ has three (2, 3 and~4),
 comound names~$aa$ and~$ab$ have each a single value (5 and~6, respectively),
 name~$b$ has a value~7 and, finally, a name~$baaa$ has one value~8. All other
-names from~$\seta$ have no values.
+names from~$\seta^\ast$ have no values.
 \end{Ex}
 
 Note that, in contrast with naming sets, no special conditions are imposed
@@ -271,7 +279,7 @@ on MVCNsets rather than on general case of sets, we will
 write~$\cup_\setcharmvcn$ and~$\cap_\setcharmvcn$.
 
 One of the fundamental operations on (univalued) naming sets is retrieving
-an only (if any) value~$d$ associated with the name~$v$ in a certain naming
+an only (if any) value~$d$ associated with the name~$v$ in a naming
 set~$s$.  Depending on the goals and abstraction level of a particular
 context, it could be regarded either as~$s(v)=d$, i.e. applying a function~$s$
 to an argument~$v$, or as an operation whose arguments are the naming set and
@@ -282,8 +290,9 @@ to be functional.
 
 \begin{Df}\label{df:mvcn-dereferencing}
 \emph{Dereferencing} is an operation~$\deref_\setcharmvcn$ (or, whenever
-possible, omiting the subscript simply~$\deref$), such that for
-a $(V,D)$-MVCNset~$p$ and a name~$v\in V^\ast$,
+possible, omiting the subscript, simply~$\deref$) of type
+$\setmvcn{V}{D} \times V^\ast \to 2^D$,
+such that
 \[
   \deref_\setcharmvcn(p, v) = \{ d \mid (v, d) \in p \} .
 \]
@@ -303,7 +312,7 @@ Consider an MVCNset~$p$ from ex.~\ref{ex:mvcn}. Then
 
 \end{Ex}
 
-It folllows immediately from the definition that dereferencing distributes
+It follows immediately from the definition that dereferencing distributes
 over set-theoretical operations.
 \begin{St}\label{st:mvcn-deref-distributivity}
 Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$p$ and~$q$ be
@@ -315,16 +324,16 @@ for every~$v\in V^\ast$.
 \end{St}
 
 The following important property means, in fact, that any MVCNset is completely
-defined by the vlues of all its names.
+defined by the values of all its names.
 \begin{St}\label{st:mvcn-deref-equality}
 Let $p, q \in \setmvcn{V}{D}$. Then
 \[
   (\forall u\in V^\ast . \deref(p,u) = \deref(q,u)) \implies (p = q) .
 \]
 \end{St}
-If one regards MVCNsets in the sense of programming, as a data container, this
-property means that two such containers with indiscernible behaviour
-(observed via a selector operation) are equal.
+In terms of programming, it means that
+if two MVCNset objects' behaviours (observed through the $\deref$ selector) are
+indiscernible, the objects are identical.
 
 The following operation is, in a reasonable sense, an opposite to
 dereferencing.  It replaces all values of some name with a new set of values.
@@ -399,12 +408,14 @@ For any~$v\in V^\ast$,
 \end{St}
 
 The next property is also just a trivial consequence of the definition:~$\bot$
-and~$\top$ are neutral elements of~$\cup$ and~$\cap$, respectively.
+and~$\top$ are units of~$\cup$ and~$\cap$, respectively and zeros vice versa.
 \begin{St}\label{st:mvcn-neutrals}
 For any MVCNset~$p$,
 \begin{eqnarray*}
-  \bot \cup p & = & p, \\
-  \top \cap p & = & p .
+  \bot \cup p & = & p,    \\
+  \top \cap p & = & p,    \\
+  \bot \cap p & = & \bot, \\
+  \top \cup p & = & \top.
 \end{eqnarray*}
 \end{St}
 
@@ -416,7 +427,7 @@ defined as follows.
 Let~$p\in\setmvcn{V}{D}$, $v\in V^\ast$, then \emph{selection} from~$p$
 under~$v$ is
 \[
-  \select_\setcharmvcn(p,v) = \{ (w, d) \mid (vw, d)\in p \} .
+  \select_\setcharmvcn(p,v) = \{ (w, d) \mid (vw, d)\in p \} \in\setmvcn{V}{D}.
 \]
 As always, the subscript will be omited if possible.
 \end{Df}
@@ -525,16 +536,15 @@ In other words, a $(V,D)$-multitrie is a pair $p = (s, f)$ where~$s\subseteq D$
 is a set of values and $f: V \to \setmt{V}{D}$ is a function that maps any
 atomic name to some $(V,D)$-multitrie. Note that this recursive definition does
 not have any basic case: every multitrie contains sub-multitries (that, in
-their turn, have the same structure) under all atomic names.
-
-The definition means that a $(V,D)$-multitrie is a \emph{trie} also known as
-a prefx tree, where every node stores a subset of~$D$ as a value, and has
-children labelled with all atomic names from~$V$. This means that such a trie
-is infinite and has no leaf nodes.
-%todo: reference about trie
+their turn, have the same structure) under all atomic names, there are no leaf
+nodes.
 Depicting multitries graphically, as on fig.~\ref{fig:trie}, we will however
 only draw nodes of interest assuning that all other nodes have empty sets of
 values.
+
+Note that a $(V,D)$-multitrie is a \emph{trie} also known as
+a prefx tree~-- that justifies their name.
+%todo: reference about trie
 
 Extreme multitries have the following recurrent definitions.
 \begin{Df}\label{df:mt-extreme}
@@ -609,8 +619,8 @@ set-theoretical operations on sets of values and corresponding operations
 on multitries.
 \end{Df}
 
-In other words, to build $r = p \cup q$, one needs to build the union of the
-value sets contained in both operands under the same path.
+In other words, to build $r = p \cup q$, one needs, for each compound name,
+build the union of the value sets contained in the operands under that name.
 
 Let us also define for multitries an operation that corresponds to replacement
 defined for MVCNsets (see def.~\ref{df:mvcn-replace}. Like other multitrie
@@ -621,7 +631,7 @@ operations, the most natural way of defining it is recursive.
 $p = (s, f) \in \setmt{V}{D}$, $t \in 2^D$, $u \in V$, $v \in V^\ast$,
 \begin{eqnarray*}
   \putval_\setcharmt(p, \varepsilon, t) & = & (t, f) , \\
-  \putval_\setcharmt(p, u v, t) & = & (p, f') ,
+  \putval_\setcharmt(p, u v, t) & = & (s, f') ,
 \end{eqnarray*}
 where $f' : V \to \setmt{V}{D}$ is such a function that $f'(w) = f(w)$ for any
 $w\neq u$, and $f'(u) = \putval_\setcharmt(f(u), v, t)$.
