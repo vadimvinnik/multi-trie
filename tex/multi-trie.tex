@@ -920,7 +920,7 @@ argument. Thus, the application operation over MVCNsets can be defined as
 follows.
 
 \begin{Df}\label{df:mvcn-apply-cartesian}
-Let $p\in \setmvcn{V}{D\to D'}$, $p\in \setmvcn{V}{D}$. Then \emph{cartesian
+Let $p\in \setmvcn{V}{D\to D'}$, $q\in \setmvcn{V}{D}$. Then \emph{cartesian
 application} is sucn an operation that
 \[
   \apply_{\setcharmvcn}^{\times} (p, q) = (\fmap \eval) (p \times q)
@@ -930,7 +930,7 @@ that is a $(V,D')$-MVCNset.
 
 Recalling the definitions of cartesian product and evaluation, one can
 obtain the main property of cartesian application.
-
+ 
 \begin{St}\label{st:mvcn-apply-cartesian}
 If $p\in \setmvcn{V}{D\to D'}$, $p\in \setmvcn{V}{D}$,
 \[
@@ -939,7 +939,30 @@ If $p\in \setmvcn{V}{D\to D'}$, $p\in \setmvcn{V}{D}$,
 \]
 \end{St}
 
-%TODO: other applications 
+Cartesian is not the only kind of application with an elegant definition and
+potentially useful properties.  The following two application operations are
+easier to define in terms of multi-tries.
+
+\begin{Df}\label{df:mt-apply-setop}
+\emph{Uniting} and \emph{intersecting application} are operations
+$\apply_{\setcharmt}^{\odot}$, where $\odot \in \{\cup, \cap \}$, of type
+\[
+  \setmvcn{V}{D\to D'} \times \setmvcn{V}{D} \to \setmvcn{V}{D'},
+\]
+such that (for any~$p = (s, f)$ and~$q = (t, g)$ of matching types)
+\[
+  \apply_{\setcharmt}^{\odot} (p, q) = (a, b) ,
+\]
+where
+\begin{eqnarray*}
+  & a      = \{ h(x) \mid h \in s, x \in t \} , \\
+  & b      = \{ v \mapsto b_1(v) \odot b_2(v) \mid v \in V \}, \\
+  & b_1(v) = \apply_{\setcharmt}^{\odot}(p, g(v)), \\
+  & b_1(v) = \apply_{\setcharmt}^{\odot}(f(v), q) .
+\end{eqnarray*}
+\end{Df}
+
+%TODO: examples and properties
 
 \section{Notes about implementation}
 
