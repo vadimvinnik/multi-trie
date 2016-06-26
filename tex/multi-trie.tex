@@ -21,8 +21,7 @@
 \lstloadlanguages{Haskell}
 \lstset{%
   basicstyle={\small\ttfamily},%
-  language=Haskell,%
-  frame=trBL%
+  language=Haskell%
 }
 
 \DTsetlength{0.2em}{2em}{0.2em}{0.4pt}{1pt}
@@ -962,7 +961,7 @@ easier to define in terms of multi-tries.
 \emph{Uniting} and \emph{intersecting application} are operations
 $\apply_{\setcharmt}^{\odot}$, where $\odot \in \{\cup, \cap \}$, of type
 \[
-  \setmvcn{V}{D\to D'} \times \setmvcn{V}{D} \to \setmvcn{V}{D'},
+  \setmt{V}{D\to D'} \times \setmt{V}{D} \to \setmt{V}{D'},
 \]
 such that (for any~$p = (s, f)$ and~$q = (t, g)$ of matching types)
 \[
@@ -1114,7 +1113,7 @@ Here is a shorh explanation of their semantics.
   in its root node and no other valies (i.e. all other names yield to an empty
   list of values).
 \item [add]
-  Given a value and a multi-trie, prepends the value to the list stored in the
+  Given a value and a multi-trie, prepend the value to the list stored in the
   root node.
 \item [values]
   Get a list of values from the root node of a multi-trie.
@@ -1138,26 +1137,31 @@ Here is a shorh explanation of their semantics.
   empty multi-trie. This function implements selection operation from
   def.~\ref{df:mvcn-select} and~\ref{df:mt-select}.
 \item [mtmap]
-  Applies a function to each value in a multi-trie and combines results into
-  a new multi-trie preserving the names (and, therefore, the trie structure).
+  Apply a function to each value in a multi-trie and combine results into
+  a new multi-trie preserving the names (and, therefore, the trie structure),
+  see def.~\ref{df:mvcn-map}.
+  This is a specific implementation of the \lstinline{fmap} method from the
+  \lstinline{Functor} class.
 \item [cartesianProduct]
-  Constructs a cartesian product of two multi-tries in the sense of
+  Construct a cartesian product of two multi-tries in the sense of
   def.~\ref{df:mvcn-cartesian} and st.~\ref{st:deref-cartesian}.
 \item [union]
-  Constructs a union of two multi-tries, see st.~\ref{st:mvcn-setop} and
+  Construct a union of two multi-tries, see st.~\ref{st:mvcn-setop} and
   def.~\ref{df:mt-setop}. There is another function for intersection.
 \item [flatten]
-  Given a multi-tries whose values are, in their turn, multi-tries, construct
-  a flattened multi-trie.
+  Given a multi-trie whose values are, in their turn, multi-tries, construct
+  a flattened multi-trie, see def.~\ref{df:flatten} and
+  st.~\ref{st:deref-flatten}. This is a specific implementation of the
+  \lstinline{join} function defined for all types of the \lstinline{Monad}
+  class.
 \item [applyCartesian]
-  Given a multi-trie of functions and a multi-trie of some objects, apply the
-  functions to the objects and combine results into a multi-trie in the same
-  way as cartesian product does.
+  Cartesian
+  application of a multi-trie of functions to a multi-trie of arguments, see
+  def.~\ref{df:mt-apply-setop}.
 \item [applyUniting]
-  %TODO
-  Given a multi-trie~$p$ of functions and a multi-trie~$q$ of some objects,
-  apply each function from~$p$ to each value from~$q$, associate results with
-  the concatenation of respective names.
+  Uniting
+  application of a multi-trie of functions to a multi-trie of arguments, see
+  def.~\ref{df:mvcn-apply-cartesian}.
   There is also a dual function for intersection.
 \item [toMap]
   Convert a multi-trie to a \lstinline{Data.Map} that maps compound names to
