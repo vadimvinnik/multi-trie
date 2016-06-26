@@ -16,6 +16,7 @@
 \usepackage{amsmath}
 \usepackage{dirtree}
 \usepackage{listings}
+\usepackage{stackrel}
 
 \lstloadlanguages{Haskell}
 \lstset{%
@@ -57,6 +58,8 @@
 \newcommand{\apply}{\operatorname{Apply}}
 \newcommand{\ylppa}{\operatorname{Ylppa}}
 \newcommand{\eval}{\operatorname{Eval}}
+
+\newcommand{\inapply}[1]{\stackbin{#1}{\nabla}}
 
 \title{Compound names with multiple values: formalisation, properties and implementation}
 \author{Vadim Vinnik}
@@ -119,7 +122,11 @@ entity} is not a purely philosophical excercise anymore but a working tool for
 everyday~-- \emph{indirect pointer}; a question \emph{does every name
 necessarily have a value} turned into a \emph{null reference} with both its
 power and danger; \emph{names changing their values depeding on the context}
-became \emph{variables} in the sense of imperative programming.
+became \emph{variables} in the sense of imperative programming. Since
+\emph{addresses} of some values in memory are obviously a special case of their
+names, and since addresses are, in their turn, values that can be computed,
+relationship and interaction between names and values in programming is even
+more complicated than in logical semantics.
 
 Therefore, every comprehensive theory of programming must give a special
 explication of naming and include a mathematical model that reflects its
@@ -157,7 +164,7 @@ evaluate to any of individual elements' names.
 An elegant formalism that liberates names from cumbersome specifics of
 \emph{being addresses} but allows any specifics to be added if needed,
 is a notion of \emph{naming set} introduced by V.\,N.\,Redko in a
-comprehensive conception of \emph{compositional programming}~\ref{bib:redko}.
+comprehensive conception of \emph{compositional programming}~\cite{bib:redko}.
 
 \begin{Df}\label{df:naming-set}
 Suppose there is a given set~$D$ whose elements are called \emph{values}, or
@@ -186,12 +193,12 @@ whereas a union is not because it can violate univaluedness:
 \]
 
 Naming mappings defined as above are widely used in theoretical computer
-science for syntactical as well as semantical tasks.
-%todo: references
-Maps, that are software
-implementations of naming sets, are included into standard libraries of various
+science for syntactical as well as semantical tasks, a good example could be
+an approach to definition of programming languages~\cite{bib:ollongren}.
+\emph{Maps}, \emph{dictionaries}~\cite{bib:dictionary} and associativer
+arrays~\cite{bib:mehlhorn-assoc}, abstract data types
+implementing the same idea, are included into standard libraries of various
 programming languages and platforms and widely used in practice.
-%todo: references
 
 At the topmost abstraction level, a naming set represents a ``plain'' relation
 where names and values are atomic in the sense that their internal structures
@@ -543,8 +550,7 @@ only draw nodes of interest assuning that all other nodes have empty sets of
 values.
 
 Note that a $(V,D)$-multitrie is a \emph{trie} also known as
-a prefx tree~-- that justifies their name.
-%todo: reference about trie
+a prefx tree~\cite{bib:knuth-trie}~-- that justifies their name.
 
 Extreme multitries have the following recurrent definitions.
 \begin{Df}\label{df:mt-extreme}
@@ -920,16 +926,21 @@ argument. Thus, the application operation over MVCNsets can be defined as
 follows.
 
 \begin{Df}\label{df:mvcn-apply-cartesian}
-Let $p\in \setmvcn{V}{D\to D'}$, $q\in \setmvcn{V}{D}$. Then \emph{cartesian
-application} is sucn an operation that
+Then \emph{cartesian application} is an operation of type
+\[
+\setmvcn{V}{D\to D'} \times \setmvcn{V}{D} \to \setmvcn{V}{D} ,
+\]
+such that
 \[
   \apply_{\setcharmvcn}^{\times} (p, q) = (\fmap \eval) (p \times q)
 \]
-that is a $(V,D')$-MVCNset.
+for any~$p$ and~$q$ of matching types.
 \end{Df}
 
 Recalling the definitions of cartesian product and evaluation, one can
-obtain the main property of cartesian application.
+obtain the main property of cartesian application (that could be also taken
+for a definition, in which case def.~\ref{df:mvcn-apply-cartesian} would turn
+into a theorem).
  
 \begin{St}\label{st:mvcn-apply-cartesian}
 If $p\in \setmvcn{V}{D\to D'}$, $p\in \setmvcn{V}{D}$,
@@ -939,8 +950,12 @@ If $p\in \setmvcn{V}{D\to D'}$, $p\in \setmvcn{V}{D}$,
 \]
 \end{St}
 
+Therefore, for every function~$f$ contained in~$p$ under a compound name~$u$
+and every object~$d$ contained in~$q$ under a name~$v$, the resulting
+multi-trie contains a value~$f(d)$ under a name~$uv$.
+
 Cartesian is not the only kind of application with an elegant definition and
-potentially useful properties.  The following two application operations are
+interesting properties.  The following two application operations are
 easier to define in terms of multi-tries.
 
 \begin{Df}\label{df:mt-apply-setop}
@@ -958,7 +973,7 @@ where
   & a      = \{ h(x) \mid h \in s, x \in t \} , \\
   & b      = \{ v \mapsto b_1(v) \odot b_2(v) \mid v \in V \}, \\
   & b_1(v) = \apply_{\setcharmt}^{\odot}(p, g(v)), \\
-  & b_1(v) = \apply_{\setcharmt}^{\odot}(f(v), q) .
+  & b_2(v) = \apply_{\setcharmt}^{\odot}(f(v), q) .
 \end{eqnarray*}
 \end{Df}
 
@@ -973,17 +988,30 @@ functions to the $v$-child of the multi-trie~$q$ of values~-- let~$b_1(v)$ be
 the result;
 \item do the same with the $v$-child of~$p$ and the entire~$q$, let the result
 be~$b_2(v)$;
-\item merge $b_1(v)$ and $b_2(w)$ with the respective multi-trie operation
+\item merge $b_1(v)$ and $b_2(v)$ with the respective multi-trie operation
 (union or intersection), let $b_1(v)\odot b_2(v) = b(v)$;
 \item compose the resulting multi-trie from the set~$a$ of root values and a
 name-to-child mapping~$b$.
 \end{itemize}
 
-Let us take a closer look at the uniting application. Take some compound
-name~$w$ that could be represented as a concatenation, i.e. split into two
-parts, in multiple ways.
+Let us introduce infix aliases for the application operations to make
+formulation of their properties more elegant (here and below~$\oplus$ means any
+of~$\cup$, $\cap$ or~$\times$):
+\[
+  p \inapply{\oplus} q = \apply^{\oplus} (p, q) .
+\]
 
-%TODO: examples and properties
+\begin{St}\label{st:apply-distr}
+Application operations distribute over set-theoretical operations.
+For any~$p, p_1, p_2, q, q_1, q_2$ of matching types,
+for $\odot \in \{\cup, \cap \}$ and $\oplus \in \{\cup, \cap, \times \}$,
+\begin{eqnarray*}
+  (p_1 \odot p_2) \inapply{\oplus} q =
+    (p_1 \inapply{\oplus} q) \odot (p_2 \inapply{\oplus} q) , \\
+  p \inapply{\oplus} (q_1 \odot q_2) =
+    (p \inapply{\oplus} q_1) \odot (p \inapply{\oplus} q_2) .
+\end{eqnarray*}
+\end{St}
 
 \section{Notes about implementation}
 
@@ -1126,7 +1154,7 @@ Here is a shorh explanation of their semantics.
   functions to the objects and combine results into a multi-trie in the same
   way as cartesian product does.
 \item [applyUniting]
-  % todo
+  %TODO
   Given a multi-trie~$p$ of functions and a multi-trie~$q$ of some objects,
   apply each function from~$p$ to each value from~$q$, associate results with
   the concatenation of respective names.
@@ -1155,7 +1183,7 @@ this kind of containers could be used as a `plain' collection of name-value
 pairs or as a hierarchical data structure. The functions implemented in the
 library support both views.
 
-% TODO
+%TODO
 
 
 
@@ -1163,8 +1191,9 @@ library support both views.
 
 \bibitem{bib:frege}
   Gottlob Frege,
-  Ueber Sinn und Bedeutung,
-  TODO.
+  \"Uber Sinn und Bedeutung.
+  In: Zeitschrift f\"ur Philosophie und philosophische Kritik,
+  NF~100. 1892, S.~25--50.
 
 \bibitem{bib:wittgenstein}
   Ludwig Wittgenstein,
@@ -1198,6 +1227,37 @@ library support both views.
   Formal verification of a C-like memory model and its uses for verifying program transformations.
   Journal of Automated Reasoning.
   41(1), pp.1-31, July 2008.
+
+\bibitem{bib:redko}
+  Basarab~I., Nikitchenko~N., Red’ko~V.
+  Compositional Databases.
+  Kiev: Lybed’, 1992.~-- 191~p. (In Russian).
+
+\bibitem{bib:ollongren}
+  Alexander Ollongren,
+  Definition of programming languages by interpreting automata.
+  London: Academic Press,
+  1974.
+
+\bibitem{bib:dictionary}
+  Paul~E.~Black,
+  "Dictionary", in Dictionary of Algorithms and Data Structures [online],
+  Vreda Pieterse and Paul E. Black, eds.
+  Available from: http://www.nist.gov/dads/HTML/dictionary.html
+
+\bibitem{bib:mehlhorn-assoc}
+  Kurt Mehlhorn, Peter Sanders
+  ``4: Hash Tables and Associative Arrays'',
+  Algorithms and Data Structures: The Basic Toolbox
+  Springer, pp.~81--98.
+
+\bibitem{bib:knuth-trie}
+  Donald Knuth,
+  ``6.3: Digital Searching''.
+  The Art of Computer Programming,
+  Volume 3: Sorting and Searching (2nd ed.).
+  Addison-Wesley. p.~492.
+
 
 \bibitem{bib:lipovaca}
   Miran Lipova\v{c}a.
