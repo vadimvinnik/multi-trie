@@ -1173,6 +1173,15 @@ Here is a shorh explanation of their semantics.
   Convert a list of name--value pairs to a multi-trie.
 \end{description}
 
+Finally, \lstinline{mtmap} function that implements the $\fmap$ operation
+(def.~\ref{df:mvcn-map}, \ref{df:mt-map} and st.~\ref{st:map-properties})
+makes \lstinline{MultiTrie} type an instance of the \lstinline{Functor} class; 
+\lstinline{applyCartesian} function as an implementation of $\apply^{\times}$
+operation makes it an instance of the \lstinline{Applicative} class; 
+\emph{bind} operation not shown in this article is easy to define using mapping
+and flattening operations~-- this makes the type an instance of the
+\lstinline{Monad} class.
+
 
 
 \section{Conclusion}
