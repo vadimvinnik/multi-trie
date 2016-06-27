@@ -75,7 +75,7 @@ a monoid under concatenation, and each name can be associated with multiple
 values.  Two different but equivalent formalisations are defined, their
 isomorphism is shown.  Counterparts of set-theoretical union, intersection and
 cartesian product operations are described together with their properties.  A
-type implementing this kind of naming is designed in Haskell, it fits into
+data type implementing this kind of naming is designed in Haskell, it fits into
 functor, applicative functor and monad classes.
 
 Keywords:
@@ -110,22 +110,23 @@ union.
 
 A trilateral relation between a \emph{name}, its \emph{value} and
 \emph{meaning} has been in the focus of philosophical and mathematical logic,
-metamathematics, semiotics and epistemology.  For example, important questions
+metamathematics, semiotics and epistemology since their origin.
+For example, important questions
 about naming were raised and deeply investigated in fundamental works by
 G.\,Frege~\cite{bib:frege},
 L.\,Wittgenstein~\cite{bib:wittgenstein},
 W.\,Quine~\cite{bib:quine}.
-Since arising of computer science, naming gained a special significance~-- for
+With arising of computer science, naming gained a special significance~-- for
 example, \emph{a name that refers to a name that, finally, relates to an
 entity} is not a purely philosophical excercise anymore but a working tool for
-everyday~-- \emph{indirect pointer}; a question \emph{does every name
+everyday~-- an \emph{indirect pointer}; a question \emph{does every name
 necessarily have a value} turned into a \emph{null reference} with both its
 power and danger; \emph{names changing their values depeding on the context}
 became \emph{variables} in the sense of imperative programming. Since
 \emph{addresses} of some entities in memory are obviously a special case of
 names, and since addresses are, in their turn, values that can be computed,
 relationship and interaction between names and values in programming is even
-more complicated than in logical semantics.
+more complicated than in pre-computer semiotics.
 
 Therefore, every comprehensive theory of programming must give a special
 explication of naming and include a mathematical model that reflects its
@@ -141,9 +142,9 @@ the objects and uses names to represent them.  Objects belong to a semantic
 level, and names to the syntactical level that do not intersect.  Therefore,
 this formalism works fine for the wide class of programs that have a predefined
 list of variables but hardly can describe programs that dynamically allocate
-memory blocks whose size is not known \emph{a priori}.  In general, it is
-natural for high-level theories of programming that deliberately distantiate
-from hardware and OS details.
+memory for objects whose number is \emph{a priori} unknown.  In general,
+high-level theories of programming deliberately distantiate from hardware and
+OS details.
 
 On the contrast to above, there are theories that explicitly describe memory
 model and allocation operations in terms of memory block
@@ -151,17 +152,14 @@ references~\cite{bib:leroy}.  These theories reflect semantics of programs on a
 relatively low, implementation-aware level, and their primary application is
 formal specification and verification of compilers.
 
-There is yet another option between these two extremes. An algorithm could
-operate with high level data abstractions far above OS or hardware level;
-therefore, it would be redundant to take memory addresses into account.
-Nevertheless it can compute names of variables to get values from or to assign
-values to. A typical example could be any array processing algorithm
-implemented in~C: \lstinline{a[i]} is a computable name because this
-expression, depending on the value of an integer variable~\lstinline{i}, can
-evaluate to any of individual elements' names.
+There is yet another option between these two extremes.  Names can be regarded
+as computable values without cumbersome specifics of \emph{being addresses}.  A
+typical example arises from array processing: \lstinline{a[i]} is a computable
+name because this expression, depending on the value of an integer
+variable~\lstinline{i}, evaluates to any of individual elements' names.
 
-An elegant formalism that liberates names from cumbersome specifics of
-\emph{being addresses} but allows any specifics to be added if needed,
+An elegant and general formalism for naming that does not burden names
+with any alien specifics, but allows any specifics to be added if needed,
 is a notion of \emph{naming set} introduced by V.\,N.\,Redko in a
 comprehensive conception of \emph{compositional programming}~\cite{bib:redko}.
 
@@ -194,21 +192,20 @@ whereas a union is not because it can violate univaluedness:
 Naming mappings defined as above are widely used in theoretical computer
 science for syntactical as well as semantical tasks, a good example could be
 an approach to definition of programming languages~\cite{bib:ollongren}.
-\emph{Maps}, \emph{dictionaries}~\cite{bib:dictionary} and associativer
-arrays~\cite{bib:mehlhorn-assoc}, abstract data types
+\emph{Maps}, \emph{dictionaries}~\cite{bib:dictionary} and \emph{associative
+arrays}~\cite{bib:mehlhorn-assoc}~-- abstract data types
 implementing the same idea, are included into standard libraries of various
-programming languages and platforms and widely used in practice.
+programming languages and widely used in practice.
 
 At the topmost abstraction level, a naming set represents a ``plain'' relation
 where names and values are atomic in the sense that their internal structures
 and any non-trivial properties are hidden as irrelevant.  In fact, the only
 special property taken into account by the definition above is equatability of
-names: for any two names it should be possible to decide whether they are
+names: for any two names, it should be possible to decide whether they are
 identical.
 
-Although def.~\ref{df:naming-set} does not \emph{require} atomicity
-of names and absence of non-trivial properties, it does not \emph{state} any of
-them.
+Although def.~\ref{df:naming-set} does not mention or use any special properties
+of names and values, it does not require their absense.
 Introducing various properties of names and/or denotata, one can obtain a
 number of interesting and useful specialised formalisations of naming for
 theoretical purposes as well as implementable data structures suitable for
@@ -217,10 +214,10 @@ two important differences from the definition~\ref{df:naming-set}.
 \begin{itemize}
 \item Multivaluedness: any name can be related to zero or more values;
 \item Compoundness of names: compound names could be concatenated from shorter
-ones, i.e. names form a monoid.
+ones, i.e. names form a monoid under concatenation.
 \end{itemize}
 
-\subsection*{Notation}
+\subsection*{Conventions about Notation}
 
 For any set~$X$, let~$X^\ast$ denote a set of all sequences of its elements
 (also known as \emph{chains}), and~$2^X$ be a set of all its subsets.
@@ -231,6 +228,7 @@ Let $\proj{n}{k}$ be a function that maps an $n$-tuple to its $k$-th component.
 A set of Latin letters (the alphabet) is denoted as~$\seta$,
 and~$\setn$ will denote a set of natural numbers~-- these two sets will be
 used in examples.
+Some more notations will be introduced later, immediately before they are used.
 
 
 
