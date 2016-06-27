@@ -2,7 +2,6 @@
 %
 % Author    : Vadim Vinnik
 % E-mail    : vadim.vinnik@gmail.com
-% Date      : 2016-04-16
 % Status    : Draft
 % License   : Creative commons
 %
@@ -28,10 +27,7 @@
 
 \theoremstyle{definition}
 \newtheorem{Df}{Definition}
-\newtheorem{Th}{Theorem}
 \newtheorem{St}{Statement}
-\newtheorem{Pf}{Proof}
-\newtheorem{Rm}{Remark}
 \newtheorem{Ex}{Example}
 
 \newcommand{\setcharmvcn}{M}
@@ -48,7 +44,6 @@
 \newcommand{\flatten}{\operatorname{Fl}}
 \newcommand{\select}{\operatorname{Sel}}
 \newcommand{\deref}{\operatorname{Get}}
-\newcommand{\imbed}{\operatorname{Imb}}
 \newcommand{\putval}{\operatorname{Put}}
 \newcommand{\proj}[2]{\operatorname{pr}^{#1}_{#2}}
 \newcommand{\fmap}{\operatorname{Map}}
@@ -60,9 +55,13 @@
 
 \newcommand{\inapply}[1]{\stackbin{#1}{\nabla}}
 
+
+
 \title{Compound names with multiple values: formalisation, properties and implementation}
 \author{Vadim Vinnik}
 \date{2016}
+
+
 
 \begin{document}
 
@@ -101,6 +100,8 @@ trie,
 union.
 \end{abstract}
 
+
+
 \tableofcontents
 
 
@@ -110,8 +111,7 @@ union.
 A trilateral relation between a \emph{name}, its \emph{value} and
 \emph{meaning} has been in the focus of philosophical and mathematical logic,
 metamathematics, semiotics and epistemology.  For example, important questions
-about naming
-were raised and deeply investigated in fundamental works by
+about naming were raised and deeply investigated in fundamental works by
 G.\,Frege~\cite{bib:frege},
 L.\,Wittgenstein~\cite{bib:wittgenstein},
 W.\,Quine~\cite{bib:quine}.
@@ -122,7 +122,7 @@ everyday~-- \emph{indirect pointer}; a question \emph{does every name
 necessarily have a value} turned into a \emph{null reference} with both its
 power and danger; \emph{names changing their values depeding on the context}
 became \emph{variables} in the sense of imperative programming. Since
-\emph{addresses} of some values in memory are obviously a special case of their
+\emph{addresses} of some entities in memory are obviously a special case of
 names, and since addresses are, in their turn, values that can be computed,
 relationship and interaction between names and values in programming is even
 more complicated than in logical semantics.
@@ -1174,7 +1174,7 @@ Here is a shorh explanation of their semantics.
 \end{description}
 
 Finally, \lstinline{mtmap} function that implements the $\fmap$ operation
-(def.~\ref{df:mvcn-map}, \ref{df:mt-map} and st.~\ref{st:map-properties})
+(def.~\ref{df:mvcn-map} and st.~\ref{st:map-properties})
 makes \lstinline{MultiTrie} type an instance of the \lstinline{Functor} class; 
 \lstinline{applyCartesian} function as an implementation of $\apply^{\times}$
 operation makes it an instance of the \lstinline{Applicative} class; 
@@ -1190,13 +1190,33 @@ Having started with an intuitive notion of naming and its most general
 formalisation, we moved to its special case with compound names and multiple
 values. Two formalisations thereof were described: one based on the idea of
 (ambigious) mapping of names to values as a whole and another based on
-decomposing names into atoms. The definitions are shown to be essentially
+decomposing names into atoms. These definitions are shown to be essentially
 equivalent. This equivalence, from the programmer's perspective, means that
 this kind of containers could be used as a `plain' collection of name-value
-pairs or as a hierarchical data structure. The functions implemented in the
-library support both views.
+pairs or as a hierarchical data structure.
 
-%TODO
+A number of operations could be naturally defined for the namings in both
+their interpretations: relational and trie-like. Most of the operations obey
+such algebraic properties as associativity and/or distributivity over other
+operations.
+
+This naming concept leads to a software implementation that consists of an
+underlying data structure roughly corresponding to a multi-trie formalisation
+and a set of utility functions corresponding to the algebraic operations on
+namings. The properties of operations described in the earlier sections fit
+the multi-trie data type an instance of applicative functor and monad
+typeclasses that makes multi-tries a member of Haskell container types,
+together with lists, maps and trees.
+
+As far as a list is a conventional model for a non-deterministic computation
+that generates cases one by one in a lazy manner, a multi-trie could be used to
+represent a non-deterministic multilevel structure unfolding when the consumer
+needs more detail.
+On the other hand, in the same way as a list could be \emph{simply a list},
+a multi-trie could represent a static entity for which a tree of lists is a
+natural form. A typical example could be a directory tree where an atomic name
+corresponds to a subdirectory and values correspond to individual files.
+A structure of an XML document is another example of such objects.
 
 
 
@@ -1254,7 +1274,7 @@ library support both views.
 
 \bibitem{bib:dictionary}
   Paul~E.~Black,
-  "Dictionary", in Dictionary of Algorithms and Data Structures [online],
+  ``Dictionary'', in Dictionary of Algorithms and Data Structures [online],
   Vreda Pieterse and Paul E. Black, eds.
   Available from: http://www.nist.gov/dads/HTML/dictionary.html
 
