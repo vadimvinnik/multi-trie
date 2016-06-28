@@ -166,7 +166,8 @@ comprehensive conception of \emph{compositional programming}~\cite{bib:redko}.
 \begin{Df}\label{df:naming-set}
 Suppose there is a given set~$D$ whose elements are called \emph{values}, or
 \emph{denotata}, and a set~$V$ of objects called \emph{names}.
-A \emph{naming set} is a partial mapping $s: V\to D$.
+A \emph{$(V,D)$-naming set} (the prefix will be omitted when possible) is a
+partial mapping $s: V\to D$.
 \end{Df}
 
 In other words, a naming set is an object of the form
@@ -212,9 +213,9 @@ theoretical purposes as well as implementable data structures suitable for
 practical tasks. This article describes a kind of naming with
 two important differences from the definition~\ref{df:naming-set}.
 \begin{itemize}
-\item Multivaluedness: any name can be related to zero or more values;
-\item Compoundness of names: compound names could be concatenated from shorter
-ones, i.e. names form a monoid under concatenation.
+\item \emph{Multivaluedness}: any name can be related to zero or more values;
+\item \emph{Compoundness of names}: compound names could be concatenated from
+shorter ones, i.e. names form a monoid under concatenation.
 \end{itemize}
 
 \subsection*{Conventions about notation}
@@ -248,6 +249,12 @@ Whenever $V$ and $D$ are obvious from the context, we'll omit ``$(V,D)$-''
 prefix and write simply ``MVCNset''. A set of $(V,D)$-MVCNsets will be
 denoted~$\setmvcn{V}{D}$.
 \end{Df}
+
+Note that there is an obvious bijection between a class of $(V,D)$-MVCNsets and
+a class of $(V^\ast, 2^D)$-naming sets: a relation between a name and its
+multiple values could be modelled through a single value that is a subset
+of~$V$. Therefore, a multivalued naming could be regarded as a special case of
+an univalued naming with extra specifics applied to values.
 
 \begin{Ex}\label{ex:mvcn}
 The following is a $(\seta, \setn)$-MVCNset:
@@ -304,7 +311,7 @@ such that
 
 Unlike the univalued case, here~$\deref$ is a total operation: even if a
 name~$v$ does not have any associated value in an MVCNset~$p$, dereferencing
-just yields an empty set of values.
+it just yields an empty set of values.
 
 \begin{Ex}\label{ex:mvcn-dereferencing}
 Consider an MVCNset~$p$ from ex.~\ref{ex:mvcn}. Then
@@ -320,36 +327,35 @@ It follows immediately from the definition that dereferencing distributes
 over set-theoretical operations.
 \begin{St}\label{st:mvcn-deref-distributivity}
 Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$p$ and~$q$ be
-$(V,D)$-MVCNsets. Then
+$(V,D)$-MVCNsets. Then, for every~$v\in V^\ast$,
 \[
-  \deref(p\odot q, v) = \deref(p, v) \odot \deref(q, v) ,
+  \deref(p\odot q, v) = \deref(p, v) \odot \deref(q, v) .
 \]
-for every~$v\in V^\ast$.
 \end{St}
 
 The following important property means, in fact, that any MVCNset is completely
-defined by the values of all its names.
+defined by the values of all its names.  In terms of programming, it means that
+if two MVCNset objects' behaviours (observed through the $\deref$ selector) are
+indiscernible, the objects are identical.
 \begin{St}\label{st:mvcn-deref-equality}
 Let $p, q \in \setmvcn{V}{D}$. Then
 \[
   (\forall u\in V^\ast . \deref(p,u) = \deref(q,u)) \implies (p = q) .
 \]
 \end{St}
-In terms of programming, it means that
-if two MVCNset objects' behaviours (observed through the $\deref$ selector) are
-indiscernible, the objects are identical.
 
 The following operation is, in a reasonable sense, an opposite to
 dereferencing.  It replaces all values of some name with a new set of values.
 Thus, it is similar to assignment in the sense of imperative programming.
 \begin{Df}\label{df:mvcn-replace}
-\emph{Replacement} is an operation $\putval_\setcharmvcn : \setmvcn{V}{D}
-\times V^\ast \times 2^D \to \setmvcn{V}{D}$, such that
-\[
-  \putval_\setcharmvcn(p, u, s) =
+\emph{Replacement} is an operation
+\begin{eqnarray*}
+ & \putval_\setcharmvcn :
+    \setmvcn{V}{D} \times V^\ast \times 2^D \to \setmvcn{V}{D}, \\
+ & \putval_\setcharmvcn(p, u, s) =
       \{ (v, x) \mid (v, x) \in p, v \neq u \} \cup
       \{ (u, y) \mid y \in s \} .
-\]
+\end{eqnarray*}
 The subscript will be omitted further whenever possible.
 \end{Df}
 In other words, this operation deletes from~$p$ all values corresponding to
@@ -374,7 +380,7 @@ Let~$p$ be an MVCNset from ex.~\ref{ex:mvcn}. Then
 
 The main property of replacement is obvious and immediately follows from the
 definition: it changes the values of one name and does not influence the other
-names. Except this, two subsequent replacement operations commute if they
+names. Except this, two replacement operations commute if they
 relate to different names, otherwise the outer operation absorbs the inner one.
 \begin{St}\label{st:mvcn-replace-deref}
 Let~$p \in \setmvcn{V}{D}$, $u, v \in V^\ast$, $s \in 2^D$. Then
