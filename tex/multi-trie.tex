@@ -201,9 +201,9 @@ programming languages and widely used in practice.
 At the topmost abstraction level, a naming set represents a ``plain'' relation
 where names and values are atomic in the sense that their internal structures
 and any non-trivial properties are hidden as irrelevant.  In fact, the only
-special property taken into account by the definition above is equatability of
-names: for any two names, it should be possible to decide whether they are
-identical.
+special property taken into account by the definition above is
+\emph{equatability} of names: for any two names, it should be possible to
+decide whether they are identical.
 
 Although def.~\ref{df:naming-set} does not mention or use any special properties
 of names and values, it does not require their absense.
@@ -254,7 +254,8 @@ Note that there is an obvious bijection between a class of $(V,D)$-MVCNsets and
 a class of $(V^\ast, 2^D)$-naming sets: a relation between a name and its
 multiple values could be modelled through a single value that is a subset
 of~$V$. Therefore, a multivalued naming could be regarded as a special case of
-an univalued naming with extra specifics applied to values.
+a univalued naming with extra specifics applied to values (being sets) and names
+(being chains).
 
 \begin{Ex}\label{ex:mvcn}
 The following object is an $(\seta, \setn)$-MVCNset:
@@ -837,7 +838,7 @@ that
 for any $p \in \setmvcn{V}{D}$.
 \end{Df}
 
-The definition of mapping for multi-tries is straightforward, it can be easily
+The definition of mapping for multitries is straightforward, it can be easily
 obtained from isomorphism. The following properties hold:
 
 \begin{St}\label{st:map-properties}
@@ -955,11 +956,11 @@ If $p\in \setmvcn{V}{D\to D'}$, $p\in \setmvcn{V}{D}$,
 
 Therefore, for every function~$f$ contained in~$p$ under a compound name~$u$
 and every object~$d$ contained in~$q$ under a name~$v$, the resulting
-multi-trie contains a value~$f(d)$ under a name~$uv$.
+multitrie contains a value~$f(d)$ under a name~$uv$.
 
 Cartesian is not the only kind of application with an elegant definition and
 interesting properties.  The following two application operations are
-easier to define in terms of multi-tries.
+easier to define in terms of multitries.
 
 \begin{Df}\label{df:mt-apply-setop}
 \emph{Uniting} and \emph{intersecting application} are operations
@@ -986,14 +987,14 @@ one should
 \item apply every function from the root node of~$p$ to every value from
 the root node of~$q$, let the result be~$a$;
 \item for every atomic name~$v\in V$, apply (in the sense that is being
-described by this list) the entire multi-trie~$p$ of
-functions to the $v$-child of the multi-trie~$q$ of values~-- let~$b_1(v)$ be
+described by this list) the entire multitrie~$p$ of
+functions to the $v$-child of the multitrie~$q$ of values~-- let~$b_1(v)$ be
 the result;
 \item do the same with the $v$-child of~$p$ and the entire~$q$, let the result
 be~$b_2(v)$;
-\item merge $b_1(v)$ and $b_2(v)$ with the respective multi-trie operation
+\item merge $b_1(v)$ and $b_2(v)$ with the respective multitrie operation
 (union or intersection), let $b_1(v)\odot b_2(v) = b(v)$;
-\item compose the resulting multi-trie from the set~$a$ of root values and a
+\item compose the resulting multitrie from the set~$a$ of root values and a
 name-to-child mapping~$b$.
 \end{itemize}
 
@@ -1044,17 +1045,17 @@ is not isomorphic to the set-based specification, let us justify it as an
 acceptable approximation.
 
 There were two isomorphic though different formalisations: MVCNsets and
-multi-tries. The former has higer abstraction level and suits well for
+multitries. The former has higer abstraction level and suits well for
 specification purposes whereas the latter involves a trie~-- a practical data
 structure suitable for an efficient implementation. The only impractical
-feature of multi-tries definition introduced for the sake of mathematical
+feature of multitries definition introduced for the sake of mathematical
 simplicity is their infiniteness~-- every multitrie has a child node under
 every atomic name; it allowed to simplify formulae omiting check whether the
 name is in the trie.  In the trie-based implementation, however, it would be
 better to store finite maps and perform such checks for the sake of efficiency.
 In particular, if the underlying trie does not contain any child node for a
 particular name, the objects behaviour observed via functions is the same as
-if it associated this name with an empty multi-trie.
+if it associated this name with an empty multitrie.
 
 All this leads to the following basic definition (indeed, the module hides it
 behind smart constructors).
@@ -1106,75 +1107,75 @@ fromList :: Ord n => [([n], v)] -> MultiTrie n v
 Here is a shorh explanation of their semantics.
 \begin{description}
 \item [empty]
-  A constant for the empty multi-trie~$\bot$, see def.~\ref{df:mvcn-extreme}
+  A constant for the empty multitrie~$\bot$, see def.~\ref{df:mvcn-extreme}
   and~\ref{df:mt-extreme}.
 \item [top]
-  A constant for the full multi-trie~$\bot$, see def.~\ref{df:mvcn-extreme}
+  A constant for the full multitrie~$\bot$, see def.~\ref{df:mvcn-extreme}
   and~\ref{df:mt-extreme}.  The long class constraint is needed because the
   function must construct a (lazy) list of all names and a list of all possible
   values.
-\item [leaf] Given a list of values, constructs a multi-trie that has this list
+\item [leaf] Given a list of values, constructs a multitrie that has this list
   in its root node and no other valies (i.e. all other names yield to an empty
   list of values).
 \item [add]
-  Given a value and a multi-trie, prepend the value to the list stored in the
+  Given a value and a multitrie, prepend the value to the list stored in the
   root node.
 \item [values]
-  Get a list of values from the root node of a multi-trie.
+  Get a list of values from the root node of a multitrie.
 \item [children]
-  From the root node of a multi-trie, get a mapping of atomic names to the
+  From the root node of a multitrie, get a mapping of atomic names to the
   child nodes.
 \item [null]
-  Check whether the argument multi-trie is empty.
+  Check whether the argument multitrie is empty.
 \item [size]
-  Get the total number of values in the multi-trie.
+  Get the total number of values in the multitrie.
 \item [isEqualStrict]
-  Compare two multi-tries: they are considered equal if equal are lists of
-  values under all compound names. I.e. if the multi-tries have equal lists
+  Compare two multitries: they are considered equal if equal are lists of
+  values under all compound names. I.e. if the multitries have equal lists
   of values in their root nodes and, for every atomic name, the corresponding
-  child multi-tries are equal in this sense, in their turn. There is another
+  child multitries are equal in this sense, in their turn. There is another
   function for weak comparison~-- it ignores order of elements in the lists
   treating them as multisets.
 \item [subnode]
   Get a node pointed to by a compound name. If the name is not present in the
   underlying data structure, the function anyway yields a correct value, the
-  empty multi-trie. This function implements selection operation from
+  empty multitrie. This function implements selection operation from
   def.~\ref{df:mvcn-select} and~\ref{df:mt-select}.
 \item [mtmap]
-  Apply a function to each value in a multi-trie and combine results into
-  a new multi-trie preserving the names (and, therefore, the trie structure),
+  Apply a function to each value in a multitrie and combine results into
+  a new multitrie preserving the names (and, therefore, the trie structure),
   see def.~\ref{df:mvcn-map}.
   This is a specific implementation of the \lstinline{fmap} method from the
   \lstinline{Functor} class.
 \item [cartesianProduct]
-  Construct a cartesian product of two multi-tries in the sense of
+  Construct a cartesian product of two multitries in the sense of
   def.~\ref{df:mvcn-cartesian} and st.~\ref{st:deref-cartesian}.
 \item [union]
-  Construct a union of two multi-tries, see st.~\ref{st:mvcn-setop} and
+  Construct a union of two multitries, see st.~\ref{st:mvcn-setop} and
   def.~\ref{df:mt-setop}. There is another function for intersection.
 \item [flatten]
-  Given a multi-trie whose values are, in their turn, multi-tries, construct
-  a flattened multi-trie, see def.~\ref{df:flatten} and
+  Given a multitrie whose values are, in their turn, multitries, construct
+  a flattened multitrie, see def.~\ref{df:flatten} and
   st.~\ref{st:deref-flatten}. This is a specific implementation of the
   \lstinline{join} function defined for all types of the \lstinline{Monad}
   class.
 \item [applyCartesian]
   Cartesian
-  application of a multi-trie of functions to a multi-trie of arguments, see
+  application of a multitrie of functions to a multitrie of arguments, see
   def.~\ref{df:mt-apply-setop}.
 \item [applyUniting]
   Uniting
-  application of a multi-trie of functions to a multi-trie of arguments, see
+  application of a multitrie of functions to a multitrie of arguments, see
   def.~\ref{df:mvcn-apply-cartesian}.
   There is also a dual function for intersection.
 \item [toMap]
-  Convert a multi-trie to a \lstinline{Data.Map} that maps compound names to
+  Convert a multitrie to a \lstinline{Data.Map} that maps compound names to
   lists of values. Corresponds to an inverse of the isomorphism~$\varphi$
   from st.~\ref{st:isomorph}.
 \item [toList]
-  Convert a multi-trie to a list of name--value pairs.
+  Convert a multitrie to a list of name--value pairs.
 \item [fromList]
-  Convert a list of name--value pairs to a multi-trie.
+  Convert a list of name--value pairs to a multitrie.
 \end{description}
 
 Finally, \lstinline{mtmap} function that implements the $\fmap$ operation
@@ -1205,19 +1206,19 @@ such algebraic properties as associativity and/or distributivity over other
 operations.
 
 This naming concept leads to a software implementation that consists of an
-underlying data structure roughly corresponding to a multi-trie formalisation
+underlying data structure roughly corresponding to a multitrie formalisation
 and a set of utility functions corresponding to the algebraic operations on
 namings. The properties of operations described in the earlier sections fit
-the multi-trie data type an instance of applicative functor and monad
-typeclasses that makes multi-tries a member of Haskell container types,
+the multitrie data type an instance of applicative functor and monad
+typeclasses that makes multitries a member of Haskell container types,
 together with lists, maps and trees.
 
 As far as a list is a conventional model for a non-deterministic computation
-that generates cases one by one in a lazy manner, a multi-trie could be used to
+that generates cases one by one in a lazy manner, a multitrie could be used to
 represent a non-deterministic multilevel structure unfolding when the consumer
 needs more detail.
 On the other hand, in the same way as a list could be \emph{simply a list},
-a multi-trie could represent a static entity for which a tree of lists is a
+a multitrie could represent a static entity for which a tree of lists is a
 natural form. A typical example could be a directory tree where an atomic name
 corresponds to a subdirectory and values correspond to individual files.
 A structure of an XML document is another example of such objects.
