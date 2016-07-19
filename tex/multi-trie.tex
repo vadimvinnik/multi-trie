@@ -530,9 +530,9 @@ fig.~\ref{fig:trie}.
 \end{figure}
 
 To grasp this informal consideration in a definition, it would be convenient to
-assume that every node in the hierarchy has \emph{all} possible children (i.e.
-that the hieraarchy includes all names from~$V^\ast$ regardless of whether they
-have values): otherwise we needed a special treatment for missing names in
+assume that every node in the hierarchy has \emph{all} possible children~-- i.e.
+that the hierarchy includes all names from~$V^\ast$ regardless of whether they
+have values: otherwise we needed a special treatment for missing names in
 every subsequent definition or statement. This leads to the following
 
 \begin{Df}\label{df:mt}
@@ -579,7 +579,7 @@ Subscripts will be omited if possible.
 \end{Df}
 
 In other words, selection operation finds a node pointed to by the
-compound name as a path in the trie, and gives a sub-trie starting
+compound name as a path in the trie, and takes a sub-trie starting
 at this node.
 
 \begin{Ex}\label{ex:mt-select}
