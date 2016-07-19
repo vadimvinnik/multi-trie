@@ -619,25 +619,30 @@ as a path to a node in the trie and then take the value stored in that node.
 Let $\odot \in \{ \cup, \cap \}$, $p, q \in \setmt{V}{D}$,
 $p = (s, f)$, $q = (t, g)$. Then
 \[
-  p \odot_\setcharmt  q = (s \odot t, h) ,
+  p \odot_\setcharmt  q = (s \odot t, f \odot g) ,
 \]
-where~$h$ is such a function that $h(v) = f(v) \odot_\setcharmt  g(v)$,
+where~$h = f \odot g$ is such a function that
+$h(v) = f(v) \odot_\setcharmt  g(v)$,
 for any~$v \in V$.
 Note that subscripts in this definition help to distinguish between
 set-theoretical operations on sets of values and corresponding operations
 on multitries.
 \end{Df}
 
-In other words, to build $r = p \cup q$, one needs to
-build a union of the value sets contained in the operands under
-each compound name.
+In other words, to build $r = p \cup q$, one needs to go through all compound
+names and, for each name, build a union of the value sets contained in the
+operands under that name.
 
 Let us also define an operation that corresponds to replacement
-defined for MVCNsets (see def.~\ref{df:mvcn-replace}. Like other multitrie
+defined for MVCNsets (see def.~\ref{df:mvcn-replace}). Like other multitrie
 operations, the most natural way of defining it is recursive.
+
 \begin{Df}\label{df:mt-replace}
-\emph{Replacement} is an operation $\putval_\setcharmt : \setmt{V}{D}
-\times V^\ast \times 2^D \to \setmt{V}{D}$, such that, for any
+\emph{Replacement} is an operation
+\[
+  \putval_\setcharmt : \setmt{V}{D} \times V^\ast \times 2^D \to \setmt{V}{D},
+\]
+such that, for any
 $p = (s, f) \in \setmt{V}{D}$, $t \in 2^D$, $u \in V$, $v \in V^\ast$,
 \begin{eqnarray*}
   \putval_\setcharmt(p, \varepsilon, t) & = & (t, f) , \\
@@ -672,7 +677,7 @@ for any~$p\in \setmvcn{V}{D}$,
 \[
   \varphi(p) = (
     \deref_\setcharmvcn(p, \varepsilon) ,
-    \{ u \mapsto \select_\setcharmvcn(p, u) \mid u\in V \}
+    \{ u \mapsto \varphi(\select_\setcharmvcn(p, u) \mid u\in V \})
   ) .
 \]
 Then~$\varphi$ is a bijection that preserves
@@ -685,11 +690,12 @@ operations:
       \varphi(p) \mathbin{\odot_{\setcharmt}} \varphi(q) , \\
   & \deref_{\setcharmvcn}(p, v) =
       \deref_{\setcharmt}(\varphi(p), v) , \\
-  & \putval_{\setcharmvcn}(p, v, s) =
+  & \varphi(\putval_{\setcharmvcn}(p, v, s)) =
       \putval_{\setcharmt}(\varphi(p), v, s) , \\
   & \varphi(\select_{\setcharmvcn}(p, v)) =
-      \select_{\setcharmt}(\varphi(p), v) .
+      \select_{\setcharmt}(\varphi(p), v) ,
 \end{eqnarray*}
+for all $p,q \in \setmvcn{V}{D}$, $v \in V^\ast$.
 \end{St}
 
 In other words, $\varphi$~is an isomorphism from many-sorted algebra of
