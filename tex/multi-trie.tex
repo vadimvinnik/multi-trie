@@ -708,7 +708,7 @@ appropriate form in each particular case.
 
 \section{Cartesian product and flattening}
 
-Operations described in the previous section (union, intersection, selection)
+Operations described in the previous sections (union, intersection, selection)
 preserve the type and structure of their operands. This section describes two
 more complicated operations.
 
@@ -716,10 +716,10 @@ Before giving a formal definition for a cartesian product of namings, let us
 informally describe how should an operation look like to deserve this name.
 Let~$p$ and~$q$ be two MVCNsets. Their cartesian product should consist of
 values of the form~$(d',d'')$ where $d'$~is a value from~$p$ and $d''$~is taken
-from~$q$. But values are attached to some names~-- say, $u$~and~$v$,
-respectively. As the product's value~$(d',d'')$ is combined from the values
-taken from operands, the name of this combined value must be combined from~$u$
-and~$v$, and the only combining operation defined for names is concatenation.
+from~$q$. But these values are attached to some names~-- say, $u$~and~$v$,
+respectively.  Therefore, the resulting product MVCNset should contain the
+combined value~$(d',d'')$ under a name combined from~$u$ and $v$, and the only
+combining operation defined for names is concatenation.
 
 \begin{Df}\label{df:mvcn-cartesian}
 Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
@@ -746,7 +746,7 @@ Then their cartesian product is
 
 \begin{St}\label{st:cartesian-distributivity}
 Obviously,~$\times$ distributes over $\cap$ and $\cup$.
-For any $p \in \setmvcn{V}{D}$ and $q, r \in \setmvcn{V}{D'}$,
+For any $p \in \setmvcn{V}{D'}$ and $q, r \in \setmvcn{V}{D''}$,
 \[
   p\times(q\odot r) = (p\times q) \odot (p\times r) .
 \]
@@ -763,22 +763,21 @@ For any $p \in \setmvcn{V}{D'}$ and $q \in \setmvcn{V}{D''}$,
 \]
 \end{St}
 
-The latter is the main property of cartesian product. Since an MVCNset is
+This is the main property of cartesian product. Since an MVCNset is
 completely defined by values of all names (st.~\ref{st:mvcn-deref-equality}),
-cartesian product can be defined in terms of dereferencing and, therefore,
-is preserved by the mapping~$\varphi$ from st.~\ref{st:isomorph}. Also, this
+it is preserved by the mapping~$\varphi$ from st.~\ref{st:isomorph}. Also, this
 property may be taken as a definition of cartesian product for multitries.
 
-Consider an MVCNset~$p$ whose values are, in their turn, MVCNsets.
-Flattening operation formally defined below turns it into a ``plain'' MVCNset.
-First, let us describe the underlying idea. Supose a name~$u$ in~$p$ has a
-value~$q$ (and, maybe, some other values) that, by precondition, is an
-MVCNset.  Then take a name~$v$ that has a value~$d$ in~$q$. In sum, to
-reach~$d$ from~$p$, one has to dereference the name~$u$ (obtaining~$q$) and
-then (in~$q$) dereference~$v$. Therefore, flattening should turn~$p$ into
-such an MVCNset~$r$, where~$d$ is a value of the name~$uv$.
+Consider an MVCNset~$p$ whose values are, in their turn, MVCNsets.  Flattening
+operation formally defined below turns it into a ``plain'' MVCNset.  Supose a
+name~$u$ in~$p$ has a value~$q$ (and, maybe, some other values) that, by
+precondition, is an MVCNset.  Then take a name~$v$ that has a value~$d$ in~$q$.
+In sum, to reach~$d$ from~$p$, one has to dereference the name~$u$
+(obtaining~$q$) and then (in~$q$) dereference~$v$. Therefore, flattening should
+turn~$p$ into such an MVCNset~$r$, where~$d$ is a value of the name~$uv$.
+
 \begin{Df}\label{df:flatten}
-\emph{Flattening} is an unary operation
+\emph{Flattening} is a unary operation
 $\flatten : \setmvcn{V}{\setmvcn{V}{D}} \to\setmvcn{V}{D}$,
 such that, for any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
 \[
@@ -830,7 +829,7 @@ For any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
 \section{Elementwise mappings and applications}
 
 The previous sections described operations on namings containing some
-`ordinary' values. Now let us consider how do these objects interact with
+`ordinary' values. Now let us consider how do namings interact with
 functions, including how can a naming populated with functions act itself
 as a function.
 
@@ -872,7 +871,10 @@ let us define first an auxiliary function that turns a value~$x$ into a
 high order function applying an argument function to~$x$:
 
 \begin{Df}\label{df:ylppa}
-\emph{Reverse application} is a function $\ylppa : X \to ((X \to Y) \to Y)$,
+\emph{Reverse application} is a function
+\[
+  \ylppa : X \to ((X \to Y) \to Y),
+\]
 such that, for every $x\in X$, $\xi = \ylppa x$ is a function satisfying the
 equation
 \[
@@ -885,12 +887,14 @@ Then the reverse mapping operation gets a concise definition.
 
 \begin{Df}\label{df:mvcn-pam}
 \emph{Reverse mapping} is an operation
-$\fpam_{\setcharmvcn} : \setmvcn{V}{D \to D'} \to (D \to \setmvcn{V}{D'})$,
+\[
+  \fpam_{\setcharmvcn} : \setmvcn{V}{D \to D'} \to (D \to \setmvcn{V}{D'}),
+\]
 such that
 \[
   (\fpam p)(d) = (\fmap (\ylppa d))(p) .
 \]
-for any $p\in \setmvcn{V}{D}$, $d\in D$.
+for any $p\in \setmvcn{V}{D \to D'}$, $d\in D$.
 \end{Df}
 
 It is easy to see from the definitions of $\fmap$ and $\ylppa$ that $\fpam$
@@ -938,7 +942,7 @@ follows.
 \begin{Df}\label{df:mvcn-apply-cartesian}
 Then \emph{cartesian application} is an operation of type
 \[
-\setmvcn{V}{D\to D'} \times \setmvcn{V}{D} \to \setmvcn{V}{D} ,
+\setmvcn{V}{D\to D'} \times \setmvcn{V}{D} \to \setmvcn{V}{D'} ,
 \]
 such that
 \[
@@ -953,7 +957,7 @@ for a definition, in which case def.~\ref{df:mvcn-apply-cartesian} would turn
 into a theorem).
  
 \begin{St}\label{st:mvcn-apply-cartesian}
-If $p\in \setmvcn{V}{D\to D'}$, $p\in \setmvcn{V}{D}$,
+If $p\in \setmvcn{V}{D\to D'}$, $q\in \setmvcn{V}{D}$,
 \[
   \apply_{\setcharmvcn}^{\times} (p, q) =
     \{ (uv, f(d)) \mid (u,f) \in p, (v,d) \in q \} .
@@ -1028,19 +1032,20 @@ for $\odot \in \{\cup, \cap \}$ and $\oplus \in \{\cup, \cap, \times \}$,
 A container type implementing the multivalued naming with compound names has
 been defined in Haskell programming language. Some trade-offs between the
 mathematical purity and implementability could hardly be avoided. On the other
-hand, the framework of fundamental concepts provided by Haskell gave a
+hand, the conceptual framework provided by Haskell gave a
 direction towards some additional features that turn an abstract mathematical
-object into a potentially useful member of Haskell programming world.
+notion into a potentially useful tool.
 
 The mathematical construct described above formalizes manyvaluedness by means
 of a \emph{set}: the value of $\deref$ function is a set of the name's values.
-In Haskell programming, however, the most common representation of many-valued
-functions is a function whose value is a \emph{list} of possible
+In Haskell programming, however, the most common representation of a many-valued
+function is a function whose value is a \emph{list} of possible
 values~\cite[p.~285]{bib:lipovaca}.  Using lists instead of sets gives some
 benefits. For example, the many-valued function, as a value generator, does not
 need to compare every newly produced value with all previous ones. Lists can be
 generated by one function and consumed by another in a lazy manner. Elements'
-type needs to be ordered for sets and does not for lists.
+type needs to be an instance of \lstinline{Ord} class sets and does not for
+lists.
 
 Therefore, the most significant difference between the mathematical constructs
 and the software implementation is that an ambigious value of a compound name is
@@ -1050,18 +1055,18 @@ possibly duplicate elements.  Keeping in mind that a list-based implementation
 is not isomorphic to the set-based specification, let us justify it as an
 acceptable approximation.
 
-There were two isomorphic though different formalisations: MVCNsets and
-multitries. The former has higer abstraction level and suits well for
-specification purposes whereas the latter involves a trie~-- a practical data
-structure suitable for an efficient implementation. The only impractical
+The previous sections presented two isomorphic though different formalisations:
+MVCNsets and multitries. The former has higer abstraction level and suits well
+for specification purposes whereas the latter involves a trie~-- a practical
+data structure suitable for an efficient implementation. The only impractical
 feature of multitries definition introduced for the sake of mathematical
 simplicity is their infiniteness~-- every multitrie has a child node under
-every atomic name; it allowed to simplify formulae omiting check whether the
-name is in the trie.  In the trie-based implementation, however, it would be
+every atomic name; this helped to simplify formulae by omiting check whether the
+name is present in the trie.  In the trie-based implementation, however, it would be
 better to store finite maps and perform such checks for the sake of efficiency.
 In particular, if the underlying trie does not contain any child node for a
-particular name, the objects behaviour observed via functions is the same as
-if it associated this name with an empty multitrie.
+particular name, the objects behaviour observed via functions is the same as if
+it associated this name with an empty multitrie.
 
 All this leads to the following basic definition (indeed, the module hides it
 behind smart constructors).
@@ -1081,17 +1086,13 @@ top :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) =>
     MultiTrie n v
 leaf :: [v] -> MultiTrie n v
 add :: v -> MultiTrie n v -> MultiTrie n v
-
 values :: MultiTrie n v -> [v]
 children :: MultiTrie n v -> MultiTrieMap n v
 null :: MultiTrie n v -> Bool
 size :: MultiTrie n v -> Int
-
 isEqualStrict :: (Ord n, Eq v) =>
     MultiTrie n v -> MultiTrie n v -> Bool
-
 subnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
-
 mtmap :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
 cartesianProduct :: Ord n =>
     MultiTrie n v -> MultiTrie n w -> MultiTrie n (v, w)
@@ -1099,18 +1100,16 @@ union :: Ord n =>
     MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 flatten :: Ord n =>
     MultiTrie n (MultiTrie n v) -> MultiTrie n v
-
 applyCartesian :: Ord n =>
     MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyUniting :: Ord n =>
     MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
-
 toMap :: Ord n => MultiTrie n v -> Map [n] [v]
 toList :: Ord n => MultiTrie n v -> [([n], v)]
 fromList :: Ord n => [([n], v)] -> MultiTrie n v
 \end{lstlisting}
 
-Here is a shorh explanation of their semantics.
+Here is a short explanation of their semantics.
 \begin{description}
 \item [empty]
   A constant for the empty multitrie~$\bot$, see def.~\ref{df:mvcn-extreme}
@@ -1215,19 +1214,19 @@ This naming concept leads to a software implementation that consists of an
 underlying data structure roughly corresponding to a multitrie formalisation
 and a set of utility functions corresponding to the algebraic operations on
 namings. The properties of operations described in the earlier sections fit
-the multitrie data type an instance of applicative functor and monad
+the multitrie data type into applicative functor and monad
 typeclasses that makes multitries a member of Haskell container types,
 together with lists, maps and trees.
 
 As far as a list is a conventional model for a non-deterministic computation
 that generates cases one by one in a lazy manner, a multitrie could be used to
 represent a non-deterministic multilevel structure unfolding when the consumer
-needs more detail.
-On the other hand, in the same way as a list could be \emph{simply a list},
-a multitrie could represent a static entity for which a tree of lists is a
-natural form. A typical example could be a directory tree where an atomic name
-corresponds to a subdirectory and values correspond to individual files.
-A structure of an XML document is another example of such objects.
+needs more detail.  On the other hand, in the same way as a list could be
+\emph{simply a list}, a multitrie could represent a static entity for which a
+tree of lists is a natural form. A typical example could be a directory tree
+where an atomic name corresponds to a directory, a compound name means a path
+and values correspond to individual files.  A structure of an XML document is
+another example of such objects.
 
 
 
