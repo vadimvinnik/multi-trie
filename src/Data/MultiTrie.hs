@@ -1,48 +1,38 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 {- |
-A multi-trie is a trie (i.e. a tree whose child nodes have distinct labels)
-with each node containing a list of values considered as a multiset.
+A 'MultiTrie' is a trie (i.e. a tree whose child nodes have distinct labels)
+with each node containing a list of values considered as a set.  It represents
+a multivalued naming with compound names: each compound name (a chain of
+labels) has a (possibly empty) list of values.
 
-Lookup of a sub-trie under a certain path is defined in an obvious way.
+The simplest possible 'MultiTrie' is 'empty' that has an empty list of values
+and an no children.  Since the only essential feature of a 'MultiTrie' is
+carrying values, the 'empty' 'MultiTrie' could be equated with an absense of a
+'MultiTrie'.  In particular, instead of saying that there is no sub-trie under
+path @p@ in a 'MultiTrie' @t@, let us say that @t@ contains a path @p@, and it
+points to an 'empty' node.  Therefore, every 'MultiTrie' could be considered as
+infinite, where each node has children under all possible names - and some of
+nodes are 'empty'.
 
-The simplest possible multi-trie is 'empty' that has an empty multiset of
-values and an no children.
+The opposite to the 'empty' is a 'top' 'MultiTrie' whose each node contains a
+list of all the element type's values under every possible path.
 
-Since the only essential feature of a multi-trie is carrying values, the
-'empty' multi-trie could be equated with an absense of a multi-trie. In
-particular, instead of saying that there is no sub-trie under path @p@ in a
-multi-trie @t@, let us say that @t@ contains a path @p@, and it points to an
-'empty' node. 
+Some operations could be defined for 'MultiTrie's in a natural way, including
+'map', 'union', 'intersection', 'cartesianProduct'.  Obviously, 'empty' is a
+neutral element of union.  Cartesian product is 'empty' if any of the two
+operands is 'empty'.
 
-Therefore, every multi-trie could be considered as infinite, where each node
-has children under all possible names - and some of nodes are 'empty'.
+A unary function can be applied to each value in each node of a 'MultiTrie'.
+Moreover, a 'MultiTrie' can contain not only ordinary values but also functions
+that makes it possible to apply a 'MultiTrie' of functions to a 'MultiTrie' of
+argument values, combining results with 'cartesianProduct'.  A 'MultiTrie'
+whose values are, in their turn,  'MultiTrie's, can be 'flatten'ed.  This makes
+'MultiTrie's an instance of 'Functor', Applicative' and 'Monad' classes.
 
-The opposite to the 'empty' is a 'top' multi-trie whose each node contains
-the greatest possible multi-set of the element type's values (i.e. an infinite
-list that has infinite instances of every of the element type's values) under
-every possible path.
-
-Some operations could be defined for multi-tries in a rather natural way,
-including 'map', 'union', 'intersection', 'cartesianProduct'.
-
-Obviously, 'empty' is a neutral element of union, and 'top' is that for
-intersection. Cartesian product is 'empty' if any of the two operands is
-'empty'. Dually, from the pure mathematical perspective, cartesian square of
-'empty' is 'empty'; although this cannot be implemented in this library within
-finite time and memory.
-
-Moreover, a multi-trie can contain not only ordinary values but also functions
-that makes it possible to apply a multi-trie of functions to a multi-trie of
-argument values, combining results with 'cartesianProduct', 'union' or
-'intersection'. It makes multi-tries an instance of 'Applicative' and 'Monad'.
-
-Implementaion notes. There are @Set@ and @Multiset@ and @Set@ types already
-implemented. However, this library only uses lists. The reason is that
-(Multi)Set requires its element type to be order-comparable, i.e. an instance
-of @Ord@ that is obviously not the case for functions. In this library's
-design, flexibility was the main priority, and a decision was made to sacrifice
-some efficiency for the sake of genericity.
+For a detailed description of a mathematical notion of multivalued naming with
+compound names, its operations and properties, see an article distributed with
+this package as a LaTeX source.
 -}
 
 module Data.MultiTrie(
@@ -120,8 +110,8 @@ type MultiTrieMap n v = M.Map n (MultiTrie n v)
 -- | A node object.
 data MultiTrie n v = MultiTrie
     {
-        values :: [v],                  -- ^ multiset
-        children :: MultiTrieMap n v    -- ^ child nodes
+        values :: [v],
+        children :: MultiTrieMap n v
     }
     deriving (Show)
 
@@ -139,20 +129,20 @@ instance Ord n => Monad (MultiTrie n) where
 instance (Ord n, Eq v) => Eq (MultiTrie n v) where
     (==) = isEqualStrict
 
--- | Constant: an empty multi-trie. A neutral element with respect to 'union'.
+-- | Constant: an empty 'MultiTrie'. A neutral element with respect to 'union'.
 empty :: MultiTrie n v
 empty = MultiTrie [] M.empty
 
--- | A multi-trie containing just one value in its root and no child nodes.
+-- | A 'MultiTrie' containing just one value in its root and no child nodes.
 singleton :: v -> MultiTrie n v
 singleton x = leaf [x]
 
--- | A multi-trie containing the given multiset in its root and no child nodes.
+-- | A 'MultiTrie' containing the given list in its root and no child nodes.
 leaf :: [v] -> MultiTrie n v
 leaf vs = MultiTrie vs M.empty
 
 {- |
-An infinite multi-trie that has in each node the same multiset of values and,
+An infinite 'MultiTrie' that has in each node the same list of values and,
 under each name from the given set, a child identical to the root.
 -}
 repeat :: Ord n => [n] -> [v] -> MultiTrie n v
@@ -162,9 +152,9 @@ repeat ns xs =
     else MultiTrie xs (M.fromList $ zip ns $ L.repeat $ repeat ns xs)
 
 {- |
-A multi-trie that has all possible values and all possible chid names in each
+A 'MultiTrie' that has all possible values and all possible chid names in each
 node. A neutral element with respect to 'intersection'. An opposite to the
-'empty' multi-trie.
+'empty' 'MultiTrie'.
 
 Use with causion! Consumes lots of memory even despite laziness. Consider using
 it only if both @n@ and @v@ types have less than dozen of values like Bool.
@@ -172,15 +162,15 @@ it only if both @n@ and @v@ types have less than dozen of values like Bool.
 top :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) => MultiTrie n v
 top = repeat allValues $ L.cycle allValues
 
--- | Change a multiset in the root node
+-- | Change a list in the root node
 updateValues :: ([v] -> [v]) -> MultiTrie n v -> MultiTrie n v
 updateValues f (MultiTrie vs m) = MultiTrie (f vs) m
 
--- | Add a new value to the root node's multiset of values.
+-- | Add a new value to the root node's list of values.
 add :: v -> MultiTrie n v -> MultiTrie n v
 add v = updateValues (v:)
 
--- | Check whether a multi-trie is empty.
+-- | Check whether a 'MultiTrie' is empty.
 null :: MultiTrie n v -> Bool
 null (MultiTrie vs m) = L.null vs && L.all null (M.elems m)
 
@@ -197,9 +187,9 @@ isEqualWeak :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> Bool
 isEqualWeak = areEquivalentUpTo listAsMultiSetEquals
 
 {- |
-Decide whether two multi-tries @u@ and @v@ are equivalent up to a custom list
+Decide whether two 'MultiTrie's @u@ and @v@ are equivalent up to a custom list
 equivalence predicate @p@.
-True if and only if (1) the multi-tries have non-empty nodes at the same paths
+True if and only if (1) the 'MultiTrie's have non-empty nodes at the same paths
 and (2) for each such path @s@, value lists from @u@ and @v@ under @p@ are
 equivalent, i.e. satisfy @p@.
 -}
@@ -213,7 +203,7 @@ areEquivalentUpTo p (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
     (areMapsEquivalentUpTo (areEquivalentUpTo p) m1 m2)
 
 {-
-Select a multi-trie subnode identified by the given path, or 'empty' if there
+Select a 'MultiTrie' subnode identified by the given path, or 'empty' if there
 is no such path.
 -}
 subnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
@@ -230,11 +220,11 @@ updateSubnode [] f mt = f mt
 updateSubnode (n:ns) f (MultiTrie vs m) =
     MultiTrie vs (M.alter (toMaybe . updateSubnode ns f . fromMaybe) n m)
 
--- | Add a value to a multiset of values in a subnode identified by the path.
+-- | Add a value to a list of values in a subnode identified by the path.
 addToSubnode :: Ord n => [n] -> v -> MultiTrie n v -> MultiTrie n v
 addToSubnode ns v = updateSubnode ns (add v)
 
--- | Replace a subnode identified by the path with a new multi-trie.
+-- | Replace a subnode identified by the path with a new 'MultiTrie'.
 replaceSubnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 replaceSubnode ns mt1 = updateSubnode ns (const mt1)
 
@@ -242,7 +232,7 @@ replaceSubnode ns mt1 = updateSubnode ns (const mt1)
 deleteSubnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
 deleteSubnode ns = replaceSubnode ns empty
 
--- | Unite a subnode identified by the path with another multi-trie.
+-- | Unite a subnode identified by the path with another 'MultiTrie'.
 uniteSubnode :: Ord n =>
     [n] ->
     MultiTrie n v ->
@@ -250,7 +240,7 @@ uniteSubnode :: Ord n =>
     MultiTrie n v
 uniteSubnode ns mt1 = updateSubnode ns (union mt1)
 
--- | Intersect a subnode identified by the path with another multi-trie.
+-- | Intersect a subnode identified by the path with another 'MultiTrie'.
 intersectSubnode :: (Ord n, Eq v) =>
     [n] ->
     MultiTrie n v ->
@@ -258,7 +248,7 @@ intersectSubnode :: (Ord n, Eq v) =>
     MultiTrie n v
 intersectSubnode ns mt1 = updateSubnode ns (intersection mt1)
 
--- | Map a function over all values in a multi-trie.
+-- | Map a function over all values in a 'MultiTrie'.
 mtmap :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
 mtmap f = mtmapContainers (L.map f)
 
@@ -267,24 +257,24 @@ mtmapWithPath :: Ord n => ([n] -> v -> w) -> MultiTrie n v -> MultiTrie n w
 mtmapWithPath f = mtmapContainersWithPath (L.map . f) 
 
 {-
-Apply a multiset @F@ of functions to all values in a multi-trie. If @V@ is a
-multi-set of values under a certain path @s@ in a multi-trie @P@, the result
-@Q@ will contain under @s@ a multi-set of all @(f v)@ values, for all @v@ from
+Apply a list @F@ of functions to all values in a 'MultiTrie'. If @V@ is a
+list of values under a certain path @s@ in a 'MultiTrie' @P@, the result
+@Q@ will contain under @s@ a list of all @(f v)@ values, for all @v@ from
 @V@ and all @f@ from F.
 -}
 mtmapAll :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
 mtmapAll fs  = mtmapContainers (fs <*>)
 
--- | Apply a multiset of functions to each value and its path.
+-- | Apply a list of functions to each value and its path.
 mtmapAllWithPath :: Ord n => [[n] -> v -> w] -> MultiTrie n v -> MultiTrie n w
 mtmapAllWithPath fs = mtmapContainersWithPath (\ns -> (L.map ($ns) fs <*>))
 
--- | Map a function over entire multisets contained in nodes.
+-- | Map a function over entire lists contained in nodes.
 mtmapContainers :: Ord n => ([v] -> [w]) -> MultiTrie n v -> MultiTrie n w
 mtmapContainers fl (MultiTrie vs vm) =
     MultiTrie (fl vs) (M.mapMaybe (toMaybe . mtmapContainers fl) vm)
 
--- | Map a function over entire multisets, passing node path as well.
+-- | Map a function over entire lists, passing node path as well.
 mtmapContainersWithPath :: Ord n =>
     ([n] -> [v] -> [w]) ->
     MultiTrie n v ->
@@ -296,7 +286,7 @@ mtmapContainersWithPath fl (MultiTrie vs vm) =
     transformChild n = toMaybe . (mtmapContainersWithPath $ fl . (n:))
 
 {- |
-Cartesian product of two multi-tries @P@ and @Q@ is a multi-trie @R@ whose
+Cartesian product of two 'MultiTrie's @P@ and @Q@ is a 'MultiTrie' @R@ whose
 paths are concatenations of any path @s@ from @P@ and every path @t@ from @Q@,
 and values under @st@ in @R@ are pairs @(v, w)@ where @v@ is a value under @s@
 in @P@, and @w@ is a value under @t@ in @Q@.
@@ -308,25 +298,25 @@ cartesianProduct :: Ord n =>
 cartesianProduct mtv = applyCartesian (mtmap (,) mtv)
 
 {- |
-Union of multi-tries @P@ and @Q@ is such a multi-trie @R@ that, under any path
-@p@, @R@ contains a union of a multiset that is contained in @P@ under @p@ and
-a multiset contained in @Q@ under @p@.
+Union of 'MultiTrie's @P@ and @Q@ is such a 'MultiTrie' @R@ that, under any path
+@p@, @R@ contains a union of a list that is contained in @P@ under @p@ and
+a list contained in @Q@ under @p@.
 -}
 union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 union = zipContentsAndChildren (++) (M.unionWith union)
 
--- | Union of a list of multi-tries.
+-- | Union of a list of 'MultiTrie's.
 unions :: Ord n => [MultiTrie n v] -> MultiTrie n v
 unions = L.foldl union empty
 
--- | Union of a non-empty list of multi-tries.
+-- | Union of a non-empty list of 'MultiTrie's.
 unions1 :: Ord n => [MultiTrie n v] -> MultiTrie n v
 unions1 = L.foldl1 union
 
 {- |
-Intersection of multi-tries @P@ and @Q@ is such a multi-trie @R@ that, under
-any path @p@, @R@ contains a union of a multiset that is contained in @P@ under
-@p@ and a multiset contained in @Q@ under @p@.
+Intersection of 'MultiTrie's @P@ and @Q@ is such a 'MultiTrie' @R@ that, under
+any path @p@, @R@ contains a union of a list that is contained in @P@ under
+@p@ and a list contained in @Q@ under @p@.
 -}
 intersection :: (Ord n, Eq v) =>
     MultiTrie n v ->
@@ -338,23 +328,23 @@ intersection mt = nullToEmpty .
         (\x y -> M.filter (not . null) (M.intersectionWith intersection x y))
         mt 
 
--- | Intersection of an empty list of multi-tries.
+-- | Intersection of an empty list of 'MultiTrie's.
 intersections :: (Ord n, Bounded n, Enum n, Eq v, Bounded v, Enum v) =>
     [MultiTrie n v] ->
     MultiTrie n v
 intersections = L.foldl intersection top 
 
--- | Intersection of a non-empty list of multi-tries.
+-- | Intersection of a non-empty list of 'MultiTrie's.
 intersections1 :: (Ord n, Eq v) =>
     [MultiTrie n v] ->
     MultiTrie n v
 intersections1 = L.foldl1 intersection
 
 {- |
-Given a multi-trie whose values are multi-tries in their turn, convert it into
-a 'plain' multi-trie.  If @P@ is a multi-trie that contains a multi-trie @Q@ as
+Given a 'MultiTrie' whose values are 'MultiTrie's in their turn, convert it into
+a 'plain' 'MultiTrie'.  If @P@ is a 'MultiTrie' that contains a 'MultiTrie' @Q@ as
 its value under a path @s@, and @Q@ contains a value @x@ under a path @t@, then
-the plain multi-trie @R@ will contain @x@ as a value under a path @st@ (that is
+the plain 'MultiTrie' @R@ will contain @x@ as a value under a path @st@ (that is
 a concatenation of @s@ and @t@).
 -}
 flatten :: Ord n => MultiTrie n (MultiTrie n v) -> MultiTrie n v
@@ -362,7 +352,7 @@ flatten (MultiTrie mts mtm) =
     F.foldr union empty mts `union` MultiTrie [] (M.map flatten mtm)
 
 {- |
-Given a multi-trie @P@ of functions and a multi-trie @Q@ of values, apply each
+Given a 'MultiTrie' @P@ of functions and a 'MultiTrie' @Q@ of values, apply each
 function from @P@ to each value from @Q@ arranging results as described in
 'cartesianProduct'.
 -}
@@ -373,14 +363,14 @@ applyCartesian :: Ord n =>
 applyCartesian mtf mtx = flatten $ mtmap (`mtmap` mtx) mtf
 
 {- |
-Given a multi-trie @P@ of functions and a multi-trie @Q@ of values, apply each
+Given a 'MultiTrie' @P@ of functions and a 'MultiTrie' @Q@ of values, apply each
 function from @P@ to each value from @Q@ combining results with 'union'.
 -}
 applyUniting :: Ord n => MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
 applyUniting = applyZippingChildren (M.unionWith union)
 
 {- |
-Given a multi-trie @P@ of functions and a multi-trie @Q@ of values, apply each
+Given a 'MultiTrie' @P@ of functions and a 'MultiTrie' @Q@ of values, apply each
 function from @P@ to each value from @Q@ combining results with 'intersection'.
 -}
 applyIntersecting :: (Ord n, Eq w) =>
@@ -391,16 +381,16 @@ applyIntersecting =
     applyZippingChildren (M.intersectionWith intersection)
 
 {-
-Given a multi-tree @P@ of values and a function @f@ that maps an arbitrary value
-to a multi-tree, apply the function @f@ to each value from @P@ and combine the
+Given a multitree @P@ of values and a function @f@ that maps an arbitrary value
+to a multitree, apply the function @f@ to each value from @P@ and combine the
 results as described in 'flatten'.
 -}
 bindCartesian :: Ord n => MultiTrie n v -> (v -> MultiTrie n w) -> MultiTrie n w
 bindCartesian mt fmt = flatten $ mtmap fmt mt
 
 {-
-Convert a multi-trie @P@ to a map @M@ whose keys are paths from @P@, and values
-in @M@ are respective lists representing multi-sets of values in @P@.
+Convert a 'MultiTrie' @P@ to a map @M@ whose keys are paths from @P@, and values
+in @M@ are respective lists representing lists of values in @P@.
 -}
 toMap :: Ord n => MultiTrie n v -> M.Map [n] [v]
 toMap (MultiTrie vs m) = if L.null vs
@@ -413,7 +403,7 @@ toMap (MultiTrie vs m) = if L.null vs
             M.mapWithKey (\n -> M.mapKeys (n:)) $
             M.map toMap m
 
--- | Convert a multi-trie to a list of path-value pairs.
+-- | Convert a 'MultiTrie' to a list of path-value pairs.
 toList :: Ord n => MultiTrie n v -> [([n], v)]
 toList (MultiTrie vs m) = (map ((,) []) vs) ++
     (
@@ -423,7 +413,7 @@ toList (MultiTrie vs m) = (map ((,) []) vs) ++
         M.map toList m
     )
 
--- | Convert a list of path-value pairs to a multi-trie.
+-- | Convert a list of path-value pairs to a 'MultiTrie'.
 fromList :: Ord n => [([n], v)] -> MultiTrie n v
 fromList = L.foldr (uncurry addToSubnode) empty
 
@@ -435,7 +425,7 @@ fromMaybe = maybe empty id
 toMaybe :: MultiTrie n v -> Maybe (MultiTrie n v)
 toMaybe mt = if null mt then Nothing else Just mt
 
--- | Convert a multi-trie into an ASCII-drawn tree.
+-- | Convert a 'MultiTrie' into an ASCII-drawn tree.
 draw :: (Show n, Show [v]) => MultiTrie n v -> String
 draw = T.drawTree . toTree show show
 
