@@ -161,7 +161,7 @@ it only if both @n@ and @v@ types have less than dozen of values like Bool.
 top :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) => MultiTrie n v
 top = repeat allValues $ L.cycle allValues
 
--- | Change a list in the root node
+-- | Change a list in the root node with a function and leave children intact.
 updateValues :: ([v] -> [v]) -> MultiTrie n v -> MultiTrie n v
 updateValues f (MultiTrie vs m) = MultiTrie (f vs) m
 
@@ -177,11 +177,11 @@ null (MultiTrie vs m) = L.null vs && L.all null (M.elems m)
 size :: MultiTrie n v -> Int
 size (MultiTrie vs m) = L.length vs + L.sum (L.map size (M.elems m))
 
--- | Check for equality, order of elements is important
+-- | Check for equality counting the order of elements.
 isEqualStrict :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> Bool
 isEqualStrict = areEquivalentUpTo (==)
 
--- | Check for equality, ignore order of elements
+-- | Check for equality ignoring the order of elements.
 isEqualWeak :: (Ord n, Eq v) => MultiTrie n v -> MultiTrie n v -> Bool
 isEqualWeak = areEquivalentUpTo listAsMultiSetEquals
 
@@ -255,12 +255,7 @@ mtmap f = mtmapOnLists (L.map f)
 mtmapWithName :: Ord n => ([n] -> v -> w) -> MultiTrie n v -> MultiTrie n w
 mtmapWithName f = mtmapOnListsWithName (L.map . f) 
 
-{-
-Apply a list @F@ of functions to all values in a 'MultiTrie'. If @V@ is a
-list of values under a certain path @s@ in a 'MultiTrie' @P@, the result
-@Q@ will contain under @s@ a list of all @(f v)@ values, for all @v@ from
-@V@ and all @f@ from F.
--}
+-- | Apply a list of functions to all values in a 'MultiTrie'.
 mtmapManyFunctions :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
 mtmapManyFunctions fs  = mtmapOnLists (fs <*>)
 
@@ -273,7 +268,7 @@ mtmapOnLists :: Ord n => ([v] -> [w]) -> MultiTrie n v -> MultiTrie n w
 mtmapOnLists fl (MultiTrie vs vm) =
     MultiTrie (fl vs) (M.mapMaybe (toMaybe . mtmapOnLists fl) vm)
 
--- | Map a function over entire lists, passing node path as well.
+-- | Map a function over entire lists in nodes, passing node path as well.
 mtmapOnListsWithName :: Ord n =>
     ([n] -> [v] -> [w]) ->
     MultiTrie n v ->
@@ -285,10 +280,10 @@ mtmapOnListsWithName fl (MultiTrie vs vm) =
     transformChild n = toMaybe . (mtmapOnListsWithName $ fl . (n:))
 
 {- |
-Cartesian product of two 'MultiTrie's @P@ and @Q@ is a 'MultiTrie' @R@ whose
-paths are concatenations of any path @s@ from @P@ and every path @t@ from @Q@,
-and values under @st@ in @R@ are pairs @(v, w)@ where @v@ is a value under @s@
-in @P@, and @w@ is a value under @t@ in @Q@.
+Cartesian product of two 'MultiTrie's. The resulting 'MultiTrie' consists of
+all possible pairs @(x,y)@ under a concatenated name @u ++ v@ where @x@ is a
+value contained in the first operand under a name @u@, and @y@ is contained in
+the second operand under a name @v@.
 -}
 cartesianProduct :: Ord n =>
     MultiTrie n v ->
@@ -296,11 +291,7 @@ cartesianProduct :: Ord n =>
     MultiTrie n (v, w)
 cartesianProduct mtv = applyCartesian (mtmap (,) mtv)
 
-{- |
-Union of 'MultiTrie's @P@ and @Q@ is such a 'MultiTrie' @R@ that, under any path
-@p@, @R@ contains a union of a list that is contained in @P@ under @p@ and
-a list contained in @Q@ under @p@.
--}
+-- | Union of 'MultiTrie's.
 union :: Ord n => MultiTrie n v -> MultiTrie n v -> MultiTrie n v
 union = zipContentsAndChildren (++) (M.unionWith union)
 
@@ -312,11 +303,7 @@ unions = L.foldl union empty
 unions1 :: Ord n => [MultiTrie n v] -> MultiTrie n v
 unions1 = L.foldl1 union
 
-{- |
-Intersection of 'MultiTrie's @P@ and @Q@ is such a 'MultiTrie' @R@ that, under
-any path @p@, @R@ contains a union of a list that is contained in @P@ under
-@p@ and a list contained in @Q@ under @p@.
--}
+-- | Intersection of 'MultiTrie's.
 intersection :: (Ord n, Eq v) =>
     MultiTrie n v ->
     MultiTrie n v ->
@@ -327,7 +314,7 @@ intersection mt = nullToEmpty .
         (\x y -> M.filter (not . null) (M.intersectionWith intersection x y))
         mt 
 
--- | Intersection of an empty list of 'MultiTrie's.
+-- | Intersection of a list of 'MultiTrie's.
 intersections :: (Ord n, Bounded n, Enum n, Eq v, Bounded v, Enum v) =>
     [MultiTrie n v] ->
     MultiTrie n v
@@ -341,19 +328,17 @@ intersections1 = L.foldl1 intersection
 
 {- |
 Given a 'MultiTrie' whose values are 'MultiTrie's in their turn, convert it into
-a 'plain' 'MultiTrie'.  If @P@ is a 'MultiTrie' that contains a 'MultiTrie' @Q@ as
-its value under a path @s@, and @Q@ contains a value @x@ under a path @t@, then
-the plain 'MultiTrie' @R@ will contain @x@ as a value under a path @st@ (that is
-a concatenation of @s@ and @t@).
+a 'plain' 'MultiTrie'.
 -}
 flatten :: Ord n => MultiTrie n (MultiTrie n v) -> MultiTrie n v
 flatten (MultiTrie mts mtm) =
     F.foldr union empty mts `union` MultiTrie [] (M.map flatten mtm)
 
 {- |
-Given a 'MultiTrie' @P@ of functions and a 'MultiTrie' @Q@ of values, apply each
-function from @P@ to each value from @Q@ arranging results as described in
-'cartesianProduct'.
+Given a 'MultiTrie' of functions and a 'MultiTrie' of values, apply each
+function from the first operand to each value from the second operand and
+combining results as in 'cartesianProduct': under a name concatenated from the
+function's and value's names.
 -}
 applyCartesian :: Ord n =>
     MultiTrie n (v -> w) ->
