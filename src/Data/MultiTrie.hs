@@ -65,11 +65,11 @@ module Data.MultiTrie(
     subnodeIntersect,
     -- * Mappings
     mtmap,
-    mtmapWithPath,
-    mtmapAll,
-    mtmapAllWithPath,
-    mtmapContainers,
-    mtmapContainersWithPath,
+    mtmapWithName,
+    mtmapManyFunctions,
+    mtmapManyFunctionsWithName,
+    mtmapOnLists,
+    mtmapOnListsWithName,
     -- * High-level operations
     cartesianProduct,
     union,
@@ -249,11 +249,11 @@ subnodeIntersect ns mt1 = subnodeUpdate ns (intersection mt1)
 
 -- | Map a function over all values in a 'MultiTrie'.
 mtmap :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
-mtmap f = mtmapContainers (L.map f)
+mtmap f = mtmapOnLists (L.map f)
 
 -- | Map a function over all values, passing node paths as well.
-mtmapWithPath :: Ord n => ([n] -> v -> w) -> MultiTrie n v -> MultiTrie n w
-mtmapWithPath f = mtmapContainersWithPath (L.map . f) 
+mtmapWithName :: Ord n => ([n] -> v -> w) -> MultiTrie n v -> MultiTrie n w
+mtmapWithName f = mtmapOnListsWithName (L.map . f) 
 
 {-
 Apply a list @F@ of functions to all values in a 'MultiTrie'. If @V@ is a
@@ -261,28 +261,28 @@ list of values under a certain path @s@ in a 'MultiTrie' @P@, the result
 @Q@ will contain under @s@ a list of all @(f v)@ values, for all @v@ from
 @V@ and all @f@ from F.
 -}
-mtmapAll :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
-mtmapAll fs  = mtmapContainers (fs <*>)
+mtmapManyFunctions :: Ord n => [v -> w] -> MultiTrie n v -> MultiTrie n w
+mtmapManyFunctions fs  = mtmapOnLists (fs <*>)
 
 -- | Apply a list of functions to each value and its path.
-mtmapAllWithPath :: Ord n => [[n] -> v -> w] -> MultiTrie n v -> MultiTrie n w
-mtmapAllWithPath fs = mtmapContainersWithPath (\ns -> (L.map ($ns) fs <*>))
+mtmapManyFunctionsWithName :: Ord n => [[n] -> v -> w] -> MultiTrie n v -> MultiTrie n w
+mtmapManyFunctionsWithName fs = mtmapOnListsWithName (\ns -> (L.map ($ns) fs <*>))
 
 -- | Map a function over entire lists contained in nodes.
-mtmapContainers :: Ord n => ([v] -> [w]) -> MultiTrie n v -> MultiTrie n w
-mtmapContainers fl (MultiTrie vs vm) =
-    MultiTrie (fl vs) (M.mapMaybe (toMaybe . mtmapContainers fl) vm)
+mtmapOnLists :: Ord n => ([v] -> [w]) -> MultiTrie n v -> MultiTrie n w
+mtmapOnLists fl (MultiTrie vs vm) =
+    MultiTrie (fl vs) (M.mapMaybe (toMaybe . mtmapOnLists fl) vm)
 
 -- | Map a function over entire lists, passing node path as well.
-mtmapContainersWithPath :: Ord n =>
+mtmapOnListsWithName :: Ord n =>
     ([n] -> [v] -> [w]) ->
     MultiTrie n v ->
     MultiTrie n w
-mtmapContainersWithPath fl (MultiTrie vs vm) =
+mtmapOnListsWithName fl (MultiTrie vs vm) =
     MultiTrie
         (fl [] vs)
         (M.mapMaybeWithKey transformChild vm) where
-    transformChild n = toMaybe . (mtmapContainersWithPath $ fl . (n:))
+    transformChild n = toMaybe . (mtmapOnListsWithName $ fl . (n:))
 
 {- |
 Cartesian product of two 'MultiTrie's @P@ and @Q@ is a 'MultiTrie' @R@ whose
