@@ -1,27 +1,27 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 {- |
-A 'MultiTrie' is a trie (i.e. a tree whose child nodes have distinct labels)
-with each node containing a list of values considered as a set.  It represents
-a multivalued naming with compound names: each compound name (a chain of
-labels) has a (possibly empty) list of values.
+A 'MultiTrie' @v d@ is a trie (i.e. a tree whose child nodes have distinct
+labels of type @v@) with each node containing a list of values of type @d@
+considered as a multiset.  It represents a multivalued naming with compound
+names: each compound name (a chain of labels) has a (possibly empty) list of
+values.
 
 The simplest possible 'MultiTrie' is 'empty' that has an empty list of values
 and an no children.  Since the only essential feature of a 'MultiTrie' is
 carrying values, the 'empty' 'MultiTrie' could be equated with an absense of a
 'MultiTrie'.  In particular, instead of saying that there is no sub-trie under
-path @p@ in a 'MultiTrie' @t@, let us say that @t@ contains a path @p@, and it
-points to an 'empty' node.  Therefore, every 'MultiTrie' could be considered as
-infinite, where each node has children under all possible names - and some of
-nodes are 'empty'.
+some path in a 'MultiTrie', let us say that the path points to an 'empty' node.
+Therefore, every 'MultiTrie' could be considered as infinite, where each node
+has children under all possible names - and some of nodes are 'empty'.
 
 The opposite to the 'empty' is a 'top' 'MultiTrie' whose each node contains a
 list of all the element type's values under every possible path.
 
 Some operations could be defined for 'MultiTrie's in a natural way, including
 'map', 'union', 'intersection', 'cartesianProduct'.  Obviously, 'empty' is a
-neutral element of union.  Cartesian product is 'empty' if any of the two
-operands is 'empty'.
+neutral element of 'union', 'top' is that of 'intersection'.  Cartesian product
+is 'empty' if any of the two operands is 'empty'.
 
 A unary function can be applied to each value in each node of a 'MultiTrie'.
 Moreover, a 'MultiTrie' can contain not only ordinary values but also functions
@@ -45,7 +45,7 @@ module Data.MultiTrie(
     repeat,
     top,
     updateValues,
-    add,
+    addValue,
     -- * Simple selectors
     values,
     children,
@@ -57,12 +57,12 @@ module Data.MultiTrie(
     areEquivalentUpTo,
     -- * Subnode access
     subnode,
-    updateSubnode,
-    addToSubnode,
-    replaceSubnode,
-    deleteSubnode,
-    uniteSubnode,
-    intersectSubnode,
+    subnodeUpdate,
+    subnodeAddValue,
+    subnodeReplace,
+    subnodeDelete,
+    subnodeUnite,
+    subnodeIntersect,
     -- * Mappings
     mtmap,
     mtmapWithPath,
@@ -104,10 +104,10 @@ import qualified Data.Tree as T
 import qualified Data.List as L
 import Control.Applicative hiding (empty)
 
--- | A map of labels onto child nodes.
+-- | A map of atomic names onto child nodes.
 type MultiTrieMap n v = M.Map n (MultiTrie n v) 
 
--- | A node object.
+-- | A trie consists of a list of values and labelled child tries.
 data MultiTrie n v = MultiTrie
     {
         values :: [v],
@@ -129,7 +129,7 @@ instance Ord n => Monad (MultiTrie n) where
 instance (Ord n, Eq v) => Eq (MultiTrie n v) where
     (==) = isEqualStrict
 
--- | Constant: an empty 'MultiTrie'. A neutral element with respect to 'union'.
+-- | An empty 'MultiTrie' constant. A neutral element of 'union'.
 empty :: MultiTrie n v
 empty = MultiTrie [] M.empty
 
@@ -153,8 +153,7 @@ repeat ns xs =
 
 {- |
 A 'MultiTrie' that has all possible values and all possible chid names in each
-node. A neutral element with respect to 'intersection'. An opposite to the
-'empty' 'MultiTrie'.
+node. A neutral element of 'intersection'. An opposite to 'empty'.
 
 Use with causion! Consumes lots of memory even despite laziness. Consider using
 it only if both @n@ and @v@ types have less than dozen of values like Bool.
@@ -167,8 +166,8 @@ updateValues :: ([v] -> [v]) -> MultiTrie n v -> MultiTrie n v
 updateValues f (MultiTrie vs m) = MultiTrie (f vs) m
 
 -- | Add a new value to the root node's list of values.
-add :: v -> MultiTrie n v -> MultiTrie n v
-add v = updateValues (v:)
+addValue :: v -> MultiTrie n v -> MultiTrie n v
+addValue v = updateValues (v:)
 
 -- | Check whether a 'MultiTrie' is empty.
 null :: MultiTrie n v -> Bool
@@ -211,42 +210,42 @@ subnode [] mt = mt
 subnode (n:ns) (MultiTrie _ m) = maybe empty (subnode ns) (M.lookup n m)
 
 -- | Perform the given transformation on a subnode identified by the path.
-updateSubnode :: Ord n =>
+subnodeUpdate :: Ord n =>
     [n] ->
     (MultiTrie n v -> MultiTrie n v) ->
     MultiTrie n v ->
     MultiTrie n v
-updateSubnode [] f mt = f mt
-updateSubnode (n:ns) f (MultiTrie vs m) =
-    MultiTrie vs (M.alter (toMaybe . updateSubnode ns f . fromMaybe) n m)
+subnodeUpdate [] f mt = f mt
+subnodeUpdate (n:ns) f (MultiTrie vs m) =
+    MultiTrie vs (M.alter (toMaybe . subnodeUpdate ns f . fromMaybe) n m)
 
 -- | Add a value to a list of values in a subnode identified by the path.
-addToSubnode :: Ord n => [n] -> v -> MultiTrie n v -> MultiTrie n v
-addToSubnode ns v = updateSubnode ns (add v)
+subnodeAddValue :: Ord n => [n] -> v -> MultiTrie n v -> MultiTrie n v
+subnodeAddValue ns v = subnodeUpdate ns (addValue v)
 
 -- | Replace a subnode identified by the path with a new 'MultiTrie'.
-replaceSubnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-replaceSubnode ns mt1 = updateSubnode ns (const mt1)
+subnodeReplace :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v -> MultiTrie n v
+subnodeReplace ns mt1 = subnodeUpdate ns (const mt1)
 
 -- | Delete a subnode identified by the given path.
-deleteSubnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
-deleteSubnode ns = replaceSubnode ns empty
+subnodeDelete :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
+subnodeDelete ns = subnodeReplace ns empty
 
 -- | Unite a subnode identified by the path with another 'MultiTrie'.
-uniteSubnode :: Ord n =>
+subnodeUnite :: Ord n =>
     [n] ->
     MultiTrie n v ->
     MultiTrie n v ->
     MultiTrie n v
-uniteSubnode ns mt1 = updateSubnode ns (union mt1)
+subnodeUnite ns mt1 = subnodeUpdate ns (union mt1)
 
 -- | Intersect a subnode identified by the path with another 'MultiTrie'.
-intersectSubnode :: (Ord n, Eq v) =>
+subnodeIntersect :: (Ord n, Eq v) =>
     [n] ->
     MultiTrie n v ->
     MultiTrie n v ->
     MultiTrie n v
-intersectSubnode ns mt1 = updateSubnode ns (intersection mt1)
+subnodeIntersect ns mt1 = subnodeUpdate ns (intersection mt1)
 
 -- | Map a function over all values in a 'MultiTrie'.
 mtmap :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
@@ -415,7 +414,7 @@ toList (MultiTrie vs m) = (map ((,) []) vs) ++
 
 -- | Convert a list of path-value pairs to a 'MultiTrie'.
 fromList :: Ord n => [([n], v)] -> MultiTrie n v
-fromList = L.foldr (uncurry addToSubnode) empty
+fromList = L.foldr (uncurry subnodeAddValue) empty
 
 -- | Map 'Nothing' to 'empty' and @Just mt@ to @mt@.
 fromMaybe :: Maybe (MultiTrie n v) -> MultiTrie n v

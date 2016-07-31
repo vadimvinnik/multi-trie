@@ -1085,7 +1085,7 @@ empty :: MultiTrie n v
 top :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) =>
     MultiTrie n v
 leaf :: [v] -> MultiTrie n v
-add :: v -> MultiTrie n v -> MultiTrie n v
+addValue :: v -> MultiTrie n v -> MultiTrie n v
 values :: MultiTrie n v -> [v]
 children :: MultiTrie n v -> MultiTrieMap n v
 null :: MultiTrie n v -> Bool
@@ -1122,7 +1122,7 @@ Here is a short explanation of their semantics.
 \item [leaf] Given a list of values, constructs a multitrie that has this list
   in its root node and no other valies (i.e. all other names yield to an empty
   list of values).
-\item [add]
+\item [addValue]
   Given a value and a multitrie, prepend the value to the list stored in the
   root node.
 \item [values]
