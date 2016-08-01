@@ -38,7 +38,7 @@ test_empty =
         w = union u u
         x = intersection u u
         y = subnode "abc" u
-        z = replaceSubnode "abc" u u
+        z = subnodeReplace "abc" u u
         t = fromList []
 
 -- | properties of the singleton MT
@@ -49,12 +49,12 @@ test_singleton =
         assertBool  (not $ null u)
         assertEqual 1 (size u)
         assertEqual u (fromList [("", x)])
-        assertEqual u (add x empty)
+        assertEqual u (addValue x empty)
         assertEqual u (union empty u)
         assertEqual u (intersection u u)
         assertBool  (null $ subnode "abc" u)
-        assertEqual (deleteSubnode "" u) empty
-        assertEqual u (deleteSubnode "abc" u)
+        assertEqual (subnodeDelete "" u) empty
+        assertEqual u (subnodeDelete "abc" u)
     where
         u = singleton x :: TestMultiTrie
         x = 0
@@ -65,14 +65,14 @@ test_leaf =
         assertEqual l (values u)
         assertBool  (M.null $ children u)
         assertEqual (length l) (size u)
-        assertEqual u (foldr add (empty :: TestMultiTrie) l)
+        assertEqual u (foldr addValue (empty :: TestMultiTrie) l)
         assertEqual u (fromList $ map (\a -> ("", a)) l)
-        assertEqual (leaf $ 0 : l) (add 0 u)
+        assertEqual (leaf $ 0 : l) (addValue 0 u)
         assertEqual u (intersection u u)
         assertEqual u (intersection u $ leaf [0..20])
         assertEqual u (union empty u)
         assertEqual u (union (leaf [1..5]) (leaf [6..10]))
-        assertEqual u (replaceSubnode "abc" empty u)
+        assertEqual u (subnodeReplace "abc" empty u)
     where
         u = leaf l :: TestMultiTrie
         l = [1..10]
@@ -88,10 +88,10 @@ test_general_basic =
         assertEqual u (subnode "" u)
         assertEqual empty (subnode "zzz" u)
         assertEqual (subnode "a" u) t
-        assertEqual u (deleteSubnode "zzz" u)
-        assertEqual v (deleteSubnode "a" u)
-        assertEqual u (replaceSubnode "a" t u)
-        assertEqual u (replaceSubnode "a" t v)
+        assertEqual u (subnodeDelete "zzz" u)
+        assertEqual v (subnodeDelete "a" u)
+        assertEqual u (subnodeReplace "a" t u)
+        assertEqual u (subnodeReplace "a" t v)
         assertEqual u (union v w)
         assertBool  (u /= (union u u))
         assertEqual empty (intersection v w)
@@ -118,7 +118,7 @@ test_repeat =
         assertEqual s (M.keys $ children u)
         assertEqual l (values v)
         assertEqual s (M.keys $ children v)
-        assertEqual w (deleteSubnode "a" $ deleteSubnode "b" u)
+        assertEqual w (subnodeDelete "a" $ subnodeDelete "b" u)
         assertEqual w (intersection w u)
         assertEqual w (intersection u w)
     where
@@ -157,7 +157,7 @@ test_top =
 test_mtmap =
     do
         assertEqual v (mtmap f u)
-        assertEqual w (mtmapWithPath g u)
+        assertEqual w (mtmapWithName g u)
     where
         u = fromList p :: TestMultiTrie
         v = fromList q
