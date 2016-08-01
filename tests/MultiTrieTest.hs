@@ -128,31 +128,6 @@ test_repeat =
         l = [0, 1]
         s = ['a', 'b']
 
--- | properties of the largest MT
-test_top =
-    do
-        assertEqual v (intersection u v)
-        assertEqual v (intersection v u)
-        assertEqual q (M.keys $ children u)
-        assertEqual q (M.keys $ children w)
-        assertEqual (f r) (f $ values u)
-        assertEqual (f r) (f $ values w)
-    where
-        u = top :: MultiTrie Ordering Bool
-        v = fromList $
-            [
-                ([EQ], True),
-                ([EQ, GT], False),
-                ([EQ, GT], True),
-                ([LT, GT, EQ, LT, GT], False),
-                ([LT, GT, EQ, GT, GT], False)
-            ]
-        w = subnode p u
-        p = [LT, GT, EQ, GT, GT]
-        q = [LT, EQ, GT]
-        r = cycle [False, True]
-        f = take 20
-
 -- | map a function over a multi-trie
 test_mtmap =
     do
@@ -178,11 +153,11 @@ test_binop =
         assertEqual x (intersection u v)
         assertBool  (null $ intersection u empty)
         assertBool  (null $ intersection empty v)
-        assertEqual y (cartesianProduct u v)
-        assertBool  (null $ cartesianProduct u empty)
-        assertBool  (null $ cartesianProduct empty v)
-        assertEqual u (mtmap snd (cartesianProduct z u))
-        assertEqual u (mtmap fst (cartesianProduct u z))
+        assertEqual y (cartesian u v)
+        assertBool  (null $ cartesian u empty)
+        assertBool  (null $ cartesian empty v)
+        assertEqual u (mtmap snd (cartesian z u))
+        assertEqual u (mtmap fst (cartesian u z))
     where
         u = fromList p :: TestMultiTrie
         v = fromList q
