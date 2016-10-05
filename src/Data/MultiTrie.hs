@@ -70,7 +70,6 @@ module Data.MultiTrie(
     cartesian,
     union,
     unions,
-    unions1,
     intersection,
     intersections1,
     flatten,
@@ -336,12 +335,6 @@ unions :: Ord n =>
     [MultiTrie n v] ->
     MultiTrie n v
 unions = L.foldl union empty
-
--- | Union of a non-empty list of 'MultiTrie's.
-unions1 :: Ord n =>
-    [MultiTrie n v] ->
-    MultiTrie n v
-unions1 = L.foldl1 union
 
 -- | Intersection of 'MultiTrie's.
 intersection :: (Ord n, Eq v) =>
