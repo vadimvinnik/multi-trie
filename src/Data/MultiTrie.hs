@@ -62,8 +62,8 @@ module Data.MultiTrie(
     -- * Mappings
     map,
     mapWithName,
-    mapManyFunctions,
-    mapManyFunctionsWithName,
+    mapMany,
+    mapManyWithName,
     mapOnLists,
     mapOnListsWithName,
     -- * High-level operations
@@ -279,18 +279,18 @@ mapWithName :: Ord n =>
 mapWithName f = mapOnListsWithName (L.map . f) 
 
 -- | Apply a list of functions to all values in a 'MultiTrie'.
-mapManyFunctions :: Ord n =>
+mapMany :: Ord n =>
     [v -> w] ->
     MultiTrie n v ->
     MultiTrie n w
-mapManyFunctions fs  = mapOnLists (fs <*>)
+mapMany fs  = mapOnLists (fs <*>)
 
 -- | Apply a list of functions to each value and its path.
-mapManyFunctionsWithName :: Ord n =>
+mapManyWithName :: Ord n =>
     [[n] -> v -> w] ->
     MultiTrie n v ->
     MultiTrie n w
-mapManyFunctionsWithName fs = mapOnListsWithName (\ns -> (L.map ($ns) fs <*>))
+mapManyWithName fs = mapOnListsWithName (\ns -> (L.map ($ns) fs <*>))
 
 -- | Map a function over entire lists contained in nodes.
 mapOnLists :: Ord n =>
