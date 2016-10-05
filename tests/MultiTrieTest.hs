@@ -2,7 +2,7 @@
 
 module MultiTrieTest where
 
-import Prelude hiding (null, repeat)
+import Prelude hiding (null, repeat, map)
 import Data.MultiTrie
 import Data.Int
 import qualified Data.Map as M
@@ -66,7 +66,7 @@ test_leaf =
         assertBool  (M.null $ children u)
         assertEqual (length l) (size u)
         assertEqual u (foldr addValue (empty :: TestMultiTrie) l)
-        assertEqual u (fromList $ map (\a -> ("", a)) l)
+        assertEqual u (fromList $ L.map (\a -> ("", a)) l)
         assertEqual (leaf $ 0 : l) (addValue 0 u)
         assertEqual u (intersection u u)
         assertEqual u (intersection u $ leaf [0..20])
@@ -97,15 +97,15 @@ test_general_basic =
         assertEqual empty (intersection v w)
         assertEqual w (intersection u w)
         assertEqual u (intersection u (union u u))
-        assertEqual y (mtmap (+1) u)
+        assertEqual y (map (+1) u)
         assertEqual u (fromList $ toList u)
         assertBool  (listAsMultiSetEquals l $ toList u)
     where
         u = fromList l :: TestMultiTrie
         v = fromList p
         w = fromList q
-        t = fromList $ map (\(_:ns, x) -> (ns, x)) q
-        y = fromList $ map (\(ns, x) -> (ns, x + 1)) l
+        t = fromList $ L.map (\(_:ns, x) -> (ns, x)) q
+        y = fromList $ L.map (\(ns, x) -> (ns, x + 1)) l
         l = p ++ q
         p = [("", 0), ("b", 9), ("", 1), ("b", 8), ("", 2), ("b", 7)]
         q = [("a", 1), ("aa", 2), ("ab", 3), ("aaa", 4), ("aba", 5)]
@@ -131,16 +131,16 @@ test_repeat =
 -- | map a function over a multi-trie
 test_mtmap =
     do
-        assertEqual v (mtmap f u)
-        assertEqual w (mtmapWithName g u)
+        assertEqual v (map f u)
+        assertEqual w (mapWithName g u)
     where
         u = fromList p :: TestMultiTrie
         v = fromList q
         w = fromList r
         p = [("", 1), ("abc", 2), ("a", 3), ("", 4),
                 ("ab", 5), ("b", 6), ("bc", 7)]
-        q = map (\(n, x) -> (n, f x)) p
-        r = map (\(n, x) -> (n, g n x)) p
+        q = L.map (\(n, x) -> (n, f x)) p
+        r = L.map (\(n, x) -> (n, g n x)) p
         f = (+7) . (*13)
         g n x = (fromIntegral $ L.length n) + x
 
@@ -156,8 +156,8 @@ test_binop =
         assertEqual y (cartesian u v)
         assertBool  (null $ cartesian u empty)
         assertBool  (null $ cartesian empty v)
-        assertEqual u (mtmap snd (cartesian z u))
-        assertEqual u (mtmap fst (cartesian u z))
+        assertEqual u (map snd (cartesian z u))
+        assertEqual u (map fst (cartesian u z))
     where
         u = fromList p :: TestMultiTrie
         v = fromList q
@@ -177,7 +177,7 @@ test_flatten =
         u = fromList p :: TestMultiTrie
         v = fromList q
         p = [(n1 ++ n2, x2) | (n1, l1) <- r, (n2, x2) <- l1]
-        q = map (\(n, l) -> (n, fromList l)) r
+        q = L.map (\(n, l) -> (n, fromList l)) r
         r = [
                 ("", [("", 0), ("ab", 1), ("abcba", 2), ("", 3), ("abc", 4)]),
                 ("ab", [("c", 1), ("", 2), ("b", 3), ("cba", 4)]),

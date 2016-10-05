@@ -60,12 +60,12 @@ module Data.MultiTrie(
     subnodeUnite,
     subnodeIntersect,
     -- * Mappings
-    mtmap,
-    mtmapWithName,
-    mtmapManyFunctions,
-    mtmapManyFunctionsWithName,
-    mtmapOnLists,
-    mtmapOnListsWithName,
+    map,
+    mapWithName,
+    mapManyFunctions,
+    mapManyFunctionsWithName,
+    mapOnLists,
+    mapOnListsWithName,
     -- * High-level operations
     cartesian,
     union,
@@ -75,8 +75,8 @@ module Data.MultiTrie(
     intersections1,
     flatten,
     -- * Applications
-    mtapply,
-    mtbind,
+    apply,
+    bind,
     -- * Conversions
     toMap,
     toList,
@@ -90,7 +90,7 @@ module Data.MultiTrie(
     areMapsEquivalentUpTo 
 ) where
 
-import Prelude hiding (null, repeat)
+import Prelude hiding (null, repeat, map)
 import qualified Data.Foldable as F
 import qualified Data.Map as M
 import qualified Data.Tree as T
@@ -109,15 +109,15 @@ data MultiTrie n v = MultiTrie
     deriving (Show)
 
 instance Ord n => Functor (MultiTrie n) where
-    fmap = mtmap
+    fmap = map
 
 instance Ord n => Applicative (MultiTrie n) where
     pure = singleton
-    (<*>) = mtapply
+    (<*>) = apply
 
 instance Ord n => Monad (MultiTrie n) where
     return = singleton
-    (>>=) = mtbind
+    (>>=) = bind
 
 instance (Ord n, Eq v) => Eq (MultiTrie n v) where
     (==) = isEqualStrict
@@ -266,51 +266,51 @@ subnodeIntersect :: (Ord n, Eq v) =>
 subnodeIntersect ns mt1 = subnodeUpdate ns (intersection mt1)
 
 -- | Map a function over all values in a 'MultiTrie'.
-mtmap :: Ord n =>
+map :: Ord n =>
     (v -> w) ->
     MultiTrie n v ->
     MultiTrie n w
-mtmap f = mtmapOnLists (L.map f)
+map f = mapOnLists (L.map f)
 
 -- | Map a function over all values, passing node paths as well.
-mtmapWithName :: Ord n =>
+mapWithName :: Ord n =>
     ([n] -> v -> w) ->
     MultiTrie n v ->
     MultiTrie n w
-mtmapWithName f = mtmapOnListsWithName (L.map . f) 
+mapWithName f = mapOnListsWithName (L.map . f) 
 
 -- | Apply a list of functions to all values in a 'MultiTrie'.
-mtmapManyFunctions :: Ord n =>
+mapManyFunctions :: Ord n =>
     [v -> w] ->
     MultiTrie n v ->
     MultiTrie n w
-mtmapManyFunctions fs  = mtmapOnLists (fs <*>)
+mapManyFunctions fs  = mapOnLists (fs <*>)
 
 -- | Apply a list of functions to each value and its path.
-mtmapManyFunctionsWithName :: Ord n =>
+mapManyFunctionsWithName :: Ord n =>
     [[n] -> v -> w] ->
     MultiTrie n v ->
     MultiTrie n w
-mtmapManyFunctionsWithName fs = mtmapOnListsWithName (\ns -> (L.map ($ns) fs <*>))
+mapManyFunctionsWithName fs = mapOnListsWithName (\ns -> (L.map ($ns) fs <*>))
 
 -- | Map a function over entire lists contained in nodes.
-mtmapOnLists :: Ord n =>
+mapOnLists :: Ord n =>
     ([v] -> [w]) ->
     MultiTrie n v ->
     MultiTrie n w
-mtmapOnLists fl (MultiTrie vs vm) =
-    MultiTrie (fl vs) (M.mapMaybe (toMaybe . mtmapOnLists fl) vm)
+mapOnLists fl (MultiTrie vs vm) =
+    MultiTrie (fl vs) (M.mapMaybe (toMaybe . mapOnLists fl) vm)
 
 -- | Map a function over entire lists in nodes, passing node path as well.
-mtmapOnListsWithName :: Ord n =>
+mapOnListsWithName :: Ord n =>
     ([n] -> [v] -> [w]) ->
     MultiTrie n v ->
     MultiTrie n w
-mtmapOnListsWithName fl (MultiTrie vs vm) =
+mapOnListsWithName fl (MultiTrie vs vm) =
     MultiTrie
         (fl [] vs)
         (M.mapMaybeWithKey transformChild vm) where
-    transformChild n = toMaybe . (mtmapOnListsWithName $ fl . (n:))
+    transformChild n = toMaybe . (mapOnListsWithName $ fl . (n:))
 
 {- |
 Cartesian product of two 'MultiTrie's. The resulting 'MultiTrie' consists of
@@ -322,7 +322,7 @@ cartesian :: Ord n =>
     MultiTrie n v ->
     MultiTrie n w ->
     MultiTrie n (v, w)
-cartesian mtv = mtapply (mtmap (,) mtv)
+cartesian mtv = apply (map (,) mtv)
 
 -- | Union of 'MultiTrie's.
 union :: Ord n =>
@@ -373,22 +373,22 @@ function from the first operand to each value from the second operand and
 combining results as in 'cartesian': under a name concatenated from the
 function's and value's names.
 -}
-mtapply :: Ord n =>
+apply :: Ord n =>
     MultiTrie n (v -> w) ->
     MultiTrie n v ->
     MultiTrie n w
-mtapply mtf mtx = flatten $ mtmap (`mtmap` mtx) mtf
+apply mtf mtx = flatten $ map (`map` mtx) mtf
 
 {-
 Given a multitree @P@ of values and a function @f@ that maps an arbitrary value
 to a multitree, apply the function @f@ to each value from @P@ and combine the
 results as described in 'flatten'.
 -}
-mtbind :: Ord n =>
+bind :: Ord n =>
     MultiTrie n v ->
     (v -> MultiTrie n w) ->
     MultiTrie n w
-mtbind mt fmt = flatten $ mtmap fmt mt
+bind mt fmt = flatten $ map fmt mt
 
 {-
 Convert a 'MultiTrie' @P@ to a map @M@ whose keys are paths from @P@, and values
@@ -411,7 +411,7 @@ toMap (MultiTrie vs m) = if L.null vs
 toList :: Ord n =>
     MultiTrie n v ->
     [([n], v)]
-toList (MultiTrie vs m) = (map ((,) []) vs) ++
+toList (MultiTrie vs m) = (L.map ((,) []) vs) ++
     (
         L.concat $
         L.map (\(n, ps) -> L.map (\(ns, ws) -> (n:ns, ws)) ps) $
