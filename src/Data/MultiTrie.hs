@@ -48,8 +48,8 @@ module Data.MultiTrie(
     null,
     size,
     -- * Comparison
-    isEqualStrict,
-    isEqualWeak,
+    areEqualStrict,
+    areEqualWeak,
     areEquivalentUpTo,
     -- * Subnode access
     subnode,
@@ -119,7 +119,7 @@ instance Ord n => Monad (MultiTrie n) where
     (>>=) = bind
 
 instance (Ord n, Eq v) => Eq (MultiTrie n v) where
-    (==) = isEqualStrict
+    (==) = areEqualStrict
 
 -- | An empty 'MultiTrie' constant. A neutral element of 'union'.
 empty :: MultiTrie n v
@@ -175,21 +175,21 @@ size ::
 size (MultiTrie vs m) = L.length vs + L.sum (L.map size (M.elems m))
 
 -- | Check for equality counting the order of elements.
-isEqualStrict :: (Ord n, Eq v) =>
+areEqualStrict :: (Ord n, Eq v) =>
     MultiTrie n v ->
     MultiTrie n v ->
     Bool
-isEqualStrict = areEquivalentUpTo (==)
+areEqualStrict = areEquivalentUpTo (==)
 
 -- | Check for equality ignoring the order of elements.
-isEqualWeak :: (Ord n, Eq v) =>
+areEqualWeak :: (Ord n, Eq v) =>
     MultiTrie n v ->
     MultiTrie n v ->
     Bool
-isEqualWeak = areEquivalentUpTo listAsMultiSetEquals
+areEqualWeak = areEquivalentUpTo listAsMultiSetEquals
 
 {- |
-Decide whether two 'MultiTrie's @u@ and @v@ are equivalent up to a custom list
+Check if two 'MultiTrie's @u@ and @v@ are equivalent up to a custom list
 equivalence predicate @p@.
 True if and only if (1) the 'MultiTrie's have non-empty nodes at the same paths
 and (2) for each such path @s@, value lists from @u@ and @v@ under @p@ are
