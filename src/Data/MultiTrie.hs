@@ -62,6 +62,7 @@ module Data.MultiTrie(
     -- * Filtration
     filter,
     project,
+    filterOnNames,
     filterWithNames,
     -- * Mappings
     map,
@@ -272,7 +273,10 @@ filter :: Ord n => (v -> Bool) -> MultiTrie n v -> MultiTrie n v
 filter p = mapOnLists (L.filter p)
 
 project :: Ord n => [[n]] -> MultiTrie n v -> MultiTrie n v
-project ns = filterWithNames (\n _ -> L.elem n ns)
+project ns = filterOnNames ((flip L.elem) ns)
+
+filterOnNames :: Ord n => ([n] -> Bool) -> MultiTrie n v -> MultiTrie n v
+filterOnNames p = filterWithNames (flip (const p))
 
 filterWithNames :: Ord n => ([n] -> v -> Bool) -> MultiTrie n v -> MultiTrie n v
 filterWithNames p = mapOnListsWithName (\n vs -> L.filter (p n) vs)
