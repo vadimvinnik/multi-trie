@@ -59,6 +59,10 @@ module Data.MultiTrie(
     subnodeDelete,
     subnodeUnite,
     subnodeIntersect,
+    -- * Filtration
+    filter,
+    project,
+    filterWithNames,
     -- * Mappings
     map,
     mapWithName,
@@ -89,7 +93,7 @@ module Data.MultiTrie(
     areMapsEquivalentUpTo 
 ) where
 
-import Prelude hiding (null, repeat, map)
+import Prelude hiding (null, repeat, map, filter)
 import qualified Data.Foldable as F
 import qualified Data.Map as M
 import qualified Data.Tree as T
@@ -263,6 +267,15 @@ subnodeIntersect :: (Ord n, Eq v) =>
     MultiTrie n v ->
     MultiTrie n v
 subnodeIntersect ns mt1 = subnodeUpdate ns (intersection mt1)
+
+filter :: Ord n => (v -> Bool) -> MultiTrie n v -> MultiTrie n v
+filter p = mapOnLists (L.filter p)
+
+project :: Ord n => [[n]] -> MultiTrie n v -> MultiTrie n v
+project ns = filterWithNames (\n _ -> L.elem n ns)
+
+filterWithNames :: Ord n => ([n] -> v -> Bool) -> MultiTrie n v -> MultiTrie n v
+filterWithNames p = mapOnListsWithName (\n vs -> L.filter (p n) vs)
 
 -- | Map a function over all values in a 'MultiTrie'.
 map :: Ord n =>
