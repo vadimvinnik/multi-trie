@@ -20,16 +20,17 @@ Some operations could be defined for 'MultiTrie's in a natural way, including
 neutral element of 'union'.  Cartesian product is 'empty' if any of the two
 operands is 'empty'.
 
-A unary function can be applied to each value in each node of a 'MultiTrie'.
-Moreover, a 'MultiTrie' can contain not only ordinary values but also functions
-that makes it possible to apply a 'MultiTrie' of functions to a 'MultiTrie' of
-argument values, combining results with 'cartesian'.  A 'MultiTrie'
-whose values are, in their turn,  'MultiTrie's, can be 'flatten'ed.  This makes
-'MultiTrie's an instance of 'Functor', Applicative' and 'Monad' classes.
+A unary function @f@ can be applied to each value in each node of a 'MultiTrie'
+that results in a 'map' function.  Moreover, a 'MultiTrie' can contain not only
+ordinary values but also functions that makes it possible to apply a 'MultiTrie'
+of functions to a 'MultiTrie' of argument values, combining results with
+'cartesian'.  A 'MultiTrie' whose values are, in their turn,  'MultiTrie's, can
+be 'flatten'ed.  This makes 'MultiTrie's an instance of 'Functor', Applicative'
+and 'Monad' classes.
 
-For a detailed description of a mathematical notion of multivalued naming with
-compound names, its operations and properties, see an article distributed with
-this package as a LaTeX source.
+For a detailed description of the multivalued naming with compound names as a a
+mathematical notion, its operations and properties, see an article distributed
+with this package as a LaTeX source.
 -}
 
 module Data.MultiTrie(
