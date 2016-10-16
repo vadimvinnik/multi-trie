@@ -1,24 +1,24 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 {- |
-A 'MultiTrie' @d d@ is a trie (i.e. a tree whose child nodes have distinct
-labels of type @d@) with each node containing a list of values of type @d@
-considered as a multiset.  It represents a multivalued naming with compound
-names: each compound name (a chain of labels) has a (possibly empty) list of
-values.
+A 'MultiTrie' @v d@ is a trie (i.e. a tree whose child nodes have distinct
+labels, or atomic names, of type @v@) with each node containing a list of values
+of type @d@ that could be considered as a set or a multiset.  It represents a
+multivalued naming with compound names: each path, or a compound name (i.e. a
+chain of labels) has a (possibly empty) list of values.
 
 The simplest possible 'MultiTrie' is 'empty' that has an empty list of values
-and an no children.  Since the only essential feature of a 'MultiTrie' is
+and no child nodes.  Since the only essential feature of a 'MultiTrie' is
 carrying values, the 'empty' 'MultiTrie' could be equated with an absense of a
 'MultiTrie'.  In particular, instead of saying that there is no sub-trie under
 some path in a 'MultiTrie', let us say that the path points to an 'empty' node.
-Therefore, every 'MultiTrie' could be considered as infinite, where each node
-has children under all possible names - and some of nodes are 'empty'.
+Therefore, every 'MultiTrie' could be considered as infinite, having child nodes
+under all possible names - and some of the nodes are 'empty'.
 
 Some operations could be defined for 'MultiTrie's in a natural way, including
-'map', 'union', 'intersection', 'cartesian'.  Obviously, 'empty' is a
-neutral element of 'union'.  Cartesian product is 'empty' if any of the two
-operands is 'empty'.
+'filter', 'union', 'intersection', 'cartesian'.  Obviously, 'empty' is a neutral
+element of 'union'.  Cartesian product is 'empty' if any of the two operands is
+'empty'.
 
 A unary function @f@ can be applied to each value in each node of a 'MultiTrie'
 that results in a 'map' function.  Moreover, a 'MultiTrie' can contain not only
@@ -127,7 +127,8 @@ instance Ord v => Monad (MultiTrie v) where
 instance (Ord v, Eq d) => Eq (MultiTrie v d) where
     (==) = areEqualStrict
 
--- | An empty 'MultiTrie' constant. A neutral element of 'union'.
+-- | An empty 'MultiTrie' constant. A neutral element of 'union' and zero of
+-- 'cartesian'.
 empty :: MultiTrie v d
 empty = MultiTrie [] M.empty
 
@@ -141,10 +142,8 @@ leaf ::
     MultiTrie v d
 leaf ds = MultiTrie ds M.empty
 
-{- |
-An infinite 'MultiTrie' that has in each node the same list of values and,
-under each name from the given set, a child identical to the root.
--}
+-- | An infinite 'MultiTrie' that has in each node the same list of values and,
+-- under each name from the given set, a child identical to the root.
 repeat :: Ord v =>
     [v] ->
     [d] ->
@@ -168,7 +167,7 @@ addValue ::
     MultiTrie v d
 addValue d = updateValues (d:)
 
--- | Check whether a 'MultiTrie' is empty.
+-- | Check if a 'MultiTrie' is empty.
 null ::
     MultiTrie v d ->
     Bool
@@ -194,13 +193,10 @@ areEqualWeak :: (Ord v, Eq d) =>
     Bool
 areEqualWeak = areEquivalentUpTo listAsMultiSetEquals
 
-{- |
-Check if two 'MultiTrie's @s@ and @t@ are equivalent up to a custom list
-equivalence predicate @p@.
-True if and only if (1) both 'MultiTrie's have non-empty nodes at the same paths
-and (2) for each such path @w@, value lists from @s@ and @t@ under @w@ are
-equivalent, i.e. satisfy @p@.
--}
+-- | Check if two 'MultiTrie's @s@ and @t@ are equivalent up to a custom list
+-- equivalence predicate @p@.  True if and only if (1) both 'MultiTrie's have
+-- non-empty nodes at the same paths and (2) for each such path @w@, value lists
+-- from @s@ and @t@ under @w@ are equivalent, i.e. satisfy @p@.
 areEquivalentUpTo :: (Ord v, Eq d) =>
     ([d] -> [d] -> Bool) ->
     MultiTrie v d ->
@@ -210,10 +206,8 @@ areEquivalentUpTo p (MultiTrie ds1 m1) (MultiTrie ds2 m2) =
     (p ds1 ds2) &&
     (areMapsEquivalentUpTo (areEquivalentUpTo p) m1 m2)
 
-{-
-Select a 'MultiTrie' subnode identified by the given path, or 'empty' if there
-is no such path.
--}
+-- | Select a 'MultiTrie' subnode identified by the given path, or 'empty' if
+-- there is no such path.
 subnode :: Ord v =>
     [v] ->
     MultiTrie v d ->
@@ -270,15 +264,20 @@ subnodeIntersect :: (Ord v, Eq d) =>
     MultiTrie v d
 subnodeIntersect vs t = subnodeUpdate vs (intersection t)
 
+-- | Leave only those values that satisfy the predicate @p@.
 filter :: Ord v => (d -> Bool) -> MultiTrie v d -> MultiTrie v d
 filter p = mapOnLists (L.filter p)
 
+-- | Leave only the nodes whose compound names are in the given list.
 project :: Ord v => [[v]] -> MultiTrie v d -> MultiTrie v d
 project vss = filterOnNames ((flip L.elem) vss)
 
+-- | Leave only those nodes whose compound names satisfy the predicate @p@.
 filterOnNames :: Ord v => ([v] -> Bool) -> MultiTrie v d -> MultiTrie v d
 filterOnNames p = filterWithNames (flip (const p))
 
+-- | Leave only those values that, with their compound names, satisfy the
+-- predicate @p@.
 filterWithNames :: Ord v => ([v] -> d -> Bool) -> MultiTrie v d -> MultiTrie v d
 filterWithNames p = mapOnListsWithName (\vs ds -> L.filter (p vs) ds)
 
@@ -289,7 +288,7 @@ map :: Ord v =>
     MultiTrie v d2
 map f = mapOnLists (L.map f)
 
--- | Map a function over all values with their paths
+-- | Map a function over all values with their compound names.
 mapWithName :: Ord v =>
     ([v] -> d1 -> d2) ->
     MultiTrie v d1 ->
@@ -303,7 +302,7 @@ mapMany :: Ord v =>
     MultiTrie v d2
 mapMany fs  = mapOnLists (fs <*>)
 
--- | Apply a list of functions to each value and its path.
+-- | Apply a list of functions to each value and its compound name.
 mapManyWithName :: Ord v =>
     [[v] -> d1 -> d2] ->
     MultiTrie v d1 ->
@@ -318,7 +317,7 @@ mapOnLists :: Ord v =>
 mapOnLists f (MultiTrie ds m) =
     MultiTrie (f ds) (M.mapMaybe (toMaybe . mapOnLists f) m)
 
--- | Map a function over entire lists in nodes, passing node path as well.
+-- | Map a function over entire lists in all nodes, with their compound names.
 mapOnListsWithName :: Ord v =>
     ([v] -> [d1] -> [d2]) ->
     MultiTrie v d1 ->
@@ -330,12 +329,10 @@ mapOnListsWithName f (MultiTrie ds m) =
     where
         transformChild v = toMaybe . (mapOnListsWithName $ f . (v:))
 
-{- |
-Cartesian product of two 'MultiTrie's. The resulting 'MultiTrie' consists of
-all possible pairs @(x,y)@ under a concatenated name @u ++ d@ where @x@ is a
-value contained in the first operand under a name @u@, and @y@ is contained in
-the second operand under a name @d@.
--}
+-- | Cartesian product of two 'MultiTrie's, @t1@ and @t2@. The resulting
+-- 'MultiTrie' consists of all possible pairs @(x1, x2)@ under a concatenated
+-- name @v1 ++ v2@ where @x1@ is a value in @t1@ under a name @v1@, and @x2@ is
+-- a value from @t2@ under the name @v2@.
 cartesian :: Ord v =>
     MultiTrie v d1 ->
     MultiTrie v d2 ->
