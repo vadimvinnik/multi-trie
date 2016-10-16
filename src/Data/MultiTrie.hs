@@ -133,13 +133,13 @@ empty = MultiTrie [] M.empty
 
 -- | A 'MultiTrie' containing just one value in its root and no child nodes.
 singleton :: d -> MultiTrie v d
-singleton x = leaf [x]
+singleton d = leaf [d]
 
 -- | A 'MultiTrie' containing the given list in its root and no child nodes.
 leaf ::
     [d] ->
     MultiTrie v d
-leaf vs = MultiTrie vs M.empty
+leaf ds = MultiTrie ds M.empty
 
 {- |
 An infinite 'MultiTrie' that has in each node the same list of values and,
@@ -149,17 +149,17 @@ repeat :: Ord v =>
     [v] ->
     [d] ->
     MultiTrie v d
-repeat ns xs =
-    if   L.null xs
+repeat vs ds =
+    if   L.null ds
     then empty
-    else MultiTrie xs (M.fromList $ zip ns $ L.repeat $ repeat ns xs)
+    else MultiTrie ds (M.fromList $ zip vs $ L.repeat $ repeat vs ds)
 
 -- | Change a list in the root node with a function and leave children intact.
 updateValues ::
     ([d] -> [d]) ->
     MultiTrie v d ->
     MultiTrie v d
-updateValues f (MultiTrie vs m) = MultiTrie (f vs) m
+updateValues f (MultiTrie ds m) = MultiTrie (f ds) m
 
 -- | Add a new value to the root node's list of values.
 addValue ::
@@ -172,13 +172,13 @@ addValue d = updateValues (d:)
 null ::
     MultiTrie v d ->
     Bool
-null (MultiTrie vs m) = L.null vs && L.all null (M.elems m)
+null (MultiTrie ds m) = L.null ds && L.all null (M.elems m)
 
 -- | A total number of values in all nodes.
 size ::
     MultiTrie v d ->
     Int
-size (MultiTrie vs m) = L.length vs + L.sum (L.map size (M.elems m))
+size (MultiTrie ds m) = L.length ds + L.sum (L.map size (M.elems m))
 
 -- | Check for equality counting the order of elements.
 areEqualStrict :: (Ord v, Eq d) =>
@@ -195,10 +195,10 @@ areEqualWeak :: (Ord v, Eq d) =>
 areEqualWeak = areEquivalentUpTo listAsMultiSetEquals
 
 {- |
-Check if two 'MultiTrie's @u@ and @d@ are equivalent up to a custom list
+Check if two 'MultiTrie's @p@ and @q@ are equivalent up to a custom list
 equivalence predicate @p@.
 True if and only if (1) the 'MultiTrie's have non-empty nodes at the same paths
-and (2) for each such path @s@, value lists from @u@ and @d@ under @p@ are
+and (2) for each such path @w@, value lists from @p@ and @q@ under @w@ are
 equivalent, i.e. satisfy @p@.
 -}
 areEquivalentUpTo :: (Ord v, Eq d) =>
@@ -206,8 +206,8 @@ areEquivalentUpTo :: (Ord v, Eq d) =>
     MultiTrie v d ->
     MultiTrie v d ->
     Bool
-areEquivalentUpTo p (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
-    (p vs1 vs2) &&
+areEquivalentUpTo p (MultiTrie ds1 m1) (MultiTrie ds2 m2) =
+    (p ds1 ds2) &&
     (areMapsEquivalentUpTo (areEquivalentUpTo p) m1 m2)
 
 {-
@@ -219,7 +219,7 @@ subnode :: Ord v =>
     MultiTrie v d ->
     MultiTrie v d
 subnode [] mt = mt
-subnode (v:ns) (MultiTrie _ m) = maybe empty (subnode ns) (M.lookup v m)
+subnode (v:vs) (MultiTrie _ m) = maybe empty (subnode vs) (M.lookup v m)
 
 -- | Perform the given transformation on a subnode identified by the path.
 subnodeUpdate :: Ord v =>
@@ -228,8 +228,8 @@ subnodeUpdate :: Ord v =>
     MultiTrie v d ->
     MultiTrie v d
 subnodeUpdate [] f mt = f mt
-subnodeUpdate (v:ns) f (MultiTrie vs m) =
-    MultiTrie vs (M.alter (toMaybe . subnodeUpdate ns f . fromMaybe) v m)
+subnodeUpdate (v:vs) f (MultiTrie ds m) =
+    MultiTrie ds (M.alter (toMaybe . subnodeUpdate vs f . fromMaybe) v m)
 
 -- | Add a value to a list of values in a subnode identified by the path.
 subnodeAddValue :: Ord v =>
@@ -237,7 +237,7 @@ subnodeAddValue :: Ord v =>
     d ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeAddValue ns d = subnodeUpdate ns (addValue d)
+subnodeAddValue vs d = subnodeUpdate vs (addValue d)
 
 -- | Replace a subnode identified by the path with a new 'MultiTrie'.
 subnodeReplace :: Ord v =>
@@ -245,14 +245,14 @@ subnodeReplace :: Ord v =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeReplace ns mt1 = subnodeUpdate ns (const mt1)
+subnodeReplace vs mt1 = subnodeUpdate vs (const mt1)
 
 -- | Delete a subnode identified by the given path.
 subnodeDelete :: Ord v =>
     [v] ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeDelete ns = subnodeReplace ns empty
+subnodeDelete vs = subnodeReplace vs empty
 
 -- | Unite a subnode identified by the path with another 'MultiTrie'.
 subnodeUnite :: Ord v =>
@@ -260,7 +260,7 @@ subnodeUnite :: Ord v =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeUnite ns mt1 = subnodeUpdate ns (union mt1)
+subnodeUnite vs mt1 = subnodeUpdate vs (union mt1)
 
 -- | Intersect a subnode identified by the path with another 'MultiTrie'.
 subnodeIntersect :: (Ord v, Eq d) =>
@@ -268,19 +268,19 @@ subnodeIntersect :: (Ord v, Eq d) =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeIntersect ns mt1 = subnodeUpdate ns (intersection mt1)
+subnodeIntersect vs mt1 = subnodeUpdate vs (intersection mt1)
 
 filter :: Ord v => (d -> Bool) -> MultiTrie v d -> MultiTrie v d
 filter p = mapOnLists (L.filter p)
 
 project :: Ord v => [[v]] -> MultiTrie v d -> MultiTrie v d
-project ns = filterOnNames ((flip L.elem) ns)
+project vss = filterOnNames ((flip L.elem) vss)
 
 filterOnNames :: Ord v => ([v] -> Bool) -> MultiTrie v d -> MultiTrie v d
 filterOnNames p = filterWithNames (flip (const p))
 
 filterWithNames :: Ord v => ([v] -> d -> Bool) -> MultiTrie v d -> MultiTrie v d
-filterWithNames p = mapOnListsWithName (\v vs -> L.filter (p v) vs)
+filterWithNames p = mapOnListsWithName (\vs ds -> L.filter (p vs) ds)
 
 -- | Map a function over all values in a 'MultiTrie'.
 map :: Ord v =>
@@ -308,26 +308,27 @@ mapManyWithName :: Ord v =>
     [[v] -> d1 -> d2] ->
     MultiTrie v d1 ->
     MultiTrie v d2
-mapManyWithName fs = mapOnListsWithName (\ns -> (L.map ($ns) fs <*>))
+mapManyWithName fs = mapOnListsWithName (\vs -> (L.map ($vs) fs <*>))
 
 -- | Map a function over entire lists contained in nodes.
 mapOnLists :: Ord v =>
     ([d1] -> [d2]) ->
     MultiTrie v d1 ->
     MultiTrie v d2
-mapOnLists fl (MultiTrie vs vm) =
-    MultiTrie (fl vs) (M.mapMaybe (toMaybe . mapOnLists fl) vm)
+mapOnLists f (MultiTrie ds m) =
+    MultiTrie (f ds) (M.mapMaybe (toMaybe . mapOnLists f) m)
 
 -- | Map a function over entire lists in nodes, passing node path as well.
 mapOnListsWithName :: Ord v =>
     ([v] -> [d1] -> [d2]) ->
     MultiTrie v d1 ->
     MultiTrie v d2
-mapOnListsWithName fl (MultiTrie vs vm) =
+mapOnListsWithName f (MultiTrie ds m) =
     MultiTrie
-        (fl [] vs)
-        (M.mapMaybeWithKey transformChild vm) where
-    transformChild v = toMaybe . (mapOnListsWithName $ fl . (v:))
+        (f [] ds)
+        (M.mapMaybeWithKey transformChild m)
+    where
+        transformChild v = toMaybe . (mapOnListsWithName $ f . (v:))
 
 {- |
 Cartesian product of two 'MultiTrie's. The resulting 'MultiTrie' consists of
@@ -399,7 +400,7 @@ bind :: Ord v =>
     MultiTrie v d1 ->
     (d1 -> MultiTrie v d2) ->
     MultiTrie v d2
-bind mt fmt = flatten $ map fmt mt
+bind mt f = flatten $ map f mt
 
 {-
 Convert a 'MultiTrie' @P@ to a map @M@ whose keys are paths from @P@, and values
@@ -408,9 +409,9 @@ in @M@ are respective lists representing lists of values in @P@.
 toMap :: Ord v =>
     MultiTrie v d ->
     M.Map [v] [d]
-toMap (MultiTrie vs m) = if L.null vs
+toMap (MultiTrie ds m) = if L.null ds
         then childrenMap
-        else M.insert [] vs childrenMap
+        else M.insert [] ds childrenMap
     where
         childrenMap =
             M.unions $
@@ -422,10 +423,10 @@ toMap (MultiTrie vs m) = if L.null vs
 toList :: Ord v =>
     MultiTrie v d ->
     [([v], d)]
-toList (MultiTrie vs m) = (L.map ((,) []) vs) ++
+toList (MultiTrie ds m) = (L.map ((,) []) ds) ++
     (
         L.concat $
-        L.map (\(v, ps) -> L.map (\(ns, ws) -> (v:ns, ws)) ps) $
+        L.map (\(v, ps) -> L.map (\(vs, ds') -> (v:vs, ds')) ps) $
         M.toList $
         M.map toList m
     )
@@ -489,16 +490,16 @@ zipContentsAndChildren :: Ord v =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-zipContentsAndChildren f g (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
-    MultiTrie (f vs1 vs2) (g m1 m2) 
+zipContentsAndChildren f g (MultiTrie ds1 m1) (MultiTrie ds2 m2) =
+    MultiTrie (f ds1 ds2) (g m1 m2) 
 
 toTree ::
     (v -> t) ->
     ([d] -> t) ->
     MultiTrie v d ->
     T.Tree t
-toTree f g (MultiTrie vs m) =
-    T.Node (g vs) $ M.elems $ M.mapWithKey namedChildToTree m
+toTree f g (MultiTrie ds m) =
+    T.Node (g ds) $ M.elems $ M.mapWithKey namedChildToTree m
     where
         namedChildToTree k mt = T.Node (f k) [toTree f g mt]
 
