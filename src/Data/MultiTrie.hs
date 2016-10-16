@@ -195,10 +195,10 @@ areEqualWeak :: (Ord v, Eq d) =>
 areEqualWeak = areEquivalentUpTo listAsMultiSetEquals
 
 {- |
-Check if two 'MultiTrie's @p@ and @q@ are equivalent up to a custom list
+Check if two 'MultiTrie's @s@ and @t@ are equivalent up to a custom list
 equivalence predicate @p@.
-True if and only if (1) the 'MultiTrie's have non-empty nodes at the same paths
-and (2) for each such path @w@, value lists from @p@ and @q@ under @w@ are
+True if and only if (1) both 'MultiTrie's have non-empty nodes at the same paths
+and (2) for each such path @w@, value lists from @s@ and @t@ under @w@ are
 equivalent, i.e. satisfy @p@.
 -}
 areEquivalentUpTo :: (Ord v, Eq d) =>
@@ -218,7 +218,7 @@ subnode :: Ord v =>
     [v] ->
     MultiTrie v d ->
     MultiTrie v d
-subnode [] mt = mt
+subnode [] t = t
 subnode (v:vs) (MultiTrie _ m) = maybe empty (subnode vs) (M.lookup v m)
 
 -- | Perform the given transformation on a subnode identified by the path.
@@ -227,7 +227,7 @@ subnodeUpdate :: Ord v =>
     (MultiTrie v d -> MultiTrie v d) ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeUpdate [] f mt = f mt
+subnodeUpdate [] f t = f t
 subnodeUpdate (v:vs) f (MultiTrie ds m) =
     MultiTrie ds (M.alter (toMaybe . subnodeUpdate vs f . fromMaybe) v m)
 
@@ -245,7 +245,7 @@ subnodeReplace :: Ord v =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeReplace vs mt1 = subnodeUpdate vs (const mt1)
+subnodeReplace vs t = subnodeUpdate vs (const t)
 
 -- | Delete a subnode identified by the given path.
 subnodeDelete :: Ord v =>
@@ -260,7 +260,7 @@ subnodeUnite :: Ord v =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeUnite vs mt1 = subnodeUpdate vs (union mt1)
+subnodeUnite vs t = subnodeUpdate vs (union t)
 
 -- | Intersect a subnode identified by the path with another 'MultiTrie'.
 subnodeIntersect :: (Ord v, Eq d) =>
@@ -268,7 +268,7 @@ subnodeIntersect :: (Ord v, Eq d) =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeIntersect vs mt1 = subnodeUpdate vs (intersection mt1)
+subnodeIntersect vs t = subnodeUpdate vs (intersection t)
 
 filter :: Ord v => (d -> Bool) -> MultiTrie v d -> MultiTrie v d
 filter p = mapOnLists (L.filter p)
@@ -340,7 +340,7 @@ cartesian :: Ord v =>
     MultiTrie v d1 ->
     MultiTrie v d2 ->
     MultiTrie v (d1, d2)
-cartesian mtv = apply (map (,) mtv)
+cartesian t = apply (map (,) t)
 
 -- | Union of 'MultiTrie's.
 union :: Ord v =>
@@ -360,11 +360,11 @@ intersection :: (Ord v, Eq d) =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-intersection mt = nullToEmpty .
+intersection t = nullToEmpty .
     zipContentsAndChildren
         listAsMultiSetIntersection
-        (\x y -> M.filter (not . null) (M.intersectionWith intersection x y))
-        mt 
+        (\ds1 ds2 -> M.filter (not . null) (M.intersectionWith intersection ds1 ds2))
+        t 
 
 -- | Intersection of a non-empty list of 'MultiTrie's.
 intersections1 :: (Ord v, Eq d) =>
@@ -376,8 +376,8 @@ intersections1 = L.foldl1 intersection
 flatten :: Ord v =>
     MultiTrie v (MultiTrie v d) ->
     MultiTrie v d
-flatten (MultiTrie mts mtm) =
-    F.foldr union empty mts `union` MultiTrie [] (M.map flatten mtm)
+flatten (MultiTrie ts m) =
+    F.foldr union empty ts `union` MultiTrie [] (M.map flatten m)
 
 {- |
 Given a 'MultiTrie' of functions and a 'MultiTrie' of values, apply each
@@ -389,7 +389,7 @@ apply :: Ord v =>
     MultiTrie v (d1 -> d2) ->
     MultiTrie v d1 ->
     MultiTrie v d2
-apply mtf mtx = flatten $ map (`map` mtx) mtf
+apply tf tx = flatten $ map (`map` tx) tf
 
 {-
 Given a multitree @P@ of values and a function @f@ that maps an arbitrary value
@@ -400,7 +400,7 @@ bind :: Ord v =>
     MultiTrie v d1 ->
     (d1 -> MultiTrie v d2) ->
     MultiTrie v d2
-bind mt f = flatten $ map f mt
+bind t f = flatten $ map f t
 
 {-
 Convert a 'MultiTrie' @P@ to a map @M@ whose keys are paths from @P@, and values
@@ -437,15 +437,15 @@ fromList :: Ord v =>
     MultiTrie v d
 fromList = L.foldr (uncurry subnodeAddValue) empty
 
--- | Map 'Nothing' to 'empty' and @Just mt@ to @mt@.
+-- | Map 'Nothing' to 'empty' and @Just t@ to @t@.
 fromMaybe :: Maybe (MultiTrie v d) -> MultiTrie v d
 fromMaybe = maybe empty id
 
--- | Map 'empty' to 'Nothing' and a non-empty @mt@ to @Just mt@.
+-- | Map 'empty' to 'Nothing' and a non-empty @t@ to @Just t@.
 toMaybe ::
     MultiTrie v d ->
     Maybe (MultiTrie v d)
-toMaybe mt = if null mt then Nothing else Just mt
+toMaybe t = if null t then Nothing else Just t
 
 -- | Convert a 'MultiTrie' into an ASCII-drawn tree.
 draw :: (Show v, Show [d]) =>
@@ -482,7 +482,7 @@ areMapsEquivalentUpTo p m1 m2 = mapEquivalenceHelper
 nullToEmpty ::
     MultiTrie v d ->
     MultiTrie v d
-nullToEmpty mt = if null mt then empty else mt
+nullToEmpty t = if null t then empty else t
 
 zipContentsAndChildren :: Ord v =>
     ([d] -> [d] -> [d]) ->
@@ -501,7 +501,7 @@ toTree ::
 toTree f g (MultiTrie ds m) =
     T.Node (g ds) $ M.elems $ M.mapWithKey namedChildToTree m
     where
-        namedChildToTree k mt = T.Node (f k) [toTree f g mt]
+        namedChildToTree k t = T.Node (f k) [toTree f g t]
 
 listAsMultiSetIntersection :: Eq a =>
     [a] ->
