@@ -1,8 +1,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 
 {- |
-A 'MultiTrie' @v d@ is a trie (i.e. a tree whose child nodes have distinct
-labels of type @v@) with each node containing a list of values of type @d@
+A 'MultiTrie' @d d@ is a trie (i.e. a tree whose child nodes have distinct
+labels of type @d@) with each node containing a list of values of type @d@
 considered as a multiset.  It represents a multivalued naming with compound
 names: each compound name (a chain of labels) has a (possibly empty) list of
 values.
@@ -103,52 +103,52 @@ import qualified Data.List as L
 import Control.Applicative hiding (empty)
 
 -- | A map of atomic names onto child nodes.
-type MultiTrieMap n v = M.Map n (MultiTrie n v) 
+type MultiTrieMap v d = M.Map v (MultiTrie v d) 
 
 -- | A trie consists of a list of values and labelled child tries.
-data MultiTrie n v = MultiTrie
+data MultiTrie v d = MultiTrie
     {
-        values :: [v],
-        children :: MultiTrieMap n v
+        values :: [d],
+        children :: MultiTrieMap v d
     }
     deriving (Show)
 
-instance Ord n => Functor (MultiTrie n) where
+instance Ord v => Functor (MultiTrie v) where
     fmap = map
 
-instance Ord n => Applicative (MultiTrie n) where
+instance Ord v => Applicative (MultiTrie v) where
     pure = singleton
     (<*>) = apply
 
-instance Ord n => Monad (MultiTrie n) where
+instance Ord v => Monad (MultiTrie v) where
     return = singleton
     (>>=) = bind
 
-instance (Ord n, Eq v) => Eq (MultiTrie n v) where
+instance (Ord v, Eq d) => Eq (MultiTrie v d) where
     (==) = areEqualStrict
 
 -- | An empty 'MultiTrie' constant. A neutral element of 'union'.
-empty :: MultiTrie n v
+empty :: MultiTrie v d
 empty = MultiTrie [] M.empty
 
 -- | A 'MultiTrie' containing just one value in its root and no child nodes.
-singleton :: v -> MultiTrie n v
+singleton :: d -> MultiTrie v d
 singleton x = leaf [x]
 
 -- | A 'MultiTrie' containing the given list in its root and no child nodes.
 leaf ::
-    [v] ->
-    MultiTrie n v
+    [d] ->
+    MultiTrie v d
 leaf vs = MultiTrie vs M.empty
 
 {- |
 An infinite 'MultiTrie' that has in each node the same list of values and,
 under each name from the given set, a child identical to the root.
 -}
-repeat :: Ord n =>
-    [n] ->
+repeat :: Ord v =>
     [v] ->
-    MultiTrie n v
+    [d] ->
+    MultiTrie v d
 repeat ns xs =
     if   L.null xs
     then empty
@@ -156,55 +156,55 @@ repeat ns xs =
 
 -- | Change a list in the root node with a function and leave children intact.
 updateValues ::
-    ([v] -> [v]) ->
-    MultiTrie n v ->
-    MultiTrie n v
+    ([d] -> [d]) ->
+    MultiTrie v d ->
+    MultiTrie v d
 updateValues f (MultiTrie vs m) = MultiTrie (f vs) m
 
 -- | Add a new value to the root node's list of values.
 addValue ::
-    v ->
-    MultiTrie n v ->
-    MultiTrie n v
-addValue v = updateValues (v:)
+    d ->
+    MultiTrie v d ->
+    MultiTrie v d
+addValue d = updateValues (d:)
 
 -- | Check whether a 'MultiTrie' is empty.
 null ::
-    MultiTrie n v ->
+    MultiTrie v d ->
     Bool
 null (MultiTrie vs m) = L.null vs && L.all null (M.elems m)
 
 -- | A total number of values in all nodes.
 size ::
-    MultiTrie n v ->
+    MultiTrie v d ->
     Int
 size (MultiTrie vs m) = L.length vs + L.sum (L.map size (M.elems m))
 
 -- | Check for equality counting the order of elements.
-areEqualStrict :: (Ord n, Eq v) =>
-    MultiTrie n v ->
-    MultiTrie n v ->
+areEqualStrict :: (Ord v, Eq d) =>
+    MultiTrie v d ->
+    MultiTrie v d ->
     Bool
 areEqualStrict = areEquivalentUpTo (==)
 
 -- | Check for equality ignoring the order of elements.
-areEqualWeak :: (Ord n, Eq v) =>
-    MultiTrie n v ->
-    MultiTrie n v ->
+areEqualWeak :: (Ord v, Eq d) =>
+    MultiTrie v d ->
+    MultiTrie v d ->
     Bool
 areEqualWeak = areEquivalentUpTo listAsMultiSetEquals
 
 {- |
-Check if two 'MultiTrie's @u@ and @v@ are equivalent up to a custom list
+Check if two 'MultiTrie's @u@ and @d@ are equivalent up to a custom list
 equivalence predicate @p@.
 True if and only if (1) the 'MultiTrie's have non-empty nodes at the same paths
-and (2) for each such path @s@, value lists from @u@ and @v@ under @p@ are
+and (2) for each such path @s@, value lists from @u@ and @d@ under @p@ are
 equivalent, i.e. satisfy @p@.
 -}
-areEquivalentUpTo :: (Ord n, Eq v) =>
-    ([v] -> [v] -> Bool) ->
-    MultiTrie n v ->
-    MultiTrie n v ->
+areEquivalentUpTo :: (Ord v, Eq d) =>
+    ([d] -> [d] -> Bool) ->
+    MultiTrie v d ->
+    MultiTrie v d ->
     Bool
 areEquivalentUpTo p (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
     (p vs1 vs2) &&
@@ -214,151 +214,151 @@ areEquivalentUpTo p (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
 Select a 'MultiTrie' subnode identified by the given path, or 'empty' if there
 is no such path.
 -}
-subnode :: Ord n =>
-    [n] ->
-    MultiTrie n v ->
-    MultiTrie n v
+subnode :: Ord v =>
+    [v] ->
+    MultiTrie v d ->
+    MultiTrie v d
 subnode [] mt = mt
-subnode (n:ns) (MultiTrie _ m) = maybe empty (subnode ns) (M.lookup n m)
+subnode (v:ns) (MultiTrie _ m) = maybe empty (subnode ns) (M.lookup v m)
 
 -- | Perform the given transformation on a subnode identified by the path.
-subnodeUpdate :: Ord n =>
-    [n] ->
-    (MultiTrie n v -> MultiTrie n v) ->
-    MultiTrie n v ->
-    MultiTrie n v
+subnodeUpdate :: Ord v =>
+    [v] ->
+    (MultiTrie v d -> MultiTrie v d) ->
+    MultiTrie v d ->
+    MultiTrie v d
 subnodeUpdate [] f mt = f mt
-subnodeUpdate (n:ns) f (MultiTrie vs m) =
-    MultiTrie vs (M.alter (toMaybe . subnodeUpdate ns f . fromMaybe) n m)
+subnodeUpdate (v:ns) f (MultiTrie vs m) =
+    MultiTrie vs (M.alter (toMaybe . subnodeUpdate ns f . fromMaybe) v m)
 
 -- | Add a value to a list of values in a subnode identified by the path.
-subnodeAddValue :: Ord n =>
-    [n] ->
-    v ->
-    MultiTrie n v ->
-    MultiTrie n v
-subnodeAddValue ns v = subnodeUpdate ns (addValue v)
+subnodeAddValue :: Ord v =>
+    [v] ->
+    d ->
+    MultiTrie v d ->
+    MultiTrie v d
+subnodeAddValue ns d = subnodeUpdate ns (addValue d)
 
 -- | Replace a subnode identified by the path with a new 'MultiTrie'.
-subnodeReplace :: Ord n =>
-    [n] ->
-    MultiTrie n v ->
-    MultiTrie n v ->
-    MultiTrie n v
+subnodeReplace :: Ord v =>
+    [v] ->
+    MultiTrie v d ->
+    MultiTrie v d ->
+    MultiTrie v d
 subnodeReplace ns mt1 = subnodeUpdate ns (const mt1)
 
 -- | Delete a subnode identified by the given path.
-subnodeDelete :: Ord n =>
-    [n] ->
-    MultiTrie n v ->
-    MultiTrie n v
+subnodeDelete :: Ord v =>
+    [v] ->
+    MultiTrie v d ->
+    MultiTrie v d
 subnodeDelete ns = subnodeReplace ns empty
 
 -- | Unite a subnode identified by the path with another 'MultiTrie'.
-subnodeUnite :: Ord n =>
-    [n] ->
-    MultiTrie n v ->
-    MultiTrie n v ->
-    MultiTrie n v
+subnodeUnite :: Ord v =>
+    [v] ->
+    MultiTrie v d ->
+    MultiTrie v d ->
+    MultiTrie v d
 subnodeUnite ns mt1 = subnodeUpdate ns (union mt1)
 
 -- | Intersect a subnode identified by the path with another 'MultiTrie'.
-subnodeIntersect :: (Ord n, Eq v) =>
-    [n] ->
-    MultiTrie n v ->
-    MultiTrie n v ->
-    MultiTrie n v
+subnodeIntersect :: (Ord v, Eq d) =>
+    [v] ->
+    MultiTrie v d ->
+    MultiTrie v d ->
+    MultiTrie v d
 subnodeIntersect ns mt1 = subnodeUpdate ns (intersection mt1)
 
-filter :: Ord n => (v -> Bool) -> MultiTrie n v -> MultiTrie n v
+filter :: Ord v => (d -> Bool) -> MultiTrie v d -> MultiTrie v d
 filter p = mapOnLists (L.filter p)
 
-project :: Ord n => [[n]] -> MultiTrie n v -> MultiTrie n v
+project :: Ord v => [[v]] -> MultiTrie v d -> MultiTrie v d
 project ns = filterOnNames ((flip L.elem) ns)
 
-filterOnNames :: Ord n => ([n] -> Bool) -> MultiTrie n v -> MultiTrie n v
+filterOnNames :: Ord v => ([v] -> Bool) -> MultiTrie v d -> MultiTrie v d
 filterOnNames p = filterWithNames (flip (const p))
 
-filterWithNames :: Ord n => ([n] -> v -> Bool) -> MultiTrie n v -> MultiTrie n v
-filterWithNames p = mapOnListsWithName (\n vs -> L.filter (p n) vs)
+filterWithNames :: Ord v => ([v] -> d -> Bool) -> MultiTrie v d -> MultiTrie v d
+filterWithNames p = mapOnListsWithName (\v vs -> L.filter (p v) vs)
 
 -- | Map a function over all values in a 'MultiTrie'.
-map :: Ord n =>
-    (v -> w) ->
-    MultiTrie n v ->
-    MultiTrie n w
+map :: Ord v =>
+    (d1 -> d2) ->
+    MultiTrie v d1 ->
+    MultiTrie v d2
 map f = mapOnLists (L.map f)
 
--- | Map a function over all values, passing node paths as well.
-mapWithName :: Ord n =>
-    ([n] -> v -> w) ->
-    MultiTrie n v ->
-    MultiTrie n w
+-- | Map a function over all values with their paths
+mapWithName :: Ord v =>
+    ([v] -> d1 -> d2) ->
+    MultiTrie v d1 ->
+    MultiTrie v d2
 mapWithName f = mapOnListsWithName (L.map . f) 
 
 -- | Apply a list of functions to all values in a 'MultiTrie'.
-mapMany :: Ord n =>
-    [v -> w] ->
-    MultiTrie n v ->
-    MultiTrie n w
+mapMany :: Ord v =>
+    [d1 -> d2] ->
+    MultiTrie v d1 ->
+    MultiTrie v d2
 mapMany fs  = mapOnLists (fs <*>)
 
 -- | Apply a list of functions to each value and its path.
-mapManyWithName :: Ord n =>
-    [[n] -> v -> w] ->
-    MultiTrie n v ->
-    MultiTrie n w
+mapManyWithName :: Ord v =>
+    [[v] -> d1 -> d2] ->
+    MultiTrie v d1 ->
+    MultiTrie v d2
 mapManyWithName fs = mapOnListsWithName (\ns -> (L.map ($ns) fs <*>))
 
 -- | Map a function over entire lists contained in nodes.
-mapOnLists :: Ord n =>
-    ([v] -> [w]) ->
-    MultiTrie n v ->
-    MultiTrie n w
+mapOnLists :: Ord v =>
+    ([d1] -> [d2]) ->
+    MultiTrie v d1 ->
+    MultiTrie v d2
 mapOnLists fl (MultiTrie vs vm) =
     MultiTrie (fl vs) (M.mapMaybe (toMaybe . mapOnLists fl) vm)
 
 -- | Map a function over entire lists in nodes, passing node path as well.
-mapOnListsWithName :: Ord n =>
-    ([n] -> [v] -> [w]) ->
-    MultiTrie n v ->
-    MultiTrie n w
+mapOnListsWithName :: Ord v =>
+    ([v] -> [d1] -> [d2]) ->
+    MultiTrie v d1 ->
+    MultiTrie v d2
 mapOnListsWithName fl (MultiTrie vs vm) =
     MultiTrie
         (fl [] vs)
         (M.mapMaybeWithKey transformChild vm) where
-    transformChild n = toMaybe . (mapOnListsWithName $ fl . (n:))
+    transformChild v = toMaybe . (mapOnListsWithName $ fl . (v:))
 
 {- |
 Cartesian product of two 'MultiTrie's. The resulting 'MultiTrie' consists of
-all possible pairs @(x,y)@ under a concatenated name @u ++ v@ where @x@ is a
+all possible pairs @(x,y)@ under a concatenated name @u ++ d@ where @x@ is a
 value contained in the first operand under a name @u@, and @y@ is contained in
-the second operand under a name @v@.
+the second operand under a name @d@.
 -}
-cartesian :: Ord n =>
-    MultiTrie n v ->
-    MultiTrie n w ->
-    MultiTrie n (v, w)
+cartesian :: Ord v =>
+    MultiTrie v d1 ->
+    MultiTrie v d2 ->
+    MultiTrie v (d1, d2)
 cartesian mtv = apply (map (,) mtv)
 
 -- | Union of 'MultiTrie's.
-union :: Ord n =>
-    MultiTrie n v ->
-    MultiTrie n v ->
-    MultiTrie n v
+union :: Ord v =>
+    MultiTrie v d ->
+    MultiTrie v d ->
+    MultiTrie v d
 union = zipContentsAndChildren (++) (M.unionWith union)
 
 -- | Union of a list of 'MultiTrie's.
-unions :: Ord n =>
-    [MultiTrie n v] ->
-    MultiTrie n v
+unions :: Ord v =>
+    [MultiTrie v d] ->
+    MultiTrie v d
 unions = L.foldl union empty
 
 -- | Intersection of 'MultiTrie's.
-intersection :: (Ord n, Eq v) =>
-    MultiTrie n v ->
-    MultiTrie n v ->
-    MultiTrie n v
+intersection :: (Ord v, Eq d) =>
+    MultiTrie v d ->
+    MultiTrie v d ->
+    MultiTrie v d
 intersection mt = nullToEmpty .
     zipContentsAndChildren
         listAsMultiSetIntersection
@@ -366,15 +366,15 @@ intersection mt = nullToEmpty .
         mt 
 
 -- | Intersection of a non-empty list of 'MultiTrie's.
-intersections1 :: (Ord n, Eq v) =>
-    [MultiTrie n v] ->
-    MultiTrie n v
+intersections1 :: (Ord v, Eq d) =>
+    [MultiTrie v d] ->
+    MultiTrie v d
 intersections1 = L.foldl1 intersection
 
 -- | Flatten a 'MultiTrie' whose values are, in their turn, 'MultiTrie's
-flatten :: Ord n =>
-    MultiTrie n (MultiTrie n v) ->
-    MultiTrie n v
+flatten :: Ord v =>
+    MultiTrie v (MultiTrie v d) ->
+    MultiTrie v d
 flatten (MultiTrie mts mtm) =
     F.foldr union empty mts `union` MultiTrie [] (M.map flatten mtm)
 
@@ -384,10 +384,10 @@ function from the first operand to each value from the second operand and
 combining results as in 'cartesian': under a name concatenated from the
 function's and value's names.
 -}
-apply :: Ord n =>
-    MultiTrie n (v -> w) ->
-    MultiTrie n v ->
-    MultiTrie n w
+apply :: Ord v =>
+    MultiTrie v (d1 -> d2) ->
+    MultiTrie v d1 ->
+    MultiTrie v d2
 apply mtf mtx = flatten $ map (`map` mtx) mtf
 
 {-
@@ -395,19 +395,19 @@ Given a multitree @P@ of values and a function @f@ that maps an arbitrary value
 to a multitree, apply the function @f@ to each value from @P@ and combine the
 results as described in 'flatten'.
 -}
-bind :: Ord n =>
-    MultiTrie n v ->
-    (v -> MultiTrie n w) ->
-    MultiTrie n w
+bind :: Ord v =>
+    MultiTrie v d1 ->
+    (d1 -> MultiTrie v d2) ->
+    MultiTrie v d2
 bind mt fmt = flatten $ map fmt mt
 
 {-
 Convert a 'MultiTrie' @P@ to a map @M@ whose keys are paths from @P@, and values
 in @M@ are respective lists representing lists of values in @P@.
 -}
-toMap :: Ord n =>
-    MultiTrie n v ->
-    M.Map [n] [v]
+toMap :: Ord v =>
+    MultiTrie v d ->
+    M.Map [v] [d]
 toMap (MultiTrie vs m) = if L.null vs
         then childrenMap
         else M.insert [] vs childrenMap
@@ -415,40 +415,40 @@ toMap (MultiTrie vs m) = if L.null vs
         childrenMap =
             M.unions $
             M.elems $
-            M.mapWithKey (\n -> M.mapKeys (n:)) $
+            M.mapWithKey (\v -> M.mapKeys (v:)) $
             M.map toMap m
 
 -- | Convert a 'MultiTrie' to a list of path-value pairs.
-toList :: Ord n =>
-    MultiTrie n v ->
-    [([n], v)]
+toList :: Ord v =>
+    MultiTrie v d ->
+    [([v], d)]
 toList (MultiTrie vs m) = (L.map ((,) []) vs) ++
     (
         L.concat $
-        L.map (\(n, ps) -> L.map (\(ns, ws) -> (n:ns, ws)) ps) $
+        L.map (\(v, ps) -> L.map (\(ns, ws) -> (v:ns, ws)) ps) $
         M.toList $
         M.map toList m
     )
 
 -- | Convert a list of path-value pairs to a 'MultiTrie'.
-fromList :: Ord n =>
-    [([n], v)] ->
-    MultiTrie n v
+fromList :: Ord v =>
+    [([v], d)] ->
+    MultiTrie v d
 fromList = L.foldr (uncurry subnodeAddValue) empty
 
 -- | Map 'Nothing' to 'empty' and @Just mt@ to @mt@.
-fromMaybe :: Maybe (MultiTrie n v) -> MultiTrie n v
+fromMaybe :: Maybe (MultiTrie v d) -> MultiTrie v d
 fromMaybe = maybe empty id
 
 -- | Map 'empty' to 'Nothing' and a non-empty @mt@ to @Just mt@.
 toMaybe ::
-    MultiTrie n v ->
-    Maybe (MultiTrie n v)
+    MultiTrie v d ->
+    Maybe (MultiTrie v d)
 toMaybe mt = if null mt then Nothing else Just mt
 
 -- | Convert a 'MultiTrie' into an ASCII-drawn tree.
-draw :: (Show n, Show [v]) =>
-    MultiTrie n v ->
+draw :: (Show v, Show [d]) =>
+    MultiTrie v d ->
     String
 draw = T.drawTree . toTree show show
 
@@ -479,23 +479,23 @@ areMapsEquivalentUpTo p m1 m2 = mapEquivalenceHelper
 --
 
 nullToEmpty ::
-    MultiTrie n v ->
-    MultiTrie n v
+    MultiTrie v d ->
+    MultiTrie v d
 nullToEmpty mt = if null mt then empty else mt
 
-zipContentsAndChildren :: Ord n =>
-    ([v] -> [v] -> [v]) ->
-    (MultiTrieMap n v -> MultiTrieMap n v -> MultiTrieMap n v) ->
-    MultiTrie n v ->
-    MultiTrie n v ->
-    MultiTrie n v
+zipContentsAndChildren :: Ord v =>
+    ([d] -> [d] -> [d]) ->
+    (MultiTrieMap v d -> MultiTrieMap v d -> MultiTrieMap v d) ->
+    MultiTrie v d ->
+    MultiTrie v d ->
+    MultiTrie v d
 zipContentsAndChildren f g (MultiTrie vs1 m1) (MultiTrie vs2 m2) =
     MultiTrie (f vs1 vs2) (g m1 m2) 
 
 toTree ::
-    (n -> t) ->
-    ([v] -> t) ->
-    MultiTrie n v ->
+    (v -> t) ->
+    ([d] -> t) ->
+    MultiTrie v d ->
     T.Tree t
 toTree f g (MultiTrie vs m) =
     T.Node (g vs) $ M.elems $ M.mapWithKey namedChildToTree m
