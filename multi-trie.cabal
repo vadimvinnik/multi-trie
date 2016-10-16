@@ -30,7 +30,8 @@ source-repository head
 library
   build-depends:    
                     base == 4.*,
-                    containers
+                    containers,
+                    composition >= 1.0.2.1
   Hs-Source-Dirs:   src/
   ghc-options:      -Wall
   exposed-modules:  Data.MultiTrie

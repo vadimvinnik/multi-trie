@@ -106,6 +106,7 @@ import qualified Data.Map as M
 import qualified Data.Tree as T
 import qualified Data.List as L
 import Control.Applicative hiding (empty)
+import Data.Composition((.:))
 
 -- | A map of atomic names onto child nodes.
 type MultiTrieMap v d = M.Map v (MultiTrie v d) 
@@ -362,10 +363,10 @@ intersection :: (Ord v, Eq d) =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-intersection = nullToEmpty .:.
+intersection = nullToEmpty .:
     zipContentsAndChildren
         listAsMultiSetIntersection
-        ((M.filter (not . null)) .:. (M.intersectionWith intersection))
+        ((M.filter (not . null)) .: (M.intersectionWith intersection))
 
 -- | Intersection of a non-empty list of 'MultiTrie's.
 intersections1 :: (Ord v, Eq d) =>
@@ -516,8 +517,3 @@ listAsMultiSetEquals _ [] = False
 listAsMultiSetEquals (x:xs) ys = if x `L.elem` ys
     then listAsMultiSetEquals xs (L.delete x ys)
     else False
-
-infixr 9 .:.
-(.:.) :: (c->d) -> (a->b->c) -> a->b->d
-(.:.) = (.).(.)
-
