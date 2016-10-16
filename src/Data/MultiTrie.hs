@@ -1,3 +1,8 @@
+--
+-- Vadim Vinnik, 2015-16
+-- vadim.vinnik@gmail.com
+--
+
 {-# LANGUAGE FlexibleContexts #-}
 
 {- |
@@ -193,10 +198,10 @@ areEqualWeak :: (Ord v, Eq d) =>
     Bool
 areEqualWeak = areEquivalentUpTo listAsMultiSetEquals
 
--- | Check if two 'MultiTrie's @s@ and @t@ are equivalent up to a custom list
--- equivalence predicate @p@.  True if and only if (1) both 'MultiTrie's have
--- non-empty nodes at the same paths and (2) for each such path @w@, value lists
--- from @s@ and @t@ under @w@ are equivalent, i.e. satisfy @p@.
+-- | Check if two 'MultiTrie's, @t1@ and @t2@, are equivalent up to a custom
+-- list equivalence predicate @p@.  True if and only if (1) both 'MultiTrie's
+-- have non-empty nodes at the same paths and (2) for each such path @w@, value
+-- lists from @t1@ and @t2@ under @w@ are equivalent, i.e. satisfy @p@.
 areEquivalentUpTo :: (Ord v, Eq d) =>
     ([d] -> [d] -> Bool) ->
     MultiTrie v d ->
@@ -369,40 +374,34 @@ intersections1 :: (Ord v, Eq d) =>
     MultiTrie v d
 intersections1 = L.foldl1 intersection
 
--- | Flatten a 'MultiTrie' whose values are, in their turn, 'MultiTrie's
+-- | Flatten a 'MultiTrie' whose values are, in their turn, 'MultiTrie's.
 flatten :: Ord v =>
     MultiTrie v (MultiTrie v d) ->
     MultiTrie v d
 flatten (MultiTrie ts m) =
     F.foldr union empty ts `union` MultiTrie [] (M.map flatten m)
 
-{- |
-Given a 'MultiTrie' of functions and a 'MultiTrie' of values, apply each
-function from the first operand to each value from the second operand and
-combining results as in 'cartesian': under a name concatenated from the
-function's and value's names.
--}
+-- | Given a 'MultiTrie' @t1@ of functions and a 'MultiTrie' @t2@ of values, for
+-- all compound names @v1@ and @v2@, apply each function named by @v1@ in @t1@
+-- to each value named by @v2@ in @t2@ and put the result into a new 'MultiTrie'
+-- under a name @v1 ++ v2@.
 apply :: Ord v =>
     MultiTrie v (d1 -> d2) ->
     MultiTrie v d1 ->
     MultiTrie v d2
-apply tf tx = flatten $ map (`map` tx) tf
+apply t1 t2 = flatten $ map (`map` t2) t1
 
-{-
-Given a multitree @P@ of values and a function @f@ that maps an arbitrary value
-to a multitree, apply the function @f@ to each value from @P@ and combine the
-results as described in 'flatten'.
--}
+-- | Given a 'MultiTrie' @t@ of values and a function @f@ that maps an arbitrary
+-- value to a 'MultiTrie', apply the function @f@ to each value from @t@ and
+-- 'flatten' the result.
 bind :: Ord v =>
     MultiTrie v d1 ->
     (d1 -> MultiTrie v d2) ->
     MultiTrie v d2
 bind t f = flatten $ map f t
 
-{-
-Convert a 'MultiTrie' @P@ to a map @M@ whose keys are paths from @P@, and values
-in @M@ are respective lists representing lists of values in @P@.
--}
+-- | Convert a 'MultiTrie' @t@ to a `Data.Map` of compound names into value
+-- lists.
 toMap :: Ord v =>
     MultiTrie v d ->
     M.Map [v] [d]
@@ -434,11 +433,11 @@ fromList :: Ord v =>
     MultiTrie v d
 fromList = L.foldr (uncurry subnodeAddValue) empty
 
--- | Map 'Nothing' to 'empty' and @Just t@ to @t@.
+-- | Map @Nothing@ to 'empty' and @Just t@ to @t@.
 fromMaybe :: Maybe (MultiTrie v d) -> MultiTrie v d
 fromMaybe = maybe empty id
 
--- | Map 'empty' to 'Nothing' and a non-empty @t@ to @Just t@.
+-- | Map 'empty' to @Nothing@ and a non-empty @t@ to @Just t@.
 toMaybe ::
     MultiTrie v d ->
     Maybe (MultiTrie v d)
@@ -450,11 +449,9 @@ draw :: (Show v, Show [d]) =>
     String
 draw = T.drawTree . toTree show show
 
-{- |
-Decide whether maps are equivalent up to a custom value equivalence predicate.
-True if and only if the maps have exactly the same names and, for each name,
-its values in the two maps are equivalent. `Data.Map` is missing this.
--}
+-- | Decide if maps are equivalent up to a custom value equivalence predicate.
+-- True if and only if the maps have exactly the same names and, for each name,
+-- its values in the two maps are equivalent. `Data.Map` is missing this.
 areMapsEquivalentUpTo :: Ord k =>
     (a -> b -> Bool) ->
     M.Map k a ->
