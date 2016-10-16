@@ -362,11 +362,10 @@ intersection :: (Ord v, Eq d) =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-intersection t = nullToEmpty .
+intersection = nullToEmpty .:.
     zipContentsAndChildren
         listAsMultiSetIntersection
-        (\ds1 ds2 -> M.filter (not . null) (M.intersectionWith intersection ds1 ds2))
-        t 
+        ((M.filter (not . null)) .:. (M.intersectionWith intersection))
 
 -- | Intersection of a non-empty list of 'MultiTrie's.
 intersections1 :: (Ord v, Eq d) =>
@@ -517,4 +516,8 @@ listAsMultiSetEquals _ [] = False
 listAsMultiSetEquals (x:xs) ys = if x `L.elem` ys
     then listAsMultiSetEquals xs (L.delete x ys)
     else False
+
+infixr 9 .:.
+(.:.) :: (c->d) -> (a->b->c) -> a->b->d
+(.:.) = (.).(.)
 
