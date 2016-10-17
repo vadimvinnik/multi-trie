@@ -237,7 +237,7 @@ subnodeAddValue :: Ord v =>
     d ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeAddValue vs d = subnodeUpdate vs (addValue d)
+subnodeAddValue vs = subnodeUpdate vs . addValue
 
 -- | Replace a subnode identified by the path with a new 'MultiTrie'.
 subnodeReplace :: Ord v =>
@@ -245,7 +245,7 @@ subnodeReplace :: Ord v =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeReplace vs t = subnodeUpdate vs (const t)
+subnodeReplace vs = subnodeUpdate vs . const
 
 -- | Delete a subnode identified by the given path.
 subnodeDelete :: Ord v =>
@@ -260,7 +260,7 @@ subnodeUnite :: Ord v =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeUnite vs t = subnodeUpdate vs (union t)
+subnodeUnite vs = subnodeUpdate vs . union
 
 -- | Intersect a subnode identified by the path with another 'MultiTrie'.
 subnodeIntersect :: (Ord v, Eq d) =>
@@ -268,7 +268,7 @@ subnodeIntersect :: (Ord v, Eq d) =>
     MultiTrie v d ->
     MultiTrie v d ->
     MultiTrie v d
-subnodeIntersect vs t = subnodeUpdate vs (intersection t)
+subnodeIntersect vs = subnodeUpdate vs . intersection
 
 -- | Leave only those values that satisfy the predicate @p@.
 filter :: Ord v => (d -> Bool) -> MultiTrie v d -> MultiTrie v d
