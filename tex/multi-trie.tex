@@ -243,7 +243,7 @@ and ``compound'' if it does not lead to confusion.
 A \emph{$(V,D)$-multi-valued compound-naming set, or $(V,D)$-MVCNset,} is a binary
 relation
 \[
-  p \subseteq V^\ast \times D .
+  s \subseteq V^\ast \times D .
 \]
 Whenever $V$ and $D$ are obvious from the context, we'll omit ``$(V,D)$-''
 prefix and write simply ``MVCNset''. A set of $(V,D)$-MVCNsets will be
@@ -251,16 +251,15 @@ denoted~$\setmvcn{V}{D}$.
 \end{Df}
 
 Note that there is an obvious bijection between a class of $(V,D)$-MVCNsets and
-a class of $(V^\ast, 2^D)$-naming sets: a relation between a name and its
-multiple values could be modelled through a single value that is a subset
-of~$V$. Therefore, a multivalued naming could be regarded as a special case of
+a class of $(V^\ast, 2^D)$-naming sets.
+Therefore, a multivalued naming could be regarded as a special case of
 a univalued naming with extra specifics applied to values (being sets) and names
 (being chains).
 
 \begin{Ex}\label{ex:mvcn}
 The following object is an $(\seta, \setn)$-MVCNset:
 \[
-  p = \{
+  s = \{
     (\varepsilon, 0),
     (\varepsilon, 1),
     (a,           2),
@@ -283,7 +282,7 @@ on an MVCNset~--- it is just an arbitrary set of name-value pairs.
 Therefore, $\setmvcn{V}{D}$ is closed against set-theoretical union
 and intersection.
 \begin{St}\label{st:mvcn-setop}
-If~$p$ and~$q$ are $(V,D)$-MVCNsets, so are~$p\cup q$ and~$p\cap q$.
+If~$s$ and~$t$ are $(V,D)$-MVCNsets, so are~$s\cup t$ and~$s\cap t$.
 \end{St}
 
 When it is important to emphasise that union and intersection are operations
@@ -306,20 +305,20 @@ possible, omiting the subscript, simply~$\deref$) of type
 $\setmvcn{V}{D} \times V^\ast \to 2^D$,
 such that
 \[
-  \deref_\setcharmvcn(p, v) = \{ d \mid (v, d) \in p \} .
+  \deref_\setcharmvcn(s, v) = \{ d \mid (v, d) \in s \} .
 \]
 \end{Df}
 
 Unlike the univalued case, here~$\deref$ is a total operation: even if a
-name~$v$ does not have any associated value in an MVCNset~$p$, dereferencing
+name~$v$ does not have any associated value in an MVCNset~$s$, dereferencing
 it just yields an empty set of values.
 
 \begin{Ex}\label{ex:mvcn-dereferencing}
-Consider an MVCNset~$p$ from ex.~\ref{ex:mvcn}. Then
+Consider an MVCNset~$s$ from ex.~\ref{ex:mvcn}. Then
 \begin{eqnarray*}
-  \deref(p, \varepsilon) & = & \{ 0, 1 \}, \\
-  \deref(p, baaa)        & = & \{ 8 \}, \\
-  \deref(p, cdcd)        & = & \varnothing .
+  \deref(s, \varepsilon) & = & \{ 0, 1 \}, \\
+  \deref(s, baaa)        & = & \{ 8 \}, \\
+  \deref(s, cdcd)        & = & \varnothing .
 \end{eqnarray*}
 
 \end{Ex}
@@ -327,10 +326,10 @@ Consider an MVCNset~$p$ from ex.~\ref{ex:mvcn}. Then
 It follows immediately from the definition that dereferencing distributes
 over set-theoretical operations.
 \begin{St}\label{st:mvcn-deref-distributivity}
-Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$p$ and~$q$ be
+Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$s$ and~$t$ be
 $(V,D)$-MVCNsets. Then, for every~$v\in V^\ast$,
 \[
-  \deref(p\odot q, v) = \deref(p, v) \odot \deref(q, v) .
+  \deref(s\odot t, v) = \deref(s, v) \odot \deref(t, v) .
 \]
 \end{St}
 
@@ -339,9 +338,9 @@ defined by the values of all its names.  In terms of programming, it means that
 if two MVCNset objects' behaviours (observed through the $\deref$ selector) are
 indiscernible, the objects are identical.
 \begin{St}\label{st:mvcn-deref-equality}
-Let $p, q \in \setmvcn{V}{D}$. Then
+Let $s, t \in \setmvcn{V}{D}$. Then
 \[
-  (\forall u\in V^\ast . \deref(p,u) = \deref(q,u)) \implies (p = q) .
+  (\forall u\in V^\ast . \deref(s,u) = \deref(t,u)) \implies (s = t) .
 \]
 \end{St}
 
@@ -353,20 +352,20 @@ Thus, it is similar to assignment in the sense of imperative programming.
 \begin{eqnarray*}
  & \putval_\setcharmvcn :
     \setmvcn{V}{D} \times V^\ast \times 2^D \to \setmvcn{V}{D}, \\
- & \putval_\setcharmvcn(p, u, s) =
-      \{ (v, x) \mid (v, x) \in p, v \neq u \} \cup
+ & \putval_\setcharmvcn(s, u, s) =
+      \{ (v, x) \mid (v, x) \in s, v \neq u \} \cup
       \{ (u, y) \mid y \in s \} .
 \end{eqnarray*}
 The subscript will be omitted further whenever possible.
 \end{Df}
-In other words, this operation deletes from~$p$ all values corresponding to
+In other words, this operation deletes from~$s$ all values corresponding to
 the name~$u$, leaves all other name-value pairs intact and assigns new values
 to~$u$.
 
 \begin{Ex}\label{ex:mvcn-replace}
-Let~$p$ be an MVCNset from ex.~\ref{ex:mvcn}. Then
+Let~$s$ be an MVCNset from ex.~\ref{ex:mvcn}. Then
 \[
-  \putval(p, a, \{ 9, 10 \}) = \{
+  \putval(s, a, \{ 9, 10 \}) = \{
     (\varepsilon, 0),
     (\varepsilon, 1),
     (a,           9),
@@ -384,12 +383,12 @@ definition: it changes the values of one name and does not influence the other
 names. Except this, two replacement operations commute if they
 relate to different names, otherwise the outer operation absorbs the inner one.
 \begin{St}\label{st:mvcn-replace-deref}
-Let~$p \in \setmvcn{V}{D}$, $u, v \in V^\ast$, $s, t \in 2^D$. Then
+Let~$s \in \setmvcn{V}{D}$, $u, v \in V^\ast$, $s, t \in 2^D$. Then
 \begin{eqnarray*}
-  & \deref(\putval(p, u, s), u) = s , \\
-  & u \neq v \implies \deref(\putval(p, u, s), v) = \deref(p, v) , \\
-  & \putval(\putval(p, u, s), u, t) = \putval(p, u, t) , \\
-  & u \neq v \implies \putval(\putval(p, u, s), v, t) = \putval(\putval(p, v, t), u, s) .
+  & \deref(\putval(s, u, s), u) = s , \\
+  & u \neq v \implies \deref(\putval(s, u, s), v) = \deref(s, v) , \\
+  & \putval(\putval(s, u, s), u, t) = \putval(s, u, t) , \\
+  & u \neq v \implies \putval(\putval(s, u, s), v, t) = \putval(\putval(s, v, t), u, s) .
 \end{eqnarray*}
 \end{St}
 
@@ -421,54 +420,54 @@ The next property is also just a trivial consequence of the definition:~$\bot$
 and~$\top$ objects are units of~$\cup$ and~$\cap$ operations respectively and
 zeros vice versa.
 \begin{St}\label{st:mvcn-neutrals}
-For any MVCNset~$p$,
+For any MVCNset~$s$,
 \begin{eqnarray*}
-  \bot \cup p & = & p,    \\
-  \top \cap p & = & p,    \\
-  \bot \cap p & = & \bot, \\
-  \top \cup p & = & \top.
+  \bot \cup s & = & s,    \\
+  \top \cap s & = & s,    \\
+  \bot \cap s & = & \bot, \\
+  \top \cup s & = & \top.
 \end{eqnarray*}
 \end{St}
 
-Note that a compound name~$v$ in a MVCNset~$p$ not only is a reference to
+Note that a compound name~$v$ in a MVCNset~$s$ not only is a reference to
 multiple values but also is a common prefix for a ``bunch'' of names starting
-with~$v$. In this sence,~$v$ is a name for an entire sub-object of~$p$ that is
+with~$v$. In this sence,~$v$ is a name for an entire sub-object of~$s$ that is
 defined as follows.
 \begin{Df}\label{df:mvcn-select}
-Let~$p\in\setmvcn{V}{D}$, $v\in V^\ast$, then \emph{selection} from~$p$
+Let~$s\in\setmvcn{V}{D}$, $v\in V^\ast$, then \emph{selection} from~$s$
 under~$v$ is
 \[
-  \select_\setcharmvcn(p,v) = \{ (w, d) \mid (vw, d)\in p \} \in\setmvcn{V}{D}.
+  \select_\setcharmvcn(s,v) = \{ (w, d) \mid (vw, d)\in s \} \in\setmvcn{V}{D}.
 \]
 As always, the subscript will be omited if possible.
 \end{Df}
 
 \begin{Ex}\label{ex:mvcn-select}
-Let~$p$ be an MVCNset from ex.~\ref{ex:mvcn}, then
+Let~$s$ be an MVCNset from ex.~\ref{ex:mvcn}, then
 \begin{eqnarray*}
-  \select(p, a) & = & \{
+  \select(s, a) & = & \{
     (\varepsilon, 2),
     (\varepsilon, 3),
     (\varepsilon, 4),
     (a,           5),
     (b,           6)
   \} , \\
-  \select(p, b) & = & \{
+  \select(s, b) & = & \{
     (\varepsilon, 7),
     (aaa,         8)
   \} , \\
-  \select(p, cdcd) & = & \bot .
+  \select(s, cdcd) & = & \bot .
 \end{eqnarray*}
 \end{Ex}
 
 \begin{St}\label{st:mvcn-selection-properties}
-For any~$p,q\in\setmvcn{V}{D}$, $u, v\in V^\ast$, $\odot\in\{\cup, \cap\}$,
+For any~$s,t\in\setmvcn{V}{D}$, $u, v\in V^\ast$, $\odot\in\{\cup, \cap\}$,
 \begin{eqnarray*}
   & \select(\bot,u) = \bot, \\
   & \select(\top,u) = \top, \\
-  & \select(p,\varepsilon) = p, \\
-  & \select(p,uv) = \select(\select(p,u), v), \\
-  & \select(p\odot q, u) = \select(p,u)\odot \select(q,u).
+  & \select(s,\varepsilon) = s, \\
+  & \select(s,uv) = \select(\select(s,u), v), \\
+  & \select(s\odot t, u) = \select(s,u)\odot \select(t,u).
 \end{eqnarray*}
 \end{St}
 In other words,
@@ -487,13 +486,13 @@ is described in the next section.
 
 \section{Trie-based definition}
 
-Take a closer look at the MVCNset~$p$ from ex.~\ref{ex:mvcn}.
+Take a closer look at the MVCNset~$s$ from ex.~\ref{ex:mvcn}.
 Recall the
 idea underlying selection operation: any name~$u$ identifies a bunch of
 names that have~$u$ as its common prefix. Except this, take into account that
 the empty name~$\varepsilon$ is a common prefix for all names.
 
-The name~$\varepsilon$, the simplest name ever, refers in~$p$ to a set of
+The name~$\varepsilon$, the simplest name ever, refers in~$s$ to a set of
 values~$\{0,1\}$. Name~$a=\varepsilon a$ is an extension of~$\varepsilon$ by
 one atomic name and refers to values~$\{2,3,4\}$. In its turn, name~$a$ can
 be extended by one atomic name to~$aa$, $ab$, \ldots, $az$, from which only the
@@ -508,7 +507,7 @@ All this gives a hierarchical view of~$V^\ast$ where
 \item appending an atomic component to a name moves one level deeper;
 \item having a common prefix means having a common ancestor.
 \end{itemize}
-The hierarchical representation of the MVCNset~$p$ is shown on the
+The hierarchical representation of the MVCNset~$s$ is shown on the
 fig.~\ref{fig:trie}.
 
 \begin{figure}[ht]
@@ -526,7 +525,7 @@ fig.~\ref{fig:trie}.
 }
 \end{minipage}
 \end{center}
-\caption{A multitrie corresponding to the MVCNset~$p$}\label{fig:trie}
+\caption{A multitrie corresponding to the MVCNset~$s$}\label{fig:trie}
 \end{figure}
 
 To grasp this informal consideration in a definition, it would be convenient to
@@ -543,7 +542,7 @@ and~$D$ are known from the context or irrelevant):
 \]
 \end{Df}
 
-In other words, a $(V,D)$-multitrie is a pair $p = (s, f)$ where~$s\subseteq D$
+In other words, a $(V,D)$-multitrie is a pair $s = (s, f)$ where~$s\subseteq D$
 is a set of values and a function $f: V \to \setmt{V}{D}$ is a total mapping of
 atomic names to some $(V,D)$-multitries. Note that this recursive definition does
 not have any basic case: every multitrie contains child multitries
@@ -569,11 +568,11 @@ In other words, empty (full) multitrie is a multitrie that has an empty
 turn, empty (full) multitries.
 
 \begin{Df}\label{df:mt-select}
-\emph{Selection} operation. Let $p=(s,f) \in \setmt{V}{D}$, $u\in V$,
+\emph{Selection} operation. Let $s=(s,f) \in \setmt{V}{D}$, $u\in V$,
 $v\in V^\ast$, then
 \begin{eqnarray*}
-  \select_\setcharmt(p, \varepsilon) & = & p , \\
-  \select_\setcharmt(p, u v) & = & \select_\setcharmt(f(u), v) .
+  \select_\setcharmt(s, \varepsilon) & = & s , \\
+  \select_\setcharmt(s, u v) & = & \select_\setcharmt(f(u), v) .
 \end{eqnarray*}
 Subscripts will be omited if possible.
 \end{Df}
@@ -583,8 +582,8 @@ compound name as a path in the trie, and takes a sub-trie starting
 at this node.
 
 \begin{Ex}\label{ex:mt-select}
-Consider a multitrie~$p$ depicted on fig.~\ref{fig:trie}. Selection under a
-name~$a$ results in a multitrie~$\select(p,a)$ shown on
+Consider a multitrie~$s$ depicted on fig.~\ref{fig:trie}. Selection under a
+name~$a$ results in a multitrie~$\select(s,a)$ shown on
 fig.~\ref{fig:mt-select}.
 \end{Ex}
 
@@ -602,24 +601,24 @@ fig.~\ref{fig:mt-select}.
 \end{figure}
 
 \begin{Df}\label{df:mt-deref}
-Given a $(V,D)$-multitrie~$p$ and a name~$v\in V^\ast$, \emph{dereferencing}
-of~$v$ in~$p$ is
+Given a $(V,D)$-multitrie~$s$ and a name~$v\in V^\ast$, \emph{dereferencing}
+of~$v$ in~$s$ is
 \[
-  \deref_\setcharmt(p, v) = \proj{2}{1}(\select(p, v)) .
+  \deref_\setcharmt(s, v) = \proj{2}{1}(\select(s, v)) .
 \]
 As always, we'll not write the subscript if it is obvious from the context.
 \end{Df}
 
-In other words, if $\select(p,v) = (s,f)$, then $\deref(p, v) = s$. To
+In other words, if $\select(s,v) = (s,f)$, then $\deref(s, v) = s$. To
 dereference a name in a multitrie, one needs to follow the compound name
 as a path to a node in the trie and then take the value stored in that node.
 
 \begin{Df}\label{df:mt-setop}
 \emph{Union} and \emph{intersection}.
-Let $\odot \in \{ \cup, \cap \}$, $p, q \in \setmt{V}{D}$,
-$p = (s, f)$, $q = (t, g)$. Then
+Let $\odot \in \{ \cup, \cap \}$, $s, t \in \setmt{V}{D}$,
+$s = (s, f)$, $t = (t, g)$. Then
 \[
-  p \odot_\setcharmt  q = (s \odot t, f \odot g) ,
+  s \odot_\setcharmt  t = (s \odot t, f \odot g) ,
 \]
 where~$h = f \odot g$ is such a function that
 $h(v) = f(v) \odot_\setcharmt  g(v)$,
@@ -629,7 +628,7 @@ set-theoretical operations on sets of values and corresponding operations
 on multitries.
 \end{Df}
 
-In other words, to build $r = p \cup q$, one needs to go through all compound
+In other words, to build $r = s \cup t$, one needs to go through all compound
 names and, for each name, build a union of the value sets contained in the
 operands under that name.
 
@@ -643,10 +642,10 @@ operations, the most natural way of defining it is recursive.
   \putval_\setcharmt : \setmt{V}{D} \times V^\ast \times 2^D \to \setmt{V}{D},
 \]
 such that, for any
-$p = (s, f) \in \setmt{V}{D}$, $t \in 2^D$, $u \in V$, $v \in V^\ast$,
+$s = (s, f) \in \setmt{V}{D}$, $t \in 2^D$, $u \in V$, $v \in V^\ast$,
 \begin{eqnarray*}
-  \putval_\setcharmt(p, \varepsilon, t) & = & (t, f) , \\
-  \putval_\setcharmt(p, u v, t) & = & (s, f') ,
+  \putval_\setcharmt(s, \varepsilon, t) & = & (t, f) , \\
+  \putval_\setcharmt(s, u v, t) & = & (s, f') ,
 \end{eqnarray*}
 where $f' : V \to \setmt{V}{D}$ is such a function that $f'(w) = f(w)$ for any
 $w\neq u$, and $f'(u) = \putval_\setcharmt(f(u), v, t)$.
@@ -673,11 +672,11 @@ of the following.
 
 \begin{St}\label{st:isomorph}
 Consider a mapping~$\varphi: \setmvcn{V}{D} \to \setmt{V}{D}$, such that,
-for any~$p\in \setmvcn{V}{D}$,
+for any~$s\in \setmvcn{V}{D}$,
 \[
-  \varphi(p) = (
-    \deref_\setcharmvcn(p, \varepsilon) ,
-    \{ u \mapsto \varphi(\select_\setcharmvcn(p, u) \mid u\in V \})
+  \varphi(s) = (
+    \deref_\setcharmvcn(s, \varepsilon) ,
+    \{ u \mapsto \varphi(\select_\setcharmvcn(s, u) \mid u\in V \})
   ) .
 \]
 Then~$\varphi$ is a bijection that preserves
@@ -686,16 +685,16 @@ operations:
 \begin{eqnarray*}
   & \varphi(\bot_{\setcharmvcn}) = \bot_{\setcharmt}, \\
   & \varphi(\top_{\setcharmvcn}) = \top_{\setcharmt}, \\
-  & \varphi(p \mathbin{\odot_{\setcharmvcn}} q) =
-      \varphi(p) \mathbin{\odot_{\setcharmt}} \varphi(q) , \\
-  & \deref_{\setcharmvcn}(p, v) =
-      \deref_{\setcharmt}(\varphi(p), v) , \\
-  & \varphi(\putval_{\setcharmvcn}(p, v, s)) =
-      \putval_{\setcharmt}(\varphi(p), v, s) , \\
-  & \varphi(\select_{\setcharmvcn}(p, v)) =
-      \select_{\setcharmt}(\varphi(p), v) ,
+  & \varphi(s \mathbin{\odot_{\setcharmvcn}} t) =
+      \varphi(s) \mathbin{\odot_{\setcharmt}} \varphi(t) , \\
+  & \deref_{\setcharmvcn}(s, v) =
+      \deref_{\setcharmt}(\varphi(s), v) , \\
+  & \varphi(\putval_{\setcharmvcn}(s, v, s)) =
+      \putval_{\setcharmt}(\varphi(s), v, s) , \\
+  & \varphi(\select_{\setcharmvcn}(s, v)) =
+      \select_{\setcharmt}(\varphi(s), v) ,
 \end{eqnarray*}
-for all $p,q \in \setmvcn{V}{D}$, $v \in V^\ast$.
+for all $s,t \in \setmvcn{V}{D}$, $v \in V^\ast$.
 \end{St}
 
 In other words, $\varphi$~is an isomorphism from many-sorted algebra of
@@ -714,30 +713,30 @@ more complicated operations.
 
 Before giving a formal definition for a cartesian product of namings, let us
 informally describe how should an operation look like to deserve this name.
-Let~$p$ and~$q$ be two MVCNsets. Their cartesian product should consist of
-values of the form~$(d',d'')$ where $d'$~is a value from~$p$ and $d''$~is taken
-from~$q$. But these values are attached to some names~-- say, $u$~and~$v$,
+Let~$s$ and~$t$ be two MVCNsets. Their cartesian product should consist of
+values of the form~$(d',d'')$ where $d'$~is a value from~$s$ and $d''$~is taken
+from~$t$. But these values are attached to some names~-- say, $u$~and~$v$,
 respectively.  Therefore, the resulting product MVCNset should contain the
 combined value~$(d',d'')$ under a name combined from~$u$ and $v$, and the only
 combining operation defined for names is concatenation.
 
 \begin{Df}\label{df:mvcn-cartesian}
-Let~$p$ and~$q$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
+Let~$s$ and~$t$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
 \emph{cartesian product} is a $(V,D'\times D'')$-MVCNset
 \[
-  p\times q = \{ (uv, (d',d'')) \mid (u,d')\in p, (v,d'')\in q \} .
+  s\times t = \{ (uv, (d',d'')) \mid (u,d')\in s, (v,d'')\in t \} .
 \]
 \end{Df}
 
 \begin{Ex}\label{ex:cartesian}
 Consider the following MVCNsets:
 \begin{eqnarray*}
-  p & = & \{ (\varepsilon, 0), (a, 1), (a, 2) \} , \\
-  q & = & \{ (\varepsilon, 3), (\varepsilon, 4), (b, 5) \} .
+  s & = & \{ (\varepsilon, 0), (a, 1), (a, 2) \} , \\
+  t & = & \{ (\varepsilon, 3), (\varepsilon, 4), (b, 5) \} .
 \end{eqnarray*}
 Then their cartesian product is
 \begin{eqnarray*}
-  p \times q & = &  \{ (\varepsilon, (0, 3)), (\varepsilon, (0, 4)) \} \cup \\
+  s \times t & = &  \{ (\varepsilon, (0, 3)), (\varepsilon, (0, 4)) \} \cup \\
     & \cup & \{ (b, (0, 5)) \} \cup \\
     & \cup & \{ (a, (1, 3)), (a, (1, 4)), (a, (2, 3)), (a, (2, 4)) \} \cup \\
     & \cup & \{ (ab, (1, 5)), (ab, (2, 5)) \} .
@@ -746,20 +745,20 @@ Then their cartesian product is
 
 \begin{St}\label{st:cartesian-distributivity}
 Obviously,~$\times$ distributes over $\cap$ and $\cup$.
-For any $p \in \setmvcn{V}{D'}$ and $q, r \in \setmvcn{V}{D''}$,
+For any $s \in \setmvcn{V}{D'}$ and $t, r \in \setmvcn{V}{D''}$,
 \[
-  p\times(q\odot r) = (p\times q) \odot (p\times r) .
+  s\times(t\odot r) = (s\times t) \odot (s\times r) .
 \]
 \end{St}
 
 \begin{St}\label{st:deref-cartesian}
-For any $p \in \setmvcn{V}{D'}$ and $q \in \setmvcn{V}{D''}$,
+For any $s \in \setmvcn{V}{D'}$ and $t \in \setmvcn{V}{D''}$,
 \[
-  \deref(p \times q, w) =
+  \deref(s \times t, w) =
       \bigcup_{u,v\in V^\ast: uv = w}
-          \deref(p, u)
+          \deref(s, u)
           \times
-          \deref(q, v) .
+          \deref(t, v) .
 \]
 \end{St}
 
@@ -768,59 +767,59 @@ completely defined by values of all names (st.~\ref{st:mvcn-deref-equality}),
 it is preserved by the mapping~$\varphi$ from st.~\ref{st:isomorph}. Also, this
 property may be taken as a definition of cartesian product for multitries.
 
-Consider an MVCNset~$p$ whose values are, in their turn, MVCNsets.  Flattening
+Consider an MVCNset~$s$ whose values are, in their turn, MVCNsets.  Flattening
 operation formally defined below turns it into a ``plain'' MVCNset.  Supose a
-name~$u$ in~$p$ has a value~$q$ (and, maybe, some other values) that, by
-precondition, is an MVCNset.  Then take a name~$v$ that has a value~$d$ in~$q$.
-In sum, to reach~$d$ from~$p$, one has to dereference the name~$u$
-(obtaining~$q$) and then (in~$q$) dereference~$v$. Therefore, flattening should
-turn~$p$ into such an MVCNset~$r$, where~$d$ is a value of the name~$uv$.
+name~$u$ in~$s$ has a value~$t$ (and, maybe, some other values) that, by
+precondition, is an MVCNset.  Then take a name~$v$ that has a value~$d$ in~$t$.
+In sum, to reach~$d$ from~$s$, one has to dereference the name~$u$
+(obtaining~$t$) and then (in~$t$) dereference~$v$. Therefore, flattening should
+turn~$s$ into such an MVCNset~$r$, where~$d$ is a value of the name~$uv$.
 
 \begin{Df}\label{df:flatten}
 \emph{Flattening} is a unary operation
 $\flatten : \setmvcn{V}{\setmvcn{V}{D}} \to\setmvcn{V}{D}$,
-such that, for any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
+such that, for any $(V,\setmvcn{V}{D})$-MVCNset~$s$,
 \[
-  \flatten(p) = \{ (uv, d) \mid (u, q) \in p, (v, d) \in q \} .
+  \flatten(s) = \{ (uv, d) \mid (u, t) \in s, (v, d) \in t \} .
 \]
 \end{Df}
 
 \begin{Ex}\label{ex:flatten}
 Let
 \begin{eqnarray*}
-  q_1 & = & \{ (\varepsilon, 0), (a, 1) \} ,\\
-  q_2 & = & \{ (a, 2), (aa, 3) \} ,\\
-  q_3 & = & \{ (\varepsilon, 4), (a, 5) \} ,\\
-  p   & = & \{ (\varepsilon, q_1), (\varepsilon, q_2), (a, q_3) \} .\\
+  t_1 & = & \{ (\varepsilon, 0), (a, 1) \} ,\\
+  t_2 & = & \{ (a, 2), (aa, 3) \} ,\\
+  t_3 & = & \{ (\varepsilon, 4), (a, 5) \} ,\\
+  s   & = & \{ (\varepsilon, t_1), (\varepsilon, t_2), (a, t_3) \} .\\
 \end{eqnarray*}
 Then
 \[
-  \flatten(p) = \{
+  \flatten(s) = \{
       (\varepsilon, 0), (a, 1), (a, 2), (a, 4), (aa, 3), (aa, 5)
   \} .
 \]
-The empty name~$\varepsilon$ has two values in~$p$, namely~$q_1$ and~$q_2$.
-In~$q_1$, in its turn, the only value of~$\varepsilon$ is~0, whereas in~$q_2$
+The empty name~$\varepsilon$ has two values in~$s$, namely~$t_1$ and~$t_2$.
+In~$t_1$, in its turn, the only value of~$\varepsilon$ is~0, whereas in~$t_2$
 it does not have any value. Therefore, 0~is the only value of $\varepsilon
-\varepsilon = \varepsilon$ in~$\flatten(p)$.  The name~$a$ has one value in~$q_1$
-and one value in~$q_2$, it is~1 and~2, respectively.  Then $a = \varepsilon a$
-has values~1 and~2 in $\flatten(p)$.  The name~$a$ in~$p$ has a value~$q_3$
+\varepsilon = \varepsilon$ in~$\flatten(s)$.  The name~$a$ has one value in~$t_1$
+and one value in~$t_2$, it is~1 and~2, respectively.  Then $a = \varepsilon a$
+has values~1 and~2 in $\flatten(s)$.  The name~$a$ in~$s$ has a value~$t_3$
 where the empty name's value is~4. Thus, 4~is also a value of $a \varepsilon =
-a$ in~$\flatten(p)$.
+a$ in~$\flatten(s)$.
 
-Now look at the name~$aa$. Its value~3 is inherited from~$q_2$. Except this,
-name~$a$ in~$p$ has a valaue~$q_3$ that, in its turn, contains a name~$a$ with
-a value~5. Hence, the name~$aa$ has in $\flatten(p)$ the second value~5.
+Now look at the name~$aa$. Its value~3 is inherited from~$t_2$. Except this,
+name~$a$ in~$s$ has a valaue~$t_3$ that, in its turn, contains a name~$a$ with
+a value~5. Hence, the name~$aa$ has in $\flatten(s)$ the second value~5.
 \end{Ex}
 
 The following property can be used to define flattening for multitries~--
 in terms of dereferencing operation.
 \begin{St}\label{st:deref-flatten}
-For any $(V,\setmvcn{V}{D})$-MVCNset~$p$,
+For any $(V,\setmvcn{V}{D})$-MVCNset~$s$,
 \[
-  \deref(\flatten(p), w) =
+  \deref(\flatten(s), w) =
       \bigcup_{u,v\in V^\ast: uv = w}
-        \deref(\deref(p, u), v) .
+        \deref(\deref(s, u), v) .
 \]
 \end{St}
 
@@ -838,9 +837,9 @@ Let $f : D \to D'$. Then $\fmap$ operation turns it into a \emph{mapping
 function} $\fmap_{\setcharmvcn} f : \setmvcn{V}{D} \to \setmvcn{V}{D'}$, such
 that
 \[
-  (\fmap_{\setcharmvcn} f)(p) = \{ (v, f(d)) \mid (v, d) \in p \}
+  (\fmap_{\setcharmvcn} f)(s) = \{ (v, f(d)) \mid (v, d) \in s \}
 \]
-for any $p \in \setmvcn{V}{D}$.
+for any $s \in \setmvcn{V}{D}$.
 \end{Df}
 
 The definition of mapping for multitries is straightforward, it can be easily
@@ -858,9 +857,9 @@ $\id_X(x) = x$ for any $x\in X$, then
 
 \begin{St}\label{st:map-distributivity}
 Mapping function distributes over set-theoretical operations.
-Let $f: D \to D'$, $p, q \in \setmvcn{V}{D}$, $\odot \in \{\cup, \cap \}$. Then
+Let $f: D \to D'$, $s, t \in \setmvcn{V}{D}$, $\odot \in \{\cup, \cap \}$. Then
 \[
-  (\fmap f) (p \odot q) = (\fmap f)(p) \odot (\fmap f)(q) .
+  (\fmap f) (s \odot t) = (\fmap f)(s) \odot (\fmap f)(t) .
 \]
 \end{St}
 
@@ -892,18 +891,18 @@ Then the reverse mapping operation gets a concise definition.
 \]
 such that
 \[
-  (\fpam p)(d) = (\fmap (\ylppa d))(p) .
+  (\fpam s)(d) = (\fmap (\ylppa d))(s) .
 \]
-for any $p\in \setmvcn{V}{D \to D'}$, $d\in D$.
+for any $s\in \setmvcn{V}{D \to D'}$, $d\in D$.
 \end{Df}
 
 It is easy to see from the definitions of $\fmap$ and $\ylppa$ that $\fpam$
 really does what was intended:
 
 \begin{St}\label{st:mvcn-pam}
-If $p$ is a $(V, D\to D')$-MVCNset, $d\in D$,
+If $s$ is a $(V, D\to D')$-MVCNset, $d\in D$,
 \[
-  (\fpam p)(d) = \{ (v, f(d)) \mid (v, f) \in p \} .
+  (\fpam s)(d) = \{ (v, f(d)) \mid (v, f) \in s \} .
 \]
 \end{St}
 
@@ -911,9 +910,9 @@ Since reverse mapping is defined as a special case of mapping, it inherits
 distributivity, see st.~\ref{st:map-distributivity}.
 
 \begin{St}\label{st:pam-distributivity}
-Let $d\in D$, $p, q \in \setmvcn{V}{D \to D'}$, $\odot \in \{\cup, \cap \}$. Then
+Let $d\in D$, $s, t \in \setmvcn{V}{D \to D'}$, $\odot \in \{\cup, \cap \}$. Then
 \[
-  (\fpam (p \odot q))(d) = (\fpam p)(d) \odot (\fpam q)(d) .
+  (\fpam (s \odot t))(d) = (\fpam s)(d) \odot (\fpam t)(d) .
 \]
 \end{St}
 
@@ -946,9 +945,9 @@ Then \emph{cartesian application} is an operation of type
 \]
 such that
 \[
-  \apply_{\setcharmvcn}^{\times} (p, q) = (\fmap \eval) (p \times q)
+  \apply_{\setcharmvcn}^{\times} (s, t) = (\fmap \eval) (s \times t)
 \]
-for any~$p$ and~$q$ of matching types.
+for any~$s$ and~$t$ of matching types.
 \end{Df}
 
 Recalling the definitions of cartesian product and evaluation, one can
@@ -957,15 +956,15 @@ for a definition, in which case def.~\ref{df:mvcn-apply-cartesian} would turn
 into a theorem).
  
 \begin{St}\label{st:mvcn-apply-cartesian}
-If $p\in \setmvcn{V}{D\to D'}$, $q\in \setmvcn{V}{D}$,
+If $s\in \setmvcn{V}{D\to D'}$, $t\in \setmvcn{V}{D}$,
 \[
-  \apply_{\setcharmvcn}^{\times} (p, q) =
-    \{ (uv, f(d)) \mid (u,f) \in p, (v,d) \in q \} .
+  \apply_{\setcharmvcn}^{\times} (s, t) =
+    \{ (uv, f(d)) \mid (u,f) \in s, (v,d) \in t \} .
 \]
 \end{St}
 
-Therefore, for every function~$f$ contained in~$p$ under a compound name~$u$
-and every object~$d$ contained in~$q$ under a name~$v$, the resulting
+Therefore, for every function~$f$ contained in~$s$ under a compound name~$u$
+and every object~$d$ contained in~$t$ under a name~$v$, the resulting
 multitrie contains a value~$f(d)$ under a name~$uv$.
 
 Cartesian is not the only kind of application with an elegant definition and
@@ -978,29 +977,29 @@ $\apply_{\setcharmt}^{\odot}$, where $\odot \in \{\cup, \cap \}$, of type
 \[
   \setmt{V}{D\to D'} \times \setmt{V}{D} \to \setmt{V}{D'},
 \]
-such that (for any~$p = (s, f)$ and~$q = (t, g)$ of matching types)
+such that (for any~$s = (s, f)$ and~$t = (t, g)$ of matching types)
 \[
-  \apply_{\setcharmt}^{\odot} (p, q) = (a, b) ,
+  \apply_{\setcharmt}^{\odot} (s, t) = (a, b) ,
 \]
 where
 \begin{eqnarray*}
   & a      = \{ h(x) \mid h \in s, x \in t \} , \\
   & b      = \{ v \mapsto b_1(v) \odot b_2(v) \mid v \in V \}, \\
-  & b_1(v) = \apply_{\setcharmt}^{\odot}(p, g(v)), \\
-  & b_2(v) = \apply_{\setcharmt}^{\odot}(f(v), q) .
+  & b_1(v) = \apply_{\setcharmt}^{\odot}(s, g(v)), \\
+  & b_2(v) = \apply_{\setcharmt}^{\odot}(f(v), t) .
 \end{eqnarray*}
 \end{Df}
 
-In other words, to build a uniting or intersecting application of~$p$ to~$q$,
+In other words, to build a uniting or intersecting application of~$s$ to~$t$,
 one should
 \begin{itemize}
-\item apply every function from the root node of~$p$ to every value from
-the root node of~$q$, let the result be~$a$;
+\item apply every function from the root node of~$s$ to every value from
+the root node of~$t$, let the result be~$a$;
 \item for every atomic name~$v\in V$, apply (in the sense that is being
-described by this list) the entire multitrie~$p$ of
-functions to the $v$-child of the multitrie~$q$ of values~-- let~$b_1(v)$ be
+described by this list) the entire multitrie~$s$ of
+functions to the $v$-child of the multitrie~$t$ of values~-- let~$b_1(v)$ be
 the result;
-\item do the same with the $v$-child of~$p$ and the entire~$q$, let the result
+\item do the same with the $v$-child of~$s$ and the entire~$t$, let the result
 be~$b_2(v)$;
 \item merge $b_1(v)$ and $b_2(v)$ with the respective multitrie operation
 (union or intersection), let $b_1(v)\odot b_2(v) = b(v)$;
@@ -1012,18 +1011,18 @@ Let us introduce infix aliases for the application operations to make
 formulation of their properties more elegant (here and below~$\oplus$ means any
 of~$\cup$, $\cap$ or~$\times$):
 \[
-  p \inapply{\oplus} q = \apply^{\oplus} (p, q) .
+  s \inapply{\oplus} t = \apply^{\oplus} (s, t) .
 \]
 
 \begin{St}\label{st:apply-distr}
 Application operations distribute over set-theoretical operations.
-For any~$p, p_1, p_2, q, q_1, q_2$ of matching types,
+For any~$s, s_1, s_2, t, t_1, t_2$ of matching types,
 for $\odot \in \{\cup, \cap \}$ and $\oplus \in \{\cup, \cap, \times \}$,
 \begin{eqnarray*}
-  (p_1 \odot p_2) \inapply{\oplus} q =
-    (p_1 \inapply{\oplus} q) \odot (p_2 \inapply{\oplus} q) , \\
-  p \inapply{\oplus} (q_1 \odot q_2) =
-    (p \inapply{\oplus} q_1) \odot (p \inapply{\oplus} q_2) .
+  (s_1 \odot s_2) \inapply{\oplus} t =
+    (s_1 \inapply{\oplus} t) \odot (s_2 \inapply{\oplus} t) , \\
+  s \inapply{\oplus} (t_1 \odot t_2) =
+    (s \inapply{\oplus} t_1) \odot (s \inapply{\oplus} t_2) .
 \end{eqnarray*}
 \end{St}
 
