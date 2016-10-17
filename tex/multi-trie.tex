@@ -229,6 +229,11 @@ Let $\proj{n}{k}$ be a function that maps an $n$-tuple to its $k$-th component.
 A set of Latin letters (the alphabet) is denoted as~$\seta$,
 and~$\setn$ will denote a set of natural numbers~-- these two sets will be
 used in examples.
+
+Throughout this paper, a class of atomic names is denoted with~$V$. The
+variable~$u$ (maybe, with indices or other decorations) always takes values
+in~$V$, whereas $v$ and $w$ take values from~$V^\ast$.
+
 Some more notations will be introduced later, immediately before they are used.
 
 
@@ -333,14 +338,14 @@ $(V,D)$-MVCNsets. Then, for every~$v\in V^\ast$,
 \]
 \end{St}
 
-The following important property means, in fact, that any MVCNset is completely
+The following important property means, in fact, that every MVCNset is completely
 defined by the values of all its names.  In terms of programming, it means that
 if two MVCNset objects' behaviours (observed through the $\deref$ selector) are
 indiscernible, the objects are identical.
 \begin{St}\label{st:mvcn-deref-equality}
 Let $s, t \in \setmvcn{V}{D}$. Then
 \[
-  (\forall u\in V^\ast . \deref(s,u) = \deref(t,u)) \implies (s = t) .
+  (\forall v\in V^\ast . \deref(s,v) = \deref(t,v)) \implies (s = t) .
 \]
 \end{St}
 
@@ -352,15 +357,15 @@ Thus, it is similar to assignment in the sense of imperative programming.
 \begin{eqnarray*}
  & \putval_\setcharmvcn :
     \setmvcn{V}{D} \times V^\ast \times 2^D \to \setmvcn{V}{D}, \\
- & \putval_\setcharmvcn(s, u, s) =
-      \{ (v, x) \mid (v, x) \in s, v \neq u \} \cup
-      \{ (u, y) \mid y \in s \} .
+ & \putval_\setcharmvcn(s, v, x) =
+      \{ (w, d) \mid (w, d) \in x, w \neq v \} \cup
+      \{ (d, y) \mid d \in x \} .
 \end{eqnarray*}
 The subscript will be omitted further whenever possible.
 \end{Df}
 In other words, this operation deletes from~$s$ all values corresponding to
-the name~$u$, leaves all other name-value pairs intact and assigns new values
-to~$u$.
+the name~$v$, leaves all other name-value pairs intact and assigns new values
+to~$v$.
 
 \begin{Ex}\label{ex:mvcn-replace}
 Let~$s$ be an MVCNset from ex.~\ref{ex:mvcn}. Then
@@ -383,12 +388,12 @@ definition: it changes the values of one name and does not influence the other
 names. Except this, two replacement operations commute if they
 relate to different names, otherwise the outer operation absorbs the inner one.
 \begin{St}\label{st:mvcn-replace-deref}
-Let~$s \in \setmvcn{V}{D}$, $u, v \in V^\ast$, $s, t \in 2^D$. Then
+Let~$s \in \setmvcn{V}{D}$, $v, w \in V^\ast$, $x, y \in 2^D$. Then
 \begin{eqnarray*}
-  & \deref(\putval(s, u, s), u) = s , \\
-  & u \neq v \implies \deref(\putval(s, u, s), v) = \deref(s, v) , \\
-  & \putval(\putval(s, u, s), u, t) = \putval(s, u, t) , \\
-  & u \neq v \implies \putval(\putval(s, u, s), v, t) = \putval(\putval(s, v, t), u, s) .
+  & \deref(\putval(s, v, x), v) = x , \\
+  & v \neq w \implies \deref(\putval(s, v, x), w) = \deref(s, w) , \\
+  & \putval(\putval(s, v, x), v, y) = \putval(s, v, y) , \\
+  & v \neq w \implies \putval(\putval(s, v, x), w, y) = \putval(\putval(s, w, y), v, x) .
 \end{eqnarray*}
 \end{St}
 
@@ -461,13 +466,13 @@ Let~$s$ be an MVCNset from ex.~\ref{ex:mvcn}, then
 \end{Ex}
 
 \begin{St}\label{st:mvcn-selection-properties}
-For any~$s,t\in\setmvcn{V}{D}$, $u, v\in V^\ast$, $\odot\in\{\cup, \cap\}$,
+For any~$s,t\in\setmvcn{V}{D}$, $v, w\in V^\ast$, $\odot\in\{\cup, \cap\}$,
 \begin{eqnarray*}
-  & \select(\bot,u) = \bot, \\
-  & \select(\top,u) = \top, \\
+  & \select(\bot,v) = \bot, \\
+  & \select(\top,v) = \top, \\
   & \select(s,\varepsilon) = s, \\
-  & \select(s,uv) = \select(\select(s,u), v), \\
-  & \select(s\odot t, u) = \select(s,u)\odot \select(t,u).
+  & \select(s,vw) = \select(\select(s,v), w), \\
+  & \select(s\odot t, v) = \select(s,v)\odot \select(t,v).
 \end{eqnarray*}
 \end{St}
 In other words,
@@ -488,8 +493,8 @@ is described in the next section.
 
 Take a closer look at the MVCNset~$s$ from ex.~\ref{ex:mvcn}.
 Recall the
-idea underlying selection operation: any name~$u$ identifies a bunch of
-names that have~$u$ as its common prefix. Except this, take into account that
+idea underlying selection operation: any name~$v$ identifies a bunch of
+names that have~$v$ as its common prefix. Except this, take into account that
 the empty name~$\varepsilon$ is a common prefix for all names.
 
 The name~$\varepsilon$, the simplest name ever, refers in~$s$ to a set of
@@ -541,6 +546,8 @@ and~$D$ are known from the context or irrelevant):
   \setmt{V}{D} = 2^D \times (V \to \setmt{V}{D}) .
 \]
 \end{Df}
+
+%%% ===== stopped here =======
 
 In other words, a $(V,D)$-multitrie is a pair $s = (s, f)$ where~$s\subseteq D$
 is a set of values and a function $f: V \to \setmt{V}{D}$ is a total mapping of
