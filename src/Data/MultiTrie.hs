@@ -389,7 +389,7 @@ apply :: Ord v =>
     MultiTrie v (d1 -> d2) ->
     MultiTrie v d1 ->
     MultiTrie v d2
-apply t1 t2 = flatten $ map (`map` t2) t1
+apply t1 t2 = flatten $ map ((flip map) t2) t1
 
 -- | Given a 'MultiTrie' @t@ of values and a function @f@ that maps an arbitrary
 -- value to a 'MultiTrie', apply the function @f@ to each value from @t@ and
