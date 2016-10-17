@@ -398,7 +398,7 @@ bind :: Ord v =>
     MultiTrie v d1 ->
     (d1 -> MultiTrie v d2) ->
     MultiTrie v d2
-bind t f = flatten $ map f t
+bind = flatten .: (flip map)
 
 -- | Convert a 'MultiTrie' @t@ to a `Data.Map` of compound names into value
 -- lists.
