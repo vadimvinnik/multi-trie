@@ -53,7 +53,7 @@
 \newcommand{\ylppa}{\operatorname{Ylppa}}
 \newcommand{\eval}{\operatorname{Eval}}
 
-\newcommand{\inapply}[1]{\stackbin{#1}{\nabla}}
+\newcommand{\inapply}{\mathbin{\nabla}}
 
 
 
@@ -284,7 +284,7 @@ names from~$\seta^\ast$ have no values.
 
 Note that, in contrast with naming sets, no special conditions are imposed
 on an MVCNset~--- it is just an arbitrary set of name-value pairs.
-Therefore, $\setmvcn{V}{D}$ is closed against set-theoretical union
+Therefore, $\setmvcn{V}{D}$ is closed against set-theore\-tical union
 and intersection.
 \begin{St}\label{st:mvcn-setop}
 If~$s$ and~$t$ are $(V,D)$-MVCNsets, so are~$s\cup t$ and~$s\cap t$.
@@ -329,7 +329,7 @@ Consider an MVCNset~$s$ from ex.~\ref{ex:mvcn}. Then
 \end{Ex}
 
 It follows immediately from the definition that dereferencing distributes
-over set-theoretical operations.
+over set-theore\-tical operations.
 \begin{St}\label{st:mvcn-deref-distributivity}
 Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$s$ and~$t$ be
 $(V,D)$-MVCNsets. Then, for every~$v\in V^\ast$,
@@ -547,13 +547,11 @@ and~$D$ are known from the context or irrelevant):
 \]
 \end{Df}
 
-%%% ===== stopped here =======
-
-In other words, a $(V,D)$-multitrie is a pair $s = (s, f)$ where~$s\subseteq D$
-is a set of values and a function $f: V \to \setmt{V}{D}$ is a total mapping of
+In other words, a $(V,D)$-multitrie is a pair $s = (x, m)$ where~$x\subseteq D$
+is a set of values and $m: V \to \setmt{V}{D}$ is a total mapping of
 atomic names to some $(V,D)$-multitries. Note that this recursive definition does
 not have any basic case: every multitrie contains child multitries
-under all atomic names, there are no leaf nodes.
+under all atomic names, hence there are no leaf nodes.
 Depicting multitries graphically, as on fig.~\ref{fig:trie}, we will however
 only draw nodes of interest assuning that all other nodes have empty sets of
 values.  Note that a $(V,D)$-multitrie is a \emph{trie} also known as
@@ -564,9 +562,9 @@ Extreme multitries have the following recurrent definitions.
 \emph{Empty} and \emph{full} $(V,D)$-multitries:
 \begin{eqnarray*}
   \bot_\setcharmt & = &
-      ( \varnothing, \{ v \mapsto \bot_\setcharmt \mid v\in V \} ) , \\
+      ( \varnothing, \{ u \mapsto \bot_\setcharmt \mid u\in V \} ) , \\
   \top_\setcharmt & = &
-      ( D,           \{ v \mapsto \top_\setcharmt \mid v\in V \} ) .
+      ( D,           \{ u \mapsto \top_\setcharmt \mid u\in V \} ) .
 \end{eqnarray*}
 Subscripts will be further omited whenever possible.
 \end{Df}
@@ -575,11 +573,11 @@ In other words, empty (full) multitrie is a multitrie that has an empty
 turn, empty (full) multitries.
 
 \begin{Df}\label{df:mt-select}
-\emph{Selection} operation. Let $s=(s,f) \in \setmt{V}{D}$, $u\in V$,
+\emph{Selection} operation. Let $s=(x,m) \in \setmt{V}{D}$, $u\in V$,
 $v\in V^\ast$, then
 \begin{eqnarray*}
   \select_\setcharmt(s, \varepsilon) & = & s , \\
-  \select_\setcharmt(s, u v) & = & \select_\setcharmt(f(u), v) .
+  \select_\setcharmt(s, u v) & = & \select_\setcharmt(m(u), v) .
 \end{eqnarray*}
 Subscripts will be omited if possible.
 \end{Df}
@@ -616,24 +614,25 @@ of~$v$ in~$s$ is
 As always, we'll not write the subscript if it is obvious from the context.
 \end{Df}
 
-In other words, if $\select(s,v) = (s,f)$, then $\deref(s, v) = s$. To
+In other words, if $\select(s,v) = (x,m)$, then $\deref(s, v) = x$. To
 dereference a name in a multitrie, one needs to follow the compound name
 as a path to a node in the trie and then take the value stored in that node.
 
 \begin{Df}\label{df:mt-setop}
 \emph{Union} and \emph{intersection}.
-Let $\odot \in \{ \cup, \cap \}$, $s, t \in \setmt{V}{D}$,
-$s = (s, f)$, $t = (t, g)$. Then
+Let
+$\odot \in \{ \cup, \cap \}$,
+$s, t \in \setmt{V}{D}$,
+$s = (x, m)$, $t = (y, n)$.
+Then
 \[
-  s \odot_\setcharmt  t = (s \odot t, f \odot g) ,
+  s \odot_\setcharmt  t =
+    (x \odot y, \{ u \mapsto m(u) \odot n(u) \mid u \in V \}) .
 \]
-where~$h = f \odot g$ is such a function that
-$h(v) = f(v) \odot_\setcharmt  g(v)$,
-for any~$v \in V$.
+\end{Df}
 Note that subscripts in this definition help to distinguish between
 set-theoretical operations on sets of values and corresponding operations
 on multitries.
-\end{Df}
 
 In other words, to build $r = s \cup t$, one needs to go through all compound
 names and, for each name, build a union of the value sets contained in the
@@ -649,13 +648,16 @@ operations, the most natural way of defining it is recursive.
   \putval_\setcharmt : \setmt{V}{D} \times V^\ast \times 2^D \to \setmt{V}{D},
 \]
 such that, for any
-$s = (s, f) \in \setmt{V}{D}$, $t \in 2^D$, $u \in V$, $v \in V^\ast$,
+$s = (x, m) \in \setmt{V}{D}$, $y \in 2^D$, $u \in V$, $v \in V^\ast$,
 \begin{eqnarray*}
-  \putval_\setcharmt(s, \varepsilon, t) & = & (t, f) , \\
-  \putval_\setcharmt(s, u v, t) & = & (s, f') ,
+  \putval_\setcharmt(s, \varepsilon, t) & = & (y, m) , \\
+  \putval_\setcharmt(s, u v, y) & = & (x, m') ,
 \end{eqnarray*}
-where $f' : V \to \setmt{V}{D}$ is such a function that $f'(w) = f(w)$ for any
-$w\neq u$, and $f'(u) = \putval_\setcharmt(f(u), v, t)$.
+where $m' : V \to \setmt{V}{D}$ is such a function that $m'(u') = m(u')$ for any
+$u'\neq u$, and
+\[
+  m'(u) = \putval_\setcharmt(m(u), v, y) .
+\]
 The subscript after the operation will be omited whenever it does not lead to
 confusion.
 \end{Df}
@@ -675,7 +677,7 @@ st.~\ref{st:mvcn-deref-distributivity},
 \ref{st:mvcn-neutrals}
 and~\ref{st:mvcn-selection-properties}.
 Moreover, all properties of MVCNsets and multitries are identical because
-of the following.
+of the following property.
 
 \begin{St}\label{st:isomorph}
 Consider a mapping~$\varphi: \setmvcn{V}{D} \to \setmt{V}{D}$, such that,
@@ -720,30 +722,30 @@ more complicated operations.
 
 Before giving a formal definition for a cartesian product of namings, let us
 informally describe how should an operation look like to deserve this name.
-Let~$s$ and~$t$ be two MVCNsets. Their cartesian product should consist of
-values of the form~$(d',d'')$ where $d'$~is a value from~$s$ and $d''$~is taken
-from~$t$. But these values are attached to some names~-- say, $u$~and~$v$,
+Let~$s'$ and~$s''$ be two MVCNsets. Their cartesian product should consist of
+values of the form~$(d',d'')$ where $d'$~is a value from~$s'$ and $d''$~is taken
+from~$s''$. But these values are attached to some names~-- say, $v'$~and~$v''$,
 respectively.  Therefore, the resulting product MVCNset should contain the
-combined value~$(d',d'')$ under a name combined from~$u$ and $v$, and the only
+combined value~$(d',d'')$ under a name combined from~$v'$ and $v''$, and the only
 combining operation defined for names is concatenation.
 
 \begin{Df}\label{df:mvcn-cartesian}
-Let~$s$ and~$t$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
+Let~$s'$ and~$s''$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
 \emph{cartesian product} is a $(V,D'\times D'')$-MVCNset
 \[
-  s\times t = \{ (uv, (d',d'')) \mid (u,d')\in s, (v,d'')\in t \} .
+  s'\times s'' = \{ (v'\cdot v'', (d',d'')) \mid (v',d')\in s', (v'',d'')\in s'' \} .
 \]
 \end{Df}
 
 \begin{Ex}\label{ex:cartesian}
 Consider the following MVCNsets:
 \begin{eqnarray*}
-  s & = & \{ (\varepsilon, 0), (a, 1), (a, 2) \} , \\
-  t & = & \{ (\varepsilon, 3), (\varepsilon, 4), (b, 5) \} .
+  s'  & = & \{ (\varepsilon, 0), (a, 1), (a, 2) \} , \\
+  s'' & = & \{ (\varepsilon, 3), (\varepsilon, 4), (b, 5) \} .
 \end{eqnarray*}
 Then their cartesian product is
 \begin{eqnarray*}
-  s \times t & = &  \{ (\varepsilon, (0, 3)), (\varepsilon, (0, 4)) \} \cup \\
+  s' \times s'' & = &  \{ (\varepsilon, (0, 3)), (\varepsilon, (0, 4)) \} \cup \\
     & \cup & \{ (b, (0, 5)) \} \cup \\
     & \cup & \{ (a, (1, 3)), (a, (1, 4)), (a, (2, 3)), (a, (2, 4)) \} \cup \\
     & \cup & \{ (ab, (1, 5)), (ab, (2, 5)) \} .
@@ -752,20 +754,21 @@ Then their cartesian product is
 
 \begin{St}\label{st:cartesian-distributivity}
 Obviously,~$\times$ distributes over $\cap$ and $\cup$.
-For any $s \in \setmvcn{V}{D'}$ and $t, r \in \setmvcn{V}{D''}$,
+For any $s' \in \setmvcn{V}{D'}$ and $s''_1, s''_2 \in \setmvcn{V}{D''}$,
 \[
-  s\times(t\odot r) = (s\times t) \odot (s\times r) .
+  s'\times(s''_1\odot s''_2) = (s'\times s''_1) \odot (s'\times s''_2) .
 \]
+The same holds for the left operand.
 \end{St}
 
 \begin{St}\label{st:deref-cartesian}
-For any $s \in \setmvcn{V}{D'}$ and $t \in \setmvcn{V}{D''}$,
+For any $s' \in \setmvcn{V}{D'}$ and $s'' \in \setmvcn{V}{D''}$,
 \[
-  \deref(s \times t, w) =
-      \bigcup_{u,v\in V^\ast: uv = w}
-          \deref(s, u)
+  \deref(s' \times s'', w) =
+      \bigcup_{v',v''\in V^\ast: v'\cdot v'' = w}
+          \deref(s', v')
           \times
-          \deref(t, v) .
+          \deref(s'', v'') .
 \]
 \end{St}
 
@@ -776,18 +779,18 @@ property may be taken as a definition of cartesian product for multitries.
 
 Consider an MVCNset~$s$ whose values are, in their turn, MVCNsets.  Flattening
 operation formally defined below turns it into a ``plain'' MVCNset.  Supose a
-name~$u$ in~$s$ has a value~$t$ (and, maybe, some other values) that, by
-precondition, is an MVCNset.  Then take a name~$v$ that has a value~$d$ in~$t$.
-In sum, to reach~$d$ from~$s$, one has to dereference the name~$u$
-(obtaining~$t$) and then (in~$t$) dereference~$v$. Therefore, flattening should
-turn~$s$ into such an MVCNset~$r$, where~$d$ is a value of the name~$uv$.
+name~$v$ in~$s$ has a value~$t$ (and, maybe, some other values) that, by
+precondition, is an MVCNset.  Then take a name~$w$ that has a value~$d$ in~$t$.
+In sum, to reach~$d$ from~$s$, one has to dereference the name~$v$
+(obtaining~$t$) and then (in~$t$) dereference~$w$. Therefore, flattening should
+turn~$s$ into such an MVCNset~$r$, where~$d$ is a value of the name~$vw$.
 
 \begin{Df}\label{df:flatten}
 \emph{Flattening} is a unary operation
 $\flatten : \setmvcn{V}{\setmvcn{V}{D}} \to\setmvcn{V}{D}$,
 such that, for any $(V,\setmvcn{V}{D})$-MVCNset~$s$,
 \[
-  \flatten(s) = \{ (uv, d) \mid (u, t) \in s, (v, d) \in t \} .
+  \flatten(s) = \{ (vw, d) \mid (v, t) \in s, (w, d) \in t \} .
 \]
 \end{Df}
 
@@ -825,8 +828,8 @@ in terms of dereferencing operation.
 For any $(V,\setmvcn{V}{D})$-MVCNset~$s$,
 \[
   \deref(\flatten(s), w) =
-      \bigcup_{u,v\in V^\ast: uv = w}
-        \deref(\deref(s, u), v) .
+      \bigcup_{v,v'\in V^\ast: v\cdot v' = w}
+        \deref(\deref(s, v), v') .
 \]
 \end{St}
 
@@ -853,12 +856,12 @@ The definition of mapping for multitries is straightforward, it can be easily
 obtained from isomorphism. The following properties hold:
 
 \begin{St}\label{st:map-properties}
-If $\circ$ is a composition of unary functions, i.e. $(f\circ g)(x) = f(g(x))$ for
+If $\circ$ is a composition of unary functions, i.e. $(g\circ f)(x) = g(f(x))$ for
 all $f$, $g$, $x$ of matching types, and $\id_X : X \to X$ is an identity function,
 $\id_X(x) = x$ for any $x\in X$, then
 \begin{eqnarray*}
   & \fmap \id_D = \id_{\setmvcn{V}{D}} , \\
-  & \fmap (f \circ g) = (\fmap f) \circ (\fmap g) .
+  & \fmap (g \circ f) = (\fmap g) \circ (\fmap f) .
 \end{eqnarray*}
 \end{St}
 
@@ -966,72 +969,36 @@ into a theorem).
 If $s\in \setmvcn{V}{D\to D'}$, $t\in \setmvcn{V}{D}$,
 \[
   \apply_{\setcharmvcn}^{\times} (s, t) =
-    \{ (uv, f(d)) \mid (u,f) \in s, (v,d) \in t \} .
+    \{ (vw, f(d)) \mid (v,f) \in s, (w,d) \in t \} .
 \]
 \end{St}
 
-Therefore, for every function~$f$ contained in~$s$ under a compound name~$u$
-and every object~$d$ contained in~$t$ under a name~$v$, the resulting
-multitrie contains a value~$f(d)$ under a name~$uv$.
+Therefore, for every function~$f$ contained in~$s$ under a compound name~$v$
+and every object~$d$ contained in~$t$ under a name~$w$, the resulting
+multitrie contains a value~$f(d)$ under a name~$vw$.
 
 Cartesian is not the only kind of application with an elegant definition and
 interesting properties.  The following two application operations are
 easier to define in terms of multitries.
 
-\begin{Df}\label{df:mt-apply-setop}
-\emph{Uniting} and \emph{intersecting application} are operations
-$\apply_{\setcharmt}^{\odot}$, where $\odot \in \{\cup, \cap \}$, of type
+Let us introduce an infix alias for the cartesian application operation to make
+formulation of its properties more elegant:
 \[
-  \setmt{V}{D\to D'} \times \setmt{V}{D} \to \setmt{V}{D'},
-\]
-such that (for any~$s = (s, f)$ and~$t = (t, g)$ of matching types)
-\[
-  \apply_{\setcharmt}^{\odot} (s, t) = (a, b) ,
-\]
-where
-\begin{eqnarray*}
-  & a      = \{ h(x) \mid h \in s, x \in t \} , \\
-  & b      = \{ v \mapsto b_1(v) \odot b_2(v) \mid v \in V \}, \\
-  & b_1(v) = \apply_{\setcharmt}^{\odot}(s, g(v)), \\
-  & b_2(v) = \apply_{\setcharmt}^{\odot}(f(v), t) .
-\end{eqnarray*}
-\end{Df}
-
-In other words, to build a uniting or intersecting application of~$s$ to~$t$,
-one should
-\begin{itemize}
-\item apply every function from the root node of~$s$ to every value from
-the root node of~$t$, let the result be~$a$;
-\item for every atomic name~$v\in V$, apply (in the sense that is being
-described by this list) the entire multitrie~$s$ of
-functions to the $v$-child of the multitrie~$t$ of values~-- let~$b_1(v)$ be
-the result;
-\item do the same with the $v$-child of~$s$ and the entire~$t$, let the result
-be~$b_2(v)$;
-\item merge $b_1(v)$ and $b_2(v)$ with the respective multitrie operation
-(union or intersection), let $b_1(v)\odot b_2(v) = b(v)$;
-\item compose the resulting multitrie from the set~$a$ of root values and a
-name-to-child mapping~$b$.
-\end{itemize}
-
-Let us introduce infix aliases for the application operations to make
-formulation of their properties more elegant (here and below~$\oplus$ means any
-of~$\cup$, $\cap$ or~$\times$):
-\[
-  s \inapply{\oplus} t = \apply^{\oplus} (s, t) .
+  s \inapply t = \apply^{\times} (s, t) .
 \]
 
 \begin{St}\label{st:apply-distr}
-Application operations distribute over set-theoretical operations.
+Cartesian application distributes over set-theoretical operations.
 For any~$s, s_1, s_2, t, t_1, t_2$ of matching types,
-for $\odot \in \{\cup, \cap \}$ and $\oplus \in \{\cup, \cap, \times \}$,
+for $\odot \in \{\cup, \cap \}$,
 \begin{eqnarray*}
-  (s_1 \odot s_2) \inapply{\oplus} t =
-    (s_1 \inapply{\oplus} t) \odot (s_2 \inapply{\oplus} t) , \\
-  s \inapply{\oplus} (t_1 \odot t_2) =
-    (s \inapply{\oplus} t_1) \odot (s \inapply{\oplus} t_2) .
+  (s_1 \odot s_2) \inapply t =
+    (s_1 \inapply t) \odot (s_2 \inapply t) , \\
+  s \inapply (t_1 \odot t_2) =
+    (s \inapply t_1) \odot (s \inapply t_2) .
 \end{eqnarray*}
 \end{St}
+
 
 \section{Notes about implementation}
 
@@ -1078,41 +1045,49 @@ All this leads to the following basic definition (indeed, the module hides it
 behind smart constructors).
 
 \begin{lstlisting}
-type MultiTrieMap n v = M.Map n (MultiTrie n v) 
-data MultiTrie n v = MultiTrie {
-        values :: [v],
-        children :: MultiTrieMap n v }
+type MultiTrieMap v d = M.Map v (MultiTrie v d) 
+data MultiTrie v d = MultiTrie {
+        values :: [d],
+        children :: MultiTrieMap v d }
 \end{lstlisting}
 
 The most important functions defined in the module are listed below.
 
 \begin{lstlisting}
-empty :: MultiTrie n v
-top :: (Ord n, Bounded n, Enum n, Bounded v, Enum v) =>
-    MultiTrie n v
-leaf :: [v] -> MultiTrie n v
-addValue :: v -> MultiTrie n v -> MultiTrie n v
-values :: MultiTrie n v -> [v]
-children :: MultiTrie n v -> MultiTrieMap n v
-null :: MultiTrie n v -> Bool
-size :: MultiTrie n v -> Int
-isEqualStrict :: (Ord n, Eq v) =>
-    MultiTrie n v -> MultiTrie n v -> Bool
-subnode :: Ord n => [n] -> MultiTrie n v -> MultiTrie n v
-mtmap :: Ord n => (v -> w) -> MultiTrie n v -> MultiTrie n w
-cartesianProduct :: Ord n =>
-    MultiTrie n v -> MultiTrie n w -> MultiTrie n (v, w)
-union :: Ord n =>
-    MultiTrie n v -> MultiTrie n v -> MultiTrie n v
-flatten :: Ord n =>
-    MultiTrie n (MultiTrie n v) -> MultiTrie n v
-applyCartesian :: Ord n =>
-    MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
-applyUniting :: Ord n =>
-    MultiTrie n (v -> w) -> MultiTrie n v -> MultiTrie n w
-toMap :: Ord n => MultiTrie n v -> Map [n] [v]
-toList :: Ord n => MultiTrie n v -> [([n], v)]
-fromList :: Ord n => [([n], v)] -> MultiTrie n v
+empty ::
+  MultiTrie v d
+leaf ::
+    [d] -> MultiTrie v d
+addValue ::
+    d -> MultiTrie v d -> MultiTrie v d
+values ::
+    MultiTrie v d -> [d]
+children ::
+    MultiTrie v d -> MultiTrieMap v d
+null ::
+    MultiTrie v d -> Bool
+size ::
+    MultiTrie v d -> Int
+isEqualStrict :: (Ord v, Eq d) =>
+    MultiTrie v d -> MultiTrie v d -> Bool
+subnode :: Ord v =>
+    [v] -> MultiTrie v d -> MultiTrie v d
+map :: Ord v =>
+    (d -> w) -> MultiTrie v d -> MultiTrie v w
+cartesian :: Ord v =>
+    MultiTrie v d -> MultiTrie v w -> MultiTrie v (d, w)
+union :: Ord v =>
+    MultiTrie v d -> MultiTrie v d -> MultiTrie v d
+flatten :: Ord v =>
+    MultiTrie v (MultiTrie v d) -> MultiTrie v d
+apply :: Ord v =>
+    MultiTrie v (d -> w) -> MultiTrie v d -> MultiTrie v w
+toMap :: Ord v =>
+    MultiTrie v d -> Map [v] [d]
+toList :: Ord v =>
+    MultiTrie v d -> [([v], d)]
+fromList :: Ord v =>
+    [([v], d)] -> MultiTrie v d
 \end{lstlisting}
 
 Here is a short explanation of their semantics.
@@ -1120,11 +1095,6 @@ Here is a short explanation of their semantics.
 \item [empty]
   A constant for the empty multitrie~$\bot$, see def.~\ref{df:mvcn-extreme}
   and~\ref{df:mt-extreme}.
-\item [top]
-  A constant for the full multitrie~$\bot$, see def.~\ref{df:mvcn-extreme}
-  and~\ref{df:mt-extreme}.  The long class constraint is needed because the
-  function must construct a (lazy) list of all names and a list of all possible
-  values.
 \item [leaf] Given a list of values, constructs a multitrie that has this list
   in its root node and no other valies (i.e. all other names yield to an empty
   list of values).
@@ -1152,13 +1122,13 @@ Here is a short explanation of their semantics.
   underlying data structure, the function anyway yields a correct value, the
   empty multitrie. This function implements selection operation from
   def.~\ref{df:mvcn-select} and~\ref{df:mt-select}.
-\item [mtmap]
+\item [map]
   Apply a function to each value in a multitrie and combine results into
   a new multitrie preserving the names (and, therefore, the trie structure),
   see def.~\ref{df:mvcn-map}.
   This is a specific implementation of the \lstinline{fmap} method from the
   \lstinline{Functor} class.
-\item [cartesianProduct]
+\item [cartesian]
   Construct a cartesian product of two multitries in the sense of
   def.~\ref{df:mvcn-cartesian} and st.~\ref{st:deref-cartesian}.
 \item [union]
@@ -1170,15 +1140,10 @@ Here is a short explanation of their semantics.
   st.~\ref{st:deref-flatten}. This is a specific implementation of the
   \lstinline{join} function defined for all types of the \lstinline{Monad}
   class.
-\item [applyCartesian]
+\item [apply]
   Cartesian
   application of a multitrie of functions to a multitrie of arguments, see
-  def.~\ref{df:mt-apply-setop}.
-\item [applyUniting]
-  Uniting
-  application of a multitrie of functions to a multitrie of arguments, see
   def.~\ref{df:mvcn-apply-cartesian}.
-  There is also a dual function for intersection.
 \item [toMap]
   Convert a multitrie to a \lstinline{Data.Map} that maps compound names to
   lists of values. Corresponds to an inverse of the isomorphism~$\varphi$
@@ -1189,7 +1154,7 @@ Here is a short explanation of their semantics.
   Convert a list of name--value pairs to a multitrie.
 \end{description}
 
-Finally, \lstinline{mtmap} function that implements the $\fmap$ operation
+Finally, \lstinline{map} function that implements the $\fmap$ operation
 (def.~\ref{df:mvcn-map} and st.~\ref{st:map-properties})
 makes \lstinline{MultiTrie} type an instance of the \lstinline{Functor} class; 
 \lstinline{applyCartesian} function as an implementation of $\apply^{\times}$
