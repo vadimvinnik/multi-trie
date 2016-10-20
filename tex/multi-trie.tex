@@ -108,10 +108,9 @@ union.
 
 \section{Introduction}
 
-A trilateral relation between a \emph{name}, its \emph{value} and
-\emph{meaning} has been in the focus of philosophical and mathematical logic,
-metamathematics, semiotics and epistemology since their origin.
-For example, important questions
+A trilateral relation between a \emph{name}, its \emph{meaning} and \emph{value}
+has been in the focus of philosophical and mathematical logic, metamathematics,
+semiotics and epistemology for a long time.  For example, important questions
 about naming were raised and deeply investigated in fundamental works by
 G.\,Frege~\cite{bib:frege},
 L.\,Wittgenstein~\cite{bib:wittgenstein},
@@ -124,27 +123,25 @@ necessarily have a value} turned into a \emph{null reference} with both its
 power and danger; \emph{names changing their values depeding on the context}
 became \emph{variables} in the sense of imperative programming. Since
 \emph{addresses} of some entities in memory are obviously a special case of
-names, and since addresses are, in their turn, values that can be computed,
-relationship and interaction between names and values in programming is even
+names, and since addresses are, in their turn, computable values,
+relations and interactions between names and values in programming are even
 more complicated than in pre-computer semiotics.
 
 Therefore, every comprehensive theory of programming must give a special
 explication of naming and include a mathematical model that reflects its
 properties and behaviour.  Approaches and formal techniques could be very
-different.  For example, \emph{A Practical Theory of
-Programming}~\cite{bib:ptop} as well as a much earlier book \emph{Unifying
-Theories of Programming}~\cite{bib:utp} represent a variable declaration by
-means of a quantifier.
+different.
 
-As always in the first-order logic, a name bound by a quantifier refers to an
-unspecified object of the semantic domain; the formula tells something about
-the objects and uses names to represent them.  Objects belong to a semantic
-level, and names to the syntactical level that do not intersect.  Therefore,
-this formalism works fine for the wide class of programs that have a predefined
-list of variables but hardly can describe programs that dynamically allocate
-memory for objects whose number is \emph{a priori} unknown.  In general,
-high-level theories of programming deliberately distantiate from hardware and
-OS details.
+For example, \emph{A Practical Theory of Programming}~\cite{bib:ptop} as well as
+\emph{Unifying Theories of Programming}~\cite{bib:utp} represent a variable
+declaration by means of a quantifier in some first order logic.  In the
+first-order logic, a variable (i.e. a name) refers to an unspecified object of a
+semantic domain; the formula tells something about the objects and uses names to
+represent them.  Objects belong to the semantic level, and names to the
+syntactical level that do not intersect.  Therefore, the first order formalism
+works fine for the wide class of programs that have a predefined list of
+variables but hardly can describe programs that dynamically allocate memory for
+objects whose number is \emph{a priori} unknown.
 
 On the contrast to above, there are theories that explicitly describe memory
 model and allocation operations in terms of memory block
@@ -155,8 +152,9 @@ formal specification and verification of compilers.
 There is yet another option between these two extremes.  Names can be regarded
 as computable values without cumbersome specifics of \emph{being addresses}.  A
 typical example arises from array processing: \lstinline{a[i]} is a computable
-name because this expression, depending on the value of an integer
-variable~\lstinline{i}, evaluates to any of individual elements' names.
+name because this expression, depending on the current value of~\lstinline{i},
+can refer to any of the array's elements and, therefore, evaluates to one of
+elements' names.
 
 An elegant and general formalism for naming that does not burden names
 with any alien specifics, but allows any specifics to be added if needed,
@@ -190,12 +188,12 @@ whereas a union is not because it can violate univaluedness:
   \{ (a, 0) \} \cup \{ (a, 1) \} = \{ (a, 0), (a, 1) \} .
 \]
 
-Naming mappings defined as above are widely used in theoretical computer
-science for syntactical as well as semantical tasks, a good example could be
-an approach to definition of programming languages~\cite{bib:ollongren}.
-\emph{Maps}, \emph{dictionaries}~\cite{bib:dictionary} and \emph{associative
-arrays}~\cite{bib:mehlhorn-assoc}~-- abstract data types
-implementing the same idea, are included into standard libraries of various
+Mappings similar to the one defined above are widely used in theoretical
+computer science for syntactical as well as semantical tasks, a good example
+could be an approach to definition of programming
+languages~\cite{bib:ollongren}.  \emph{Dictionaries}~\cite{bib:dictionary} and
+\emph{associative arrays}~\cite{bib:mehlhorn-assoc} are abstract data types
+implementing the same idea, included into standard libraries of various
 programming languages and widely used in practice.
 
 At the topmost abstraction level, a naming set represents a ``plain'' relation
@@ -213,10 +211,14 @@ theoretical purposes as well as implementable data structures suitable for
 practical tasks. This article describes a kind of naming with
 two important differences from the definition~\ref{df:naming-set}.
 \begin{itemize}
-\item \emph{Multivaluedness}: any name can be related to zero or more values;
+\item \emph{Multivaluedness}: any name can be related to zero or more values.
+This does not break the definition of the naming set because one can easily
+represent it as a (univalued) naming set whose denotata are sets of individual
+values;
 \item \emph{Compoundness of names}: compound names could be concatenated from
 shorter ones, i.e. names form a monoid under concatenation.
 \end{itemize}
+
 
 \subsection*{Conventions about notation}
 
