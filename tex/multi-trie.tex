@@ -1171,12 +1171,14 @@ and flattening operations~-- this makes the type an instance of the
 
 Having started with an intuitive notion of naming and its most general
 formalisation, we moved to its special case with compound names and multiple
-values. Two formalisations thereof were described: one based on the idea of
-(ambigious) mapping of names to values as a whole and another based on
-decomposing names into atoms. These definitions are shown to be essentially
-equivalent. This equivalence, from the programmer's perspective, means that
-this kind of containers could be used as a `plain' collection of name-value
-pairs or as a hierarchical data structure.
+values. Two formalisations thereof were described: one based on
+a relation between compound names and values, another based on
+a tree-like structure.
+The first approach is \emph{extensional}, it concentrates on properties of the
+naming relation taken as a whole. The second approach is \emph{intensional}, it
+reveals a decomposition of the whole naming into simpler sub-namings that
+is also a possible implementation in a programming language.
+These definitions are shown to be essentially equivalent.
 
 A number of operations could be naturally defined for the namings in both
 their interpretations: relational and trie-like. Most of the operations obey
