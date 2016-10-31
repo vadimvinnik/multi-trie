@@ -129,32 +129,35 @@ more complicated than in pre-computer semiotics.
 
 Therefore, every comprehensive theory of programming must give a special
 explication of naming and include a mathematical model that reflects its
-properties and behaviour.  Approaches and formal techniques could be very
-different.
+properties and behaviour.  Approaches and formal techniques however could be
+very different.
 
 For example, \emph{A Practical Theory of Programming}~\cite{bib:ptop} as well as
 \emph{Unifying Theories of Programming}~\cite{bib:utp} represent a variable
 declaration by means of a quantifier in some first order logic.  In the
-first-order logic, a variable (i.e. a name) refers to an unspecified object of a
-semantic domain; the formula tells something about the objects and uses names to
+first-order logic, a variable refers to an unspecified object of a
+semantic domain; the formula \emph{tells} about the objects \emph{using} names to
 represent them.  Objects belong to the semantic level, and names to the
 syntactical level that do not intersect.  Therefore, the first order formalism
-works fine for the wide class of programs that have a predefined list of
+works fine for programs that have a predefined list of
 variables but hardly can describe programs that dynamically allocate memory for
-objects whose number is \emph{a priori} unknown.
+objects whose number is not known \emph{a priori}.
 
 On the contrast to above, there are theories that explicitly describe memory
-model and allocation operations in terms of memory block
-references~\cite{bib:leroy}.  These theories reflect semantics of programs on a
+layout and allocation operations, for example in terms of memory block
+references~\cite{bib:leroy}, and other formal memory models.
+Such theories reflect semantics of programs on a
 relatively low, implementation-aware level, and their primary application is
-formal specification and verification of compilers.
+formal specification and verification of compilers and OS kernels.
 
 There is yet another option between these two extremes.  Names can be regarded
 as computable values without cumbersome specifics of \emph{being addresses}.  A
 typical example arises from array processing: \lstinline{a[i]} is a computable
 name because this expression, depending on the current value of~\lstinline{i},
 can refer to any of the array's elements and, therefore, evaluates to one of
-elements' names.
+the elements' names~--- and it is exactly how array indexing operation is
+treated in C~language: adding offset \lstinline{i * size} to the base
+address~\lstinline{a} gives a pointer to the element.
 
 An elegant and general formalism for naming that does not burden names
 with any alien specifics, but allows any specifics to be added if needed,
@@ -211,13 +214,14 @@ theoretical purposes as well as implementable data structures suitable for
 practical tasks. This article describes a kind of naming with
 two important differences from the definition~\ref{df:naming-set}.
 \begin{itemize}
-\item \emph{Multivaluedness}: any name can be related to zero or more values.
-This does not break the definition of the naming set because one can easily
-represent it as a (univalued) naming set whose denotata are sets of individual
-values;
+\item \emph{Multivaluedness}: any name can be related to zero or more values;
 \item \emph{Compoundness of names}: compound names could be concatenated from
 shorter ones, i.e. names form a monoid under concatenation.
 \end{itemize}
+The first difference may seem violating the general definition of the
+naming set but multivaluedness could be easily modelled as a special case of
+univaluedness: the value is unique and is a set (of `proper' values)~-- see
+below.
 
 
 \subsection*{Conventions about notation}
@@ -257,11 +261,12 @@ prefix and write simply ``MVCNset''. A set of $(V,D)$-MVCNsets will be
 denoted~$\setmvcn{V}{D}$.
 \end{Df}
 
-Note that there is an obvious bijection between a class of $(V,D)$-MVCNsets and
-a class of $(V^\ast, 2^D)$-naming sets.
-Therefore, a multivalued naming could be regarded as a special case of
-a univalued naming with extra specifics applied to values (being sets) and names
-(being chains).
+Note that there is an obvious mapping from $(V,D)$-MVCNsets to $(V^\ast,
+2^D)$-naming sets as well as an opposite mapping.  Therefore, a multivalued
+naming could be regarded as a special case of a univalued naming with extra
+specifics applied to values (being sets) and names (being chains). However,
+such modelling, although mathematically correct, does not preserve the matter
+of the notion and is not investigated further in this paper.
 
 \begin{Ex}\label{ex:mvcn}
 The following object is an $(\seta, \setn)$-MVCNset:
