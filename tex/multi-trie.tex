@@ -251,17 +251,16 @@ of~$V^\ast$ are called \emph{compound names}. Let us omit the words ``atomic''
 and ``compound'' if it does not lead to confusion.
 
 \begin{Df}\label{df:mvcn}
-A \emph{$(V,D)$-multi-valued compound-naming set, or $(V,D)$-MVCNset,} is a binary
-relation
+A \emph{$(V,D)$-multinaming set,} is a binary relation
 \[
   s \subseteq V^\ast \times D .
 \]
 Whenever $V$ and $D$ are obvious from the context, we'll omit ``$(V,D)$-''
-prefix and write simply ``MVCNset''. A set of $(V,D)$-MVCNsets will be
+prefix and write simply ``multinaming set''. A set of $(V,D)$-multinaming sets will be
 denoted~$\setmvcn{V}{D}$.
 \end{Df}
 
-Note that there is an obvious mapping from $(V,D)$-MVCNsets to $(V^\ast,
+Note that there is an obvious mapping from $(V,D)$-multinaming sets to $(V^\ast,
 2^D)$-naming sets as well as an opposite mapping.  Therefore, a multivalued
 naming could be regarded as a special case of a univalued naming with extra
 specifics applied to values (being sets) and names (being chains). However,
@@ -269,7 +268,7 @@ such modelling, although mathematically correct, does not preserve the matter
 of the notion and is not investigated further in this paper.
 
 \begin{Ex}\label{ex:mvcn}
-The following object is an $(\seta, \setn)$-MVCNset:
+The following object is an $(\seta, \setn)$-multinaming set:
 \[
   s = \{
     (\varepsilon, 0),
@@ -290,15 +289,15 @@ names from~$\seta^\ast$ have no values.
 \end{Ex}
 
 Note that, in contrast with naming sets, no special conditions are imposed
-on an MVCNset~--- it is just an arbitrary set of name-value pairs.
+on a multinaming set~--- it is just an arbitrary set of name-value pairs.
 Therefore, $\setmvcn{V}{D}$ is closed against set-theore\-tical union
 and intersection.
 \begin{St}\label{st:mvcn-setop}
-If~$s$ and~$t$ are $(V,D)$-MVCNsets, so are~$s\cup t$ and~$s\cap t$.
+If~$s$ and~$t$ are $(V,D)$-multinaming sets, so are~$s\cup t$ and~$s\cap t$.
 \end{St}
 
 When it is important to emphasise that union and intersection are operations
-on MVCNsets rather than on general case of sets, we will
+on multinaming sets rather than on general case of sets, we will
 write~$\cup_\setcharmvcn$ and~$\cap_\setcharmvcn$.
 
 One of the fundamental operations on (univalued) naming sets is retrieving
@@ -306,9 +305,9 @@ the only (if any) value~$d$ associated with the name~$v$ in a naming
 set~$s$.  Depending on the goals and abstraction level of a particular
 context, it could be regarded either as~$s(v)=d$, i.e. applying a function~$s$
 to an argument~$v$, or as an operation whose arguments are the naming set and
-the name, i.e.~$\deref(s, v)=d$. Its counterpart in MVCNset world that
+the name, i.e.~$\deref(s, v)=d$. Its counterpart in multinaming set world that
 retrieves all values of a name, no matter how many, obviously cannot be denoted
-using the first style because MVCNsets, as general binary relations, need not
+using the first style because multinaming sets, as general binary relations, need not
 to be functional.
 
 \begin{Df}\label{df:mvcn-dereferencing}
@@ -322,11 +321,11 @@ such that
 \end{Df}
 
 Unlike the univalued case, here~$\deref$ is a total operation: even if a
-name~$v$ does not have any associated value in an MVCNset~$s$, dereferencing
+name~$v$ does not have any associated value in a multinaming set~$s$, dereferencing
 it just yields an empty set of values.
 
 \begin{Ex}\label{ex:mvcn-dereferencing}
-Consider an MVCNset~$s$ from ex.~\ref{ex:mvcn}. Then
+Consider a multinaming set~$s$ from ex.~\ref{ex:mvcn}. Then
 \begin{eqnarray*}
   \deref(s, \varepsilon) & = & \{ 0, 1 \}, \\
   \deref(s, baaa)        & = & \{ 8 \}, \\
@@ -339,15 +338,15 @@ It follows immediately from the definition that dereferencing distributes
 over set-theore\-tical operations.
 \begin{St}\label{st:mvcn-deref-distributivity}
 Let~$\odot$ stand for either~$\cup$ or~$\cap$, and let~$s$ and~$t$ be
-$(V,D)$-MVCNsets. Then, for every~$v\in V^\ast$,
+$(V,D)$-multinaming sets. Then, for every~$v\in V^\ast$,
 \[
   \deref(s\odot t, v) = \deref(s, v) \odot \deref(t, v) .
 \]
 \end{St}
 
-The following important property means, in fact, that every MVCNset is completely
+The following important property means, in fact, that every multinaming set is completely
 defined by the values of all its names.  In terms of programming, it means that
-if two MVCNset objects' behaviours (observed through the $\deref$ selector) are
+if two multinaming set objects' behaviours (observed through the $\deref$ selector) are
 indiscernible, the objects are identical.
 \begin{St}\label{st:mvcn-deref-equality}
 Let $s, t \in \setmvcn{V}{D}$. Then
@@ -375,7 +374,7 @@ the name~$v$, leaves all other name-value pairs intact and assigns new values
 to~$v$.
 
 \begin{Ex}\label{ex:mvcn-replace}
-Let~$s$ be an MVCNset from ex.~\ref{ex:mvcn}. Then
+Let~$s$ be a multinaming set from ex.~\ref{ex:mvcn}. Then
 \[
   \putval(s, a, \{ 9, 10 \}) = \{
     (\varepsilon, 0),
@@ -405,9 +404,9 @@ Let~$s \in \setmvcn{V}{D}$, $v, w \in V^\ast$, $x, y \in 2^D$. Then
 \end{St}
 
 Let us introduce special terms and symbols for the two extreme cases of
-MVCNsets, namely:
+multinaming sets, namely:
 \begin{Df}\label{df:mvcn-extreme}
-MVCNset $\bot_\setcharmvcn$ called \emph{empty} and $\top_\setcharmvcn$ called
+Multinaming set $\bot_\setcharmvcn$ called \emph{empty} and $\top_\setcharmvcn$ called
 \emph{full} are defined by
 \begin{eqnarray*}
   \bot_\setcharmvcn &  = &  \varnothing ; \\
@@ -416,8 +415,8 @@ MVCNset $\bot_\setcharmvcn$ called \emph{empty} and $\top_\setcharmvcn$ called
 Further, we'll omit the subscript when it does not lead to confusion.
 \end{Df}
 
-In other words, each name in the empty MVCNset has no value whereas in the
-full MVCNset every name has all possible values.
+In other words, each name in the empty multinaming set has no value whereas in the
+full multinaming set every name has all possible values.
 \begin{St}\label{st:mvcn-extreme-deref}
 For any~$v\in V^\ast$,
 \begin{eqnarray*}
@@ -432,7 +431,7 @@ The next property is also just a trivial consequence of the definition:~$\bot$
 and~$\top$ objects are units of~$\cup$ and~$\cap$ operations respectively and
 zeros vice versa.
 \begin{St}\label{st:mvcn-neutrals}
-For any MVCNset~$s$,
+For any multinaming set~$s$,
 \begin{eqnarray*}
   \bot \cup s & = & s,    \\
   \top \cap s & = & s,    \\
@@ -441,7 +440,7 @@ For any MVCNset~$s$,
 \end{eqnarray*}
 \end{St}
 
-Note that a compound name~$v$ in a MVCNset~$s$ not only is a reference to
+Note that a compound name~$v$ in a multinaming set~$s$ not only is a reference to
 multiple values but also is a common prefix for a ``bunch'' of names starting
 with~$v$. In this sence,~$v$ is a name for an entire sub-object of~$s$ that is
 defined as follows.
@@ -455,7 +454,7 @@ As always, the subscript will be omited if possible.
 \end{Df}
 
 \begin{Ex}\label{ex:mvcn-select}
-Let~$s$ be an MVCNset from ex.~\ref{ex:mvcn}, then
+Let~$s$ be a multinaming set from ex.~\ref{ex:mvcn}, then
 \begin{eqnarray*}
   \select(s, a) & = & \{
     (\varepsilon, 2),
@@ -484,8 +483,8 @@ For any~$s,t\in\setmvcn{V}{D}$, $v, w\in V^\ast$, $\odot\in\{\cup, \cap\}$,
 \end{St}
 In other words,
 \begin{itemize}
-\item $\select$~preserves empty and full MVCNset;
-\item selection under an empty name is an identity over MVCNsets;
+\item $\select$~preserves empty and full multinaming set;
+\item selection under an empty name is an identity over multinaming sets;
 \item selection under a compound name can be performed by parts;
 \item selection distributes over union and intersection.
 \end{itemize}
@@ -498,7 +497,7 @@ is described in the next section.
 
 \section{Trie-based definition}
 
-Take a closer look at the MVCNset~$s$ from ex.~\ref{ex:mvcn}.
+Take a closer look at the multinaming set~$s$ from ex.~\ref{ex:mvcn}.
 Recall the
 idea underlying selection operation: any name~$v$ identifies a bunch of
 names that have~$v$ as its common prefix. Except this, take into account that
@@ -519,7 +518,7 @@ All this gives a hierarchical view of~$V^\ast$ where
 \item appending an atomic component to a name moves one level deeper;
 \item having a common prefix means having a common ancestor.
 \end{itemize}
-The hierarchical representation of the MVCNset~$s$ is shown on the
+The hierarchical representation of the multinaming set~$s$ is shown on the
 fig.~\ref{fig:trie}.
 
 \begin{figure}[ht]
@@ -537,7 +536,7 @@ fig.~\ref{fig:trie}.
 }
 \end{minipage}
 \end{center}
-\caption{A multitrie corresponding to the MVCNset~$s$}\label{fig:trie}
+\caption{A multitrie corresponding to the multinaming set~$s$}\label{fig:trie}
 \end{figure}
 
 To grasp this informal consideration in a definition, it would be convenient to
@@ -646,7 +645,7 @@ names and, for each name, build a union of the value sets contained in the
 operands under that name.
 
 Let us also define an operation that corresponds to replacement
-defined for MVCNsets (see def.~\ref{df:mvcn-replace}). Like other multitrie
+defined for multinaming sets (see def.~\ref{df:mvcn-replace}). Like other multitrie
 operations, the most natural way of defining it is recursive.
 
 \begin{Df}\label{df:mt-replace}
@@ -675,7 +674,7 @@ values in the root node of the trie. Otherwise, take the first atomic component
 of the name, go to the child node associated with that atom, and perform a
 replacement under a remainder of the name.
 
-It is easy to see that properties identical to those of MVCNsets
+It is easy to see that properties identical to those of multinaming sets
 hold for multitries, namely counterparts of
 st.~\ref{st:mvcn-deref-distributivity},
 \ref{st:mvcn-deref-equality},
@@ -683,7 +682,7 @@ st.~\ref{st:mvcn-deref-distributivity},
 \ref{st:mvcn-extreme-deref},
 \ref{st:mvcn-neutrals}
 and~\ref{st:mvcn-selection-properties}.
-Moreover, all properties of MVCNsets and multitries are identical because
+Moreover, all properties of multinaming sets and multitries are identical because
 of the following property.
 
 \begin{St}\label{st:isomorph}
@@ -714,8 +713,8 @@ for all $s,t \in \setmvcn{V}{D}$, $v \in V^\ast$.
 \end{St}
 
 In other words, $\varphi$~is an isomorphism from many-sorted algebra of
-MVCNsets to an algebra of multitries.
-This allows us to switch flexibly between MVCNset and multitrie
+multinaming sets to an algebra of multitries.
+This allows us to switch flexibly between multinaming set and multitrie
 languages when describing further notions, choosing the most
 appropriate form in each particular case.
 
@@ -729,23 +728,23 @@ more complicated operations.
 
 Before giving a formal definition for a cartesian product of namings, let us
 informally describe how should an operation look like to deserve this name.
-Let~$s'$ and~$s''$ be two MVCNsets. Their cartesian product should consist of
+Let~$s'$ and~$s''$ be two multinaming sets. Their cartesian product should consist of
 values of the form~$(d',d'')$ where $d'$~is a value from~$s'$ and $d''$~is taken
 from~$s''$. But these values are attached to some names~-- say, $v'$~and~$v''$,
-respectively.  Therefore, the resulting product MVCNset should contain the
+respectively.  Therefore, the resulting product multinaming set should contain the
 combined value~$(d',d'')$ under a name combined from~$v'$ and $v''$, and the only
 combining operation defined for names is concatenation.
 
 \begin{Df}\label{df:mvcn-cartesian}
-Let~$s'$ and~$s''$ be $(V,D')$- and $(V,D'')$-MVCNsets, respectively. Their
-\emph{cartesian product} is a $(V,D'\times D'')$-MVCNset
+Let~$s'$ and~$s''$ be $(V,D')$- and $(V,D'')$-multinaming sets, respectively. Their
+\emph{cartesian product} is a $(V,D'\times D'')$-multinaming set
 \[
   s'\times s'' = \{ (v'\cdot v'', (d',d'')) \mid (v',d')\in s', (v'',d'')\in s'' \} .
 \]
 \end{Df}
 
 \begin{Ex}\label{ex:cartesian}
-Consider the following MVCNsets:
+Consider the following multinaming sets:
 \begin{eqnarray*}
   s'  & = & \{ (\varepsilon, 0), (a, 1), (a, 2) \} , \\
   s'' & = & \{ (\varepsilon, 3), (\varepsilon, 4), (b, 5) \} .
@@ -779,23 +778,23 @@ For any $s' \in \setmvcn{V}{D'}$ and $s'' \in \setmvcn{V}{D''}$,
 \]
 \end{St}
 
-This is the main property of cartesian product. Since an MVCNset is
+This is the main property of cartesian product. Since a multinaming set is
 completely defined by values of all names (st.~\ref{st:mvcn-deref-equality}),
 it is preserved by the mapping~$\varphi$ from st.~\ref{st:isomorph}. Also, this
 property may be taken as a definition of cartesian product for multitries.
 
-Consider an MVCNset~$s$ whose values are, in their turn, MVCNsets.  Flattening
-operation formally defined below turns it into a ``plain'' MVCNset.  Supose a
+Consider a multinaming set~$s$ whose values are, in their turn, multinaming sets.  Flattening
+operation formally defined below turns it into a ``plain'' multinaming set.  Supose a
 name~$v$ in~$s$ has a value~$t$ (and, maybe, some other values) that, by
-precondition, is an MVCNset.  Then take a name~$w$ that has a value~$d$ in~$t$.
+precondition, is a multinaming set.  Then take a name~$w$ that has a value~$d$ in~$t$.
 In sum, to reach~$d$ from~$s$, one has to dereference the name~$v$
 (obtaining~$t$) and then (in~$t$) dereference~$w$. Therefore, flattening should
-turn~$s$ into such an MVCNset~$r$, where~$d$ is a value of the name~$vw$.
+turn~$s$ into such a multinaming set~$r$, where~$d$ is a value of the name~$vw$.
 
 \begin{Df}\label{df:flatten}
 \emph{Flattening} is a unary operation
 $\flatten : \setmvcn{V}{\setmvcn{V}{D}} \to\setmvcn{V}{D}$,
-such that, for any $(V,\setmvcn{V}{D})$-MVCNset~$s$,
+such that, for any $(V,\setmvcn{V}{D})$-multinaming set~$s$,
 \[
   \flatten(s) = \{ (vw, d) \mid (v, t) \in s, (w, d) \in t \} .
 \]
@@ -832,7 +831,7 @@ a value~5. Hence, the name~$aa$ has in $\flatten(s)$ the second value~5.
 The following property can be used to define flattening for multitries~--
 in terms of dereferencing operation.
 \begin{St}\label{st:deref-flatten}
-For any $(V,\setmvcn{V}{D})$-MVCNset~$s$,
+For any $(V,\setmvcn{V}{D})$-multinaming set~$s$,
 \[
   \deref(\flatten(s), w) =
       \bigcup_{v,v'\in V^\ast: v\cdot v' = w}
@@ -880,9 +879,9 @@ Let $f: D \to D'$, $s, t \in \setmvcn{V}{D}$, $\odot \in \{\cup, \cap \}$. Then
 \]
 \end{St}
 
-Thus, $\fmap$ operation can apply a single unary function to an MVCNset of
+Thus, $\fmap$ operation can apply a single unary function to a multinaming set of
 values. It is easy to define an operation $\fpam$ that does the opposite:
-applies an MVCNset of unary functions to a single value. For this purpose,
+applies a multinaming set of unary functions to a single value. For this purpose,
 let us define first an auxiliary function that turns a value~$x$ into a
 high order function applying an argument function to~$x$:
 
@@ -917,7 +916,7 @@ It is easy to see from the definitions of $\fmap$ and $\ylppa$ that $\fpam$
 really does what was intended:
 
 \begin{St}\label{st:mvcn-pam}
-If $s$ is a $(V, D\to D')$-MVCNset, $d\in D$,
+If $s$ is a $(V, D\to D')$-multinaming set, $d\in D$,
 \[
   (\fpam s)(d) = \{ (v, f(d)) \mid (v, f) \in s \} .
 \]
@@ -933,9 +932,9 @@ Let $d\in D$, $s, t \in \setmvcn{V}{D \to D'}$, $\odot \in \{\cup, \cap \}$. The
 \]
 \end{St}
 
-Having defined operations that apply a single function to an MVCNset of values
-and an MVCNset of functions to a single value, let us define an
-operation that applies an MVCNset of functions to an MVCNset of values. The
+Having defined operations that apply a single function to a multinaming set of values
+and a multinaming set of functions to a single value, let us define an
+operation that applies a multinaming set of functions to a multinaming set of values. The
 operation must preserve trie-like naming structures of both operands~-- the
 considerations motivating the definition of cartesian product apply here
 as well. To avoid rewriting essentially the same definition twice, let us
@@ -952,7 +951,7 @@ $(X \to Y) \times X \to Y$ and is defined as follows.
 
 In other words, this operation takes a pair whose first element is a unary
 function and the second is an argument, and applies the function to the
-argument. Thus, the application operation over MVCNsets can be defined as
+argument. Thus, the application operation over multinaming sets can be defined as
 follows.
 
 \begin{Df}\label{df:mvcn-apply-cartesian}
@@ -1036,7 +1035,7 @@ is not isomorphic to the set-based specification, let us justify it as an
 acceptable approximation.
 
 The previous sections presented two isomorphic though different formalisations:
-MVCNsets and multitries. The former has higer abstraction level and suits well
+multinaming sets and multitries. The former has higer abstraction level and suits well
 for specification purposes whereas the latter involves a trie~-- a practical
 data structure suitable for an efficient implementation. The only impractical
 feature of multitries definition introduced for the sake of mathematical
