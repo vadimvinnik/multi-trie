@@ -251,7 +251,7 @@ of~$V^\ast$ are called \emph{compound names}. Let us omit the words ``atomic''
 and ``compound'' if it does not lead to confusion.
 
 \begin{Df}\label{df:mvcn}
-A \emph{$(V,D)$-multinaming set,} is a binary relation
+A \emph{$(V,D)$-multinaming set} is a binary relation
 \[
   s \subseteq V^\ast \times D .
 \]
@@ -507,18 +507,18 @@ The name~$\varepsilon$, the simplest name ever, refers in~$s$ to a set of
 values~$\{0,1\}$. Name~$a=\varepsilon a$ is an extension of~$\varepsilon$ by
 one atomic name and refers to values~$\{2,3,4\}$. In its turn, name~$a$ can
 be extended by one atomic name to~$aa$, $ab$, \ldots, $az$, from which only the
-former two are of intrest because their sets of values are non-empty.
+former two have values.
 Now return to the empty name and compose another its continuation, namely~$b$.
-This name is a prefix for~$ba$ that, in its turn, can be extended to~$baa$ and
-then to~$baaa$.
+This name has no values but it is a prefix for~$ba$ that, in its turn, can be extended to~$baa$ and
+then to~$baaa$ that has non-empty set of values.
 
-All this gives a hierarchical view of~$V^\ast$ where
+This gives a hierarchical view of~$V^\ast$ where
 \begin{itemize}
-\item the highest member of the hierarchy is the empty name;
+\item the root of the hierarchy is the empty name;
 \item appending an atomic component to a name moves one level deeper;
 \item having a common prefix means having a common ancestor.
 \end{itemize}
-The hierarchical representation of the multinaming set~$s$ is shown on the
+The corresponding tree-like representation of the multinaming set~$s$ is shown on
 fig.~\ref{fig:trie}.
 
 \begin{figure}[ht]
@@ -555,7 +555,8 @@ and~$D$ are known from the context or irrelevant):
 
 In other words, a $(V,D)$-multitrie is a pair $s = (x, m)$ where~$x\subseteq D$
 is a set of values and $m: V \to \setmt{V}{D}$ is a total mapping of
-atomic names to some $(V,D)$-multitries. Note that this recursive definition does
+atomic names to some $(V,D)$-multitries called \emph{children}.
+Note that this recursive definition does
 not have any basic case: every multitrie contains child multitries
 under all atomic names, hence there are no leaf nodes.
 Depicting multitries graphically, as on fig.~\ref{fig:trie}, we will however
@@ -633,7 +634,7 @@ $s = (x, m)$, $t = (y, n)$.
 Then
 \[
   s \odot_\setcharmt  t =
-    (x \odot y, \{ u \mapsto m(u) \odot n(u) \mid u \in V \}) .
+    (x \odot y, \{ u \mapsto m(u) \odot_\setcharmt n(u) \mid u \in V \}) .
 \]
 \end{Df}
 Note that subscripts in this definition help to distinguish between
@@ -656,7 +657,7 @@ operations, the most natural way of defining it is recursive.
 such that, for any
 $s = (x, m) \in \setmt{V}{D}$, $y \in 2^D$, $u \in V$, $v \in V^\ast$,
 \begin{eqnarray*}
-  \putval_\setcharmt(s, \varepsilon, t) & = & (y, m) , \\
+  \putval_\setcharmt(s, \varepsilon, y) & = & (y, m) , \\
   \putval_\setcharmt(s, u v, y) & = & (x, m') ,
 \end{eqnarray*}
 where $m' : V \to \setmt{V}{D}$ is such a function that $m'(u') = m(u')$ for any
@@ -721,6 +722,8 @@ appropriate form in each particular case.
 
 
 \section{Cartesian product and flattening}
+
+% ==== stopped here ====
 
 Operations described in the previous sections (union, intersection, selection)
 preserve the type and structure of their operands. This section describes two
