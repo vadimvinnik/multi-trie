@@ -860,7 +860,7 @@ for any $s \in \setmvcn{V}{D}$.
 \end{Df}
 
 The definition of mapping for multitries is straightforward, it can be easily
-obtained from isomorphism. The following properties hold:
+obtained from isomorphism. There are following well-known properties:
 
 \begin{St}\label{st:map-properties}
 If $\circ$ is a composition of unary functions, i.e. $(g\circ f)(x) = g(f(x))$ for
@@ -873,10 +873,10 @@ $\id_X(x) = x$ for any $x\in X$, then
 \end{St}
 
 \begin{St}\label{st:map-distributivity}
-Mapping function distributes over set-theoretical operations.
-Let $f: D \to D'$, $s, t \in \setmvcn{V}{D}$, $\odot \in \{\cup, \cap \}$. Then
+Mapping function distributes over set-theoretical union (but not intersection, in general):
+Let $f: D \to D'$, $s, t \in \setmvcn{V}{D}$. Then
 \[
-  (\fmap f) (s \odot t) = (\fmap f)(s) \odot (\fmap f)(t) .
+  (\fmap f) (s \cup t) = (\fmap f)(s) \cup (\fmap f)(t) .
 \]
 \end{St}
 
@@ -927,9 +927,9 @@ Since reverse mapping is defined as a special case of mapping, it inherits
 distributivity, see st.~\ref{st:map-distributivity}.
 
 \begin{St}\label{st:pam-distributivity}
-Let $d\in D$, $s, t \in \setmvcn{V}{D \to D'}$, $\odot \in \{\cup, \cap \}$. Then
+Let $d\in D$, $s, t \in \setmvcn{V}{D \to D'}$. Then
 \[
-  (\fpam (s \odot t))(d) = (\fpam s)(d) \odot (\fpam t)(d) .
+  (\fpam (s \cup t))(d) = (\fpam s)(d) \cup (\fpam t)(d) .
 \]
 \end{St}
 
