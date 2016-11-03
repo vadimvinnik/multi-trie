@@ -723,8 +723,6 @@ appropriate form in each particular case.
 
 \section{Cartesian product and flattening}
 
-% ==== stopped here ====
-
 Operations described in the previous sections (union, intersection, selection)
 preserve the type and structure of their operands. This section describes two
 more complicated operations.
@@ -742,7 +740,7 @@ combining operation defined for names is concatenation.
 Let~$s'$ and~$s''$ be $(V,D')$- and $(V,D'')$-multinaming sets, respectively. Their
 \emph{cartesian product} is a $(V,D'\times D'')$-multinaming set
 \[
-  s'\times s'' = \{ (v'\cdot v'', (d',d'')) \mid (v',d')\in s', (v'',d'')\in s'' \} .
+  s'\times s'' = \{ (v' v'', (d',d'')) \mid (v',d')\in s', (v'',d'')\in s'' \} .
 \]
 \end{Df}
 
@@ -774,7 +772,7 @@ The same holds for the left operand.
 For any $s' \in \setmvcn{V}{D'}$ and $s'' \in \setmvcn{V}{D''}$,
 \[
   \deref(s' \times s'', w) =
-      \bigcup_{v',v''\in V^\ast: v'\cdot v'' = w}
+      \bigcup_{v',v''\in V^\ast: v' v'' = w}
           \deref(s', v')
           \times
           \deref(s'', v'') .
@@ -789,9 +787,9 @@ property may be taken as a definition of cartesian product for multitries.
 Consider a multinaming set~$s$ whose values are, in their turn, multinaming sets.  Flattening
 operation formally defined below turns it into a ``plain'' multinaming set.  Supose a
 name~$v$ in~$s$ has a value~$t$ (and, maybe, some other values) that, by
-precondition, is a multinaming set.  Then take a name~$w$ that has a value~$d$ in~$t$.
-In sum, to reach~$d$ from~$s$, one has to dereference the name~$v$
-(obtaining~$t$) and then (in~$t$) dereference~$w$. Therefore, flattening should
+precondition, is a multinaming set.  Take a name~$w$ that has a value~$d$ in~$t$
+(and maybe other values).
+Then flattening should
 turn~$s$ into such a multinaming set~$r$, where~$d$ is a value of the name~$vw$.
 
 \begin{Df}\label{df:flatten}
@@ -837,8 +835,8 @@ in terms of dereferencing operation.
 For any $(V,\setmvcn{V}{D})$-multinaming set~$s$,
 \[
   \deref(\flatten(s), w) =
-      \bigcup_{v,v'\in V^\ast: v\cdot v' = w}
-        \deref(\deref(s, v), v') .
+      \bigcup_{v',v''\in V^\ast: v' v'' = w}
+        \deref(\deref(s, v'), v'') .
 \]
 \end{St}
 
