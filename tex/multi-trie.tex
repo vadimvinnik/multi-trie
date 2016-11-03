@@ -956,7 +956,7 @@ argument. Thus, the application operation over multinaming sets can be defined a
 follows.
 
 \begin{Df}\label{df:mvcn-apply-cartesian}
-Then \emph{cartesian application} is an operation of type
+\emph{Cartesian application} is an operation of type
 \[
 \setmvcn{V}{D\to D'} \times \setmvcn{V}{D} \to \setmvcn{V}{D'} ,
 \]
@@ -984,10 +984,6 @@ Therefore, for every function~$f$ contained in~$s$ under a compound name~$v$
 and every object~$d$ contained in~$t$ under a name~$w$, the resulting
 multitrie contains a value~$f(d)$ under a name~$vw$.
 
-Cartesian is not the only kind of application with an elegant definition and
-interesting properties.  The following two application operations are
-easier to define in terms of multitries.
-
 Let us introduce an infix alias for the cartesian application operation to make
 formulation of its properties more elegant:
 \[
@@ -995,14 +991,11 @@ formulation of its properties more elegant:
 \]
 
 \begin{St}\label{st:apply-distr}
-Cartesian application distributes over set-theoretical operations.
+Cartesian application distributes over set-theoretical union.
 For any~$s, s_1, s_2, t, t_1, t_2$ of matching types,
-for $\odot \in \{\cup, \cap \}$,
 \begin{eqnarray*}
-  (s_1 \odot s_2) \inapply t =
-    (s_1 \inapply t) \odot (s_2 \inapply t) , \\
-  s \inapply (t_1 \odot t_2) =
-    (s \inapply t_1) \odot (s \inapply t_2) .
+  (s_1 \cup s_2) \inapply t = (s_1 \inapply t) \cup (s_2 \inapply t) , \\
+  s \inapply (t_1 \cup t_2) = (s \inapply t_1) \cup (s \inapply t_2) .
 \end{eqnarray*}
 \end{St}
 
