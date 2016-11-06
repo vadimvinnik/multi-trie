@@ -68,13 +68,13 @@
 \maketitle
 
 \begin{abstract}
-Naming is one of the most fundamental concepts in programming.  In most
-cases, a name is considered to be atomic and to have a unique value.  This
-paper describes a kind of naming with both these principles negated: names form
-a monoid under concatenation, and each name can be associated with multiple
+Naming is one of the most fundamental concepts in programming.  In most cases,
+a name is considered to be atomic and to have a unique value.  This paper
+describes a kind of naming with both these principles negated: names form a
+monoid under concatenation, and each name can be associated with multiple
 values.  Two different but equivalent formalisations are defined, their
 isomorphism is shown.  Counterparts of set-theoretical union, intersection and
-cartesian product operations are described together with their properties.  A
+cartesian product operations are defined, their properties are described.  A
 data type implementing this kind of naming is designed in Haskell, it fits into
 functor, applicative functor and monad classes.
 
@@ -108,40 +108,39 @@ union.
 
 \section{Introduction}
 
-A trilateral relation between a \emph{name}, its \emph{meaning} and \emph{value}
-has been in the focus of philosophical and mathematical logic, metamathematics,
-semiotics and epistemology for a long time.  For example, important questions
-about naming were raised and deeply investigated in fundamental works by
-G.\,Frege~\cite{bib:frege},
-L.\,Wittgenstein~\cite{bib:wittgenstein},
-W.\,Quine~\cite{bib:quine}.
-With arising of computer science, naming gained a special significance~-- for
+A trilateral relation between a \emph{name}, its \emph{meaning} and
+\emph{value} has been in the focus of philosophical and mathematical logic,
+metamathematics, semiotics and epistemology for a long time.  For example,
+important questions about naming were raised and deeply investigated in
+fundamental works by G.\,Frege~\cite{bib:frege},
+L.\,Wittgenstein~\cite{bib:wittgenstein}, W.\,Quine~\cite{bib:quine}.  With
+arising of computer science, naming gained a special significance~-- for
 example, \emph{a name that refers to a name that, finally, relates to an
 entity} is not a purely philosophical excercise anymore but a working tool for
-everyday~-- an \emph{indirect pointer}; a question \emph{does every name
-necessarily have a value} turned into a \emph{null reference} with both its
-power and danger; \emph{names changing their values depeding on the context}
-became \emph{variables} in the sense of imperative programming. Since
-\emph{addresses} of some entities in memory are obviously a special case of
-names, and since addresses are, in their turn, computable values,
-relations and interactions between names and values in programming are even
-more complicated than in pre-computer semiotics.
+everyday~-- an \emph{indirect pointer}; a \emph{a name with a meaning but
+without a value} turned into a \emph{null reference} with both its power and
+danger; \emph{names changing their values depeding on the context} became
+\emph{variables} in the sense of imperative programming. Since \emph{addresses}
+of some entities in memory are obviously a special case of names, and since
+addresses are, in their turn, computable values, relations and interactions
+between names and values in programming are even more complicated than in
+pre-computer semiotics.
 
 Therefore, every comprehensive theory of programming must give a special
 explication of naming and include a mathematical model that reflects its
 properties and behaviour.  Approaches and formal techniques however could be
 very different.
 
-For example, \emph{A Practical Theory of Programming}~\cite{bib:ptop} as well as
-\emph{Unifying Theories of Programming}~\cite{bib:utp} represent a variable
+For example, \emph{A Practical Theory of Programming}~\cite{bib:ptop} as well
+as \emph{Unifying Theories of Programming}~\cite{bib:utp} represent a variable
 declaration by means of a quantifier in some first order logic.  In the
-first-order logic, a variable refers to an unspecified object of a
-semantic domain; the formula \emph{tells} about the objects \emph{using} names to
-represent them.  Objects belong to the semantic level, and names to the
-syntactical level that do not intersect.  Therefore, the first order formalism
-works fine for programs that have a predefined list of
-variables but hardly can describe programs that dynamically allocate memory for
-objects whose number is not known \emph{a priori}.
+first-order logic, a variable refers to an unspecified object of a semantic
+domain; the formula tells about the objects using names to represent them.
+Objects belong to the semantic level, and names to the syntactical level that
+do not intersect.  Therefore, the first order formalism works fine for programs
+that have a predefined list of variables but hardly can describe programs that
+dynamically allocate memory for objects whose number is not known \emph{a
+priori}.
 
 On the contrast to above, there are theories that explicitly describe memory
 layout and allocation operations, for example in terms of memory block
@@ -186,7 +185,7 @@ denotes~1, no other names have values.
 \end{Ex}
 
 A set-theoretical intersection  of naming sets is obviously a naming set
-whereas a union is not because it can violate univaluedness:
+whe\-re\-as a union is not because it can violate univaluedness:
 \[
   \{ (a, 0) \} \cup \{ (a, 1) \} = \{ (a, 0), (a, 1) \} .
 \]
@@ -220,20 +219,19 @@ shorter ones, i.e. names form a monoid under concatenation.
 \end{itemize}
 The first difference may seem violating the general definition of the
 naming set but multivaluedness could be easily modelled as a special case of
-univaluedness: the value is unique and is a set (of `proper' values)~-- see
-below.
+univaluedness: the value is unique and is a set (of `proper' values).
 
 
 \subsection*{Conventions about notation}
 
 For any set~$X$, let~$X^\ast$ denote a set of all sequences of its elements
-(also known as \emph{chains}), and~$2^X$ be a set of all its subsets.
+(also known as \emph{chains}), and~$2^X$ be a set of all subsets of~$X$.
 If~$a,b\in X^\ast$ are two chains, their concatenation will be denoted simply
 as~$ab$. Let~$\varepsilon$ stand for the empty chain.
 Let $\proj{n}{k}$ be a function that maps an $n$-tuple to its $k$-th component.
 
 A set of Latin letters (the alphabet) is denoted as~$\seta$,
-and~$\setn$ will denote a set of natural numbers~-- these two sets will be
+and~$\setn$ denotes a set of natural numbers~-- these two sets will be
 used in examples.
 
 Throughout this paper, a class of atomic names is denoted with~$V$. The
@@ -260,12 +258,13 @@ prefix and write simply ``multinaming set''. A set of $(V,D)$-multinaming sets w
 denoted~$\setmvcn{V}{D}$.
 \end{Df}
 
-Note that there is an obvious mapping from $(V,D)$-multinaming sets to $(V^\ast,
-2^D)$-naming sets as well as an opposite mapping.  Therefore, a multivalued
-naming could be regarded as a special case of a univalued naming with extra
-specifics applied to values (being sets) and names (being chains). However,
-such modelling, although mathematically correct, does not preserve the matter
-of the notion and is not investigated further in this paper.
+Note that there is an obvious mapping from the class of $(V,D)$-multinaming
+sets to the class of $(V^\ast, 2^D)$-naming sets as well as an opposite
+mapping. Therefore, a multivalued naming could be modelled as a special case of
+a univalued naming with extra specifics applied to values (being sets) and
+names (being chains). Such modelling is not investigated below~-- instead, two
+formalisations are described that reflect the essence of the notion in a more
+direct way.
 
 \begin{Ex}\label{ex:mvcn}
 The following object is an $(\seta, \setn)$-multinaming set:
@@ -300,15 +299,14 @@ When it is important to emphasise that union and intersection are operations
 on multinaming sets rather than on general case of sets, we will
 write~$\cup_\setcharmvcn$ and~$\cap_\setcharmvcn$.
 
-One of the fundamental operations on (univalued) naming sets is retrieving
-the only (if any) value~$d$ associated with the name~$v$ in a naming
-set~$s$.  Depending on the goals and abstraction level of a particular
-context, it could be regarded either as~$s(v)=d$, i.e. applying a function~$s$
-to an argument~$v$, or as an operation whose arguments are the naming set and
-the name, i.e.~$\deref(s, v)=d$. Its counterpart in multinaming set world that
+One of the fundamental operations on (univalued) naming sets is retrieving the
+only (if any) value~$d$ associated with the name~$v$ in a naming set~$s$.
+Depending on the goals and abstraction level of a particular context, it could
+be regarded either as~$s(v)=d$, i.e. applying a function~$s$ to an
+argument~$v$, or as an operation whose arguments are the naming set and the
+name, i.e.~$\deref(s, v)=d$. Its counterpart in multinaming set world that
 retrieves all values of a name, no matter how many, obviously cannot be denoted
-using the first style because multinaming sets, as general binary relations, need not
-to be functional.
+using the first style.
 
 \begin{Df}\label{df:mvcn-dereferencing}
 \emph{Dereferencing} is an operation~$\deref_\setcharmvcn$ (or, whenever
@@ -364,8 +362,8 @@ Thus, it is similar to assignment in the sense of imperative programming.
  & \putval_\setcharmvcn :
     \setmvcn{V}{D} \times V^\ast \times 2^D \to \setmvcn{V}{D}, \\
  & \putval_\setcharmvcn(s, v, x) =
-      \{ (w, d) \mid (w, d) \in x, w \neq v \} \cup
-      \{ (d, y) \mid d \in x \} .
+      \{ (w, d) \mid (w, d) \in s, w \neq v \} \cup
+      \{ (v, d) \mid d \in x \} .
 \end{eqnarray*}
 The subscript will be omitted further whenever possible.
 \end{Df}
@@ -440,10 +438,14 @@ For any multinaming set~$s$,
 \end{eqnarray*}
 \end{St}
 
-Note that a compound name~$v$ in a multinaming set~$s$ not only is a reference to
-multiple values but also is a common prefix for a ``bunch'' of names starting
-with~$v$. In this sence,~$v$ is a name for an entire sub-object of~$s$ that is
-defined as follows.
+Note that a compound name~$v$ in a multinaming set~$s$ not only refers to its
+values but also is a common prefix for a ``bunch'' of names starting with~$v$.
+A name~$vw$ in a multinaming set~$s$ can be regarded as a name~$w$
+\emph{relative} to a point referred to by~$v$ or, in other words, as a name~$w$
+in a multinaming set subobject selected from~$s$. To select a subobject means:
+throw away names that do not start with~$v$, and remove this comon prefix from
+those that do. Formally, it leads to the definition.
+
 \begin{Df}\label{df:mvcn-select}
 Let~$s\in\setmvcn{V}{D}$, $v\in V^\ast$, then \emph{selection} from~$s$
 under~$v$ is
@@ -483,7 +485,7 @@ For any~$s,t\in\setmvcn{V}{D}$, $v, w\in V^\ast$, $\odot\in\{\cup, \cap\}$,
 \end{St}
 In other words,
 \begin{itemize}
-\item $\select$~preserves empty and full multinaming set;
+\item selection preserves empty and full multinaming set;
 \item selection under an empty name is an identity over multinaming sets;
 \item selection under a compound name can be performed by parts;
 \item selection distributes over union and intersection.
@@ -497,26 +499,26 @@ is described in the next section.
 
 \section{Trie-based definition}
 
-Take a closer look at the multinaming set~$s$ from ex.~\ref{ex:mvcn}.
-Recall the
-idea underlying selection operation: any name~$v$ identifies a bunch of
-names that have~$v$ as its common prefix. Except this, take into account that
-the empty name~$\varepsilon$ is a common prefix for all names.
+Take a closer look at the multinaming set~$s$ from ex.~\ref{ex:mvcn}.  Recall
+the idea underlying selection operation: any name~$v$ is a common prefix for a
+bunch of names of the form~$vw$~-- and, therefore, is a root of a sub-naming
+relative to~$v$. Except this, take into account that the empty
+name~$\varepsilon$ is a common prefix for all names.
 
 The name~$\varepsilon$, the simplest name ever, refers in~$s$ to a set of
 values~$\{0,1\}$. Name~$a=\varepsilon a$ is an extension of~$\varepsilon$ by
-one atomic name and refers to values~$\{2,3,4\}$. In its turn, name~$a$ can
-be extended by one atomic name to~$aa$, $ab$, \ldots, $az$, from which only the
-former two have values.
-Now return to the empty name and compose another its continuation, namely~$b$.
-This name has no values but it is a prefix for~$ba$ that, in its turn, can be extended to~$baa$ and
-then to~$baaa$ that has non-empty set of values.
+one atomic name and refers to values~$\{2,3,4\}$. In its turn, name~$a$ can be
+extended by one atomic name to~$aa$, $ab$, \ldots, $az$, from which only the
+former two have values.  Now return to the empty name and compose another its
+continuation, namely~$b$.  This name has no values but it is a prefix for~$ba$
+that, in its turn, can be extended to~$baa$ and then to~$baaa$ that has
+non-empty set of values.
 
 This gives a hierarchical view of~$V^\ast$ where
 \begin{itemize}
 \item the root of the hierarchy is the empty name;
 \item appending an atomic component to a name moves one level deeper;
-\item having a common prefix means having a common ancestor.
+\item a common prefix is a common ancestor.
 \end{itemize}
 The corresponding tree-like representation of the multinaming set~$s$ is shown on
 fig.~\ref{fig:trie}.
@@ -638,7 +640,7 @@ Then
 \]
 \end{Df}
 Note that subscripts in this definition help to distinguish between
-set-theoretical operations on sets of values and corresponding operations
+set-the\-o\-re\-ti\-cal operations on sets of values and corresponding operations
 on multitries.
 
 In other words, to build $r = s \cup t$, one needs to go through all compound
@@ -1002,6 +1004,8 @@ For any~$s, s_1, s_2, t, t_1, t_2$ of matching types,
 
 \section{Notes about implementation}
 
+% === stopped here ===
+
 A container type implementing the multivalued naming with compound names has
 been defined in Haskell programming language. Some trade-offs between the
 mathematical purity and implementability could hardly be avoided. On the other
@@ -1017,12 +1021,8 @@ values~\cite[p.~285]{bib:lipovaca}.  Using lists instead of sets gives some
 benefits. For example, the many-valued function, as a value generator, does not
 need to compare every newly produced value with all previous ones. Lists can be
 generated by one function and consumed by another in a lazy manner. Elements'
-type needs to be an instance of \lstinline{Ord} class sets and does not for
-lists.
-
-Therefore, the most significant difference between the mathematical constructs
-and the software implementation is that an ambigious value of a compound name is
-programmatically represented by a list of individual values.  From the
+type needs to be an instance of \lstinline{Ord} class for sets and does not for
+lists.  Note that,  from the
 mathematical perspective, lists are closer to multisets than to sets because of
 possibly duplicate elements.  Keeping in mind that a list-based implementation
 is not isomorphic to the set-based specification, let us justify it as an
@@ -1038,17 +1038,16 @@ every atomic name; this helped to simplify formulae by omiting check whether the
 name is present in the trie.  In the trie-based implementation, however, it would be
 better to store finite maps and perform such checks for the sake of efficiency.
 In particular, if the underlying trie does not contain any child node for a
-particular name, the objects behaviour observed via functions is the same as if
+particular name, the object's behaviour observed via functions is the same as if
 it associated this name with an empty multitrie.
 
 All this leads to the following basic definition (indeed, the module hides it
 behind smart constructors).
 
 \begin{lstlisting}
-type MultiTrieMap v d = M.Map v (MultiTrie v d) 
 data MultiTrie v d = MultiTrie {
         values :: [d],
-        children :: MultiTrieMap v d }
+        children :: Data.Map.Map v (MultiTrie v d) }
 \end{lstlisting}
 
 The most important functions defined in the module are listed below.
@@ -1157,9 +1156,9 @@ Here is a short explanation of their semantics.
 Finally, \lstinline{map} function that implements the $\fmap$ operation
 (def.~\ref{df:mvcn-map} and st.~\ref{st:map-properties})
 makes \lstinline{MultiTrie} type an instance of the \lstinline{Functor} class; 
-\lstinline{applyCartesian} function as an implementation of $\apply^{\times}$
+\lstinline{apply} function as an implementation of $\apply^{\times}$
 operation makes it an instance of the \lstinline{Applicative} class; 
-\emph{bind} operation not shown in this article is easy to define using mapping
+\emph{bind} operation (not shown in this article) is easy to define using mapping
 and flattening operations~-- this makes the type an instance of the
 \lstinline{Monad} class.
 
@@ -1167,37 +1166,40 @@ and flattening operations~-- this makes the type an instance of the
 
 \section{Conclusion}
 
-Having started with an intuitive notion of naming and its most general
-formalisation, we moved to its special case with compound names and multiple
-values. Two formalisations thereof were described: one based on
-a relation between compound names and values, another based on
-a tree-like structure.
-The first approach is \emph{extensional}, it concentrates on properties of the
+The notion of naming and its most general formalisation, taken as a sterting
+point, has been transformed into a specialisation enriched with specifics of
+a \emph{structured} object and that of a many-valued object. Being structured
+means that a name in an object can not only refer to an atomic value but also
+to a structured value, i.e. to a subobject that, in its turn, has named parts.
+Being many-valued means that, instead of a unique atomic value, each leaf node
+of a structured object can have zero, one or multiple, even infinitely many
+values.
+
+It is not surprising that structuredness and manyvaluedness appear together in
+this consideration. Although univalued structured objects seem more familiar
+(and, in fact, found in practical programming everywhere), it is multivaluedness
+that makes mathematical properties of such namings so harmonic: otherwise
+set-theoretical union and intersection, cartesian product, flattening and
+application would not have sense. Due to multivaluedness, these operations are
+not just meaningful but also obey `good' properties, e.g.
+associativity and/or distributivity over other operations.
+
+From the two formalisations of multivalued structured objects, the first
+approach is \emph{extensional}~-- it concentrates on the properties of the
 naming relation taken as a whole. The second approach is \emph{intensional}, it
-reveals a decomposition of the whole naming into simpler sub-namings that
-is also a possible implementation in a programming language.
-These definitions are shown to be essentially equivalent.
-
-A number of operations could be naturally defined for the namings in both
-their interpretations: relational and trie-like. Most of the operations obey
-such algebraic properties as associativity and/or distributivity over other
-operations.
-
-This naming concept leads to a software implementation that consists of an
-underlying data structure roughly corresponding to a multitrie formalisation
-and a set of utility functions corresponding to the algebraic operations on
-namings. The properties of operations described in the earlier sections fit
-the multitrie data type into applicative functor and monad
-typeclasses that makes multitries a member of Haskell container types,
-together with lists, maps and trees.
+reveals a decomposition of the whole naming into simpler sub-naming and thus
+gives a hint about how it could be implemented programmatically.  The `good'
+properties of operations fit the multitrie data type into rich typeclasses that
+makes multitries a first-class member of Haskell container types, together with
+lists, maps and trees.
 
 As far as a list is a conventional model for a non-deterministic computation
 that generates cases one by one in a lazy manner, a multitrie could be used to
-represent a non-deterministic multilevel structure unfolding when the consumer
+represent a non-deterministic structure unfolding when the consumer
 needs more detail.  On the other hand, in the same way as a list could be
 \emph{simply a list}, a multitrie could represent a static entity for which a
-tree of lists is a natural form. A typical example could be a directory tree
-where an atomic name corresponds to a directory, a compound name means a path
+list is a normal contents. A typical example could be a directory tree
+where an atomic name corresponds to a directory, a compound name means a path,
 and values correspond to individual files.  A structure of an XML document is
 another example of such objects.
 
