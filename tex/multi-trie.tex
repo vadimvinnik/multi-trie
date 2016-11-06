@@ -731,12 +731,12 @@ more complicated operations.
 
 Before giving a formal definition for a cartesian product of namings, let us
 informally describe how should an operation look like to deserve this name.
-Let~$s'$ and~$s''$ be two multinaming sets. Their cartesian product should consist of
-values of the form~$(d',d'')$ where $d'$~is a value from~$s'$ and $d''$~is taken
-from~$s''$. But these values are attached to some names~-- say, $v'$~and~$v''$,
-respectively.  Therefore, the resulting product multinaming set should contain the
-combined value~$(d',d'')$ under a name combined from~$v'$ and $v''$, and the only
-combining operation defined for names is concatenation.
+Let~$s'$ and~$s''$ be two multinaming sets. The values in their cartesian
+product should be pairs~$(d',d'')$ where $d'$~is a value from~$s'$ and $d''$~is
+taken from~$s''$. But these values are attached to some names~-- say,
+$v'$~and~$v''$, respectively.  Therefore, the product should contain the
+combined value~$(d',d'')$ under a name combined from~$v'$ and $v''$, and the
+only combining operation defined for names is concatenation.
 
 \begin{Df}\label{df:mvcn-cartesian}
 Let~$s'$ and~$s''$ be $(V,D')$- and $(V,D'')$-multinaming sets, respectively. Their
@@ -786,20 +786,19 @@ completely defined by values of all names (st.~\ref{st:mvcn-deref-equality}),
 it is preserved by the mapping~$\varphi$ from st.~\ref{st:isomorph}. Also, this
 property may be taken as a definition of cartesian product for multitries.
 
-Consider a multinaming set~$s$ whose values are, in their turn, multinaming sets.  Flattening
-operation formally defined below turns it into a ``plain'' multinaming set.  Supose a
-name~$v$ in~$s$ has a value~$t$ (and, maybe, some other values) that, by
-precondition, is a multinaming set.  Take a name~$w$ that has a value~$d$ in~$t$
-(and maybe other values).
-Then flattening should
-turn~$s$ into such a multinaming set~$r$, where~$d$ is a value of the name~$vw$.
+Consider a multinaming set~$s$ whose values are, in their turn, multinaming
+sets.  Flattening operation formally defined below turns it into a ``plain''
+multinaming set.  Supose a name~$v'$ in~$s$ has a value~$t$ (and, maybe, some
+other values).  Take a name~$v''$ that has a value~$d$ in the multinaming set~$t$
+(and maybe other values).  Then flattening should turn~$s$ into such a
+multinaming set~$r$, where~$d$ is a value of the name~$v'v''$.
 
 \begin{Df}\label{df:flatten}
 \emph{Flattening} is a unary operation
 $\flatten : \setmvcn{V}{\setmvcn{V}{D}} \to\setmvcn{V}{D}$,
 such that, for any $(V,\setmvcn{V}{D})$-multinaming set~$s$,
 \[
-  \flatten(s) = \{ (vw, d) \mid (v, t) \in s, (w, d) \in t \} .
+  \flatten(s) = \{ (v'v'', d) \mid (v', t) \in s, (v'', d) \in t \} .
 \]
 \end{Df}
 
@@ -809,7 +808,7 @@ Let
   t_1 & = & \{ (\varepsilon, 0), (a, 1) \} ,\\
   t_2 & = & \{ (a, 2), (aa, 3) \} ,\\
   t_3 & = & \{ (\varepsilon, 4), (a, 5) \} ,\\
-  s   & = & \{ (\varepsilon, t_1), (\varepsilon, t_2), (a, t_3) \} .\\
+  s   & = & \{ (\varepsilon, t_1), (\varepsilon, t_2), (a, t_3) \} .
 \end{eqnarray*}
 Then
 \[
@@ -1004,8 +1003,6 @@ For any~$s, s_1, s_2, t, t_1, t_2$ of matching types,
 
 \section{Notes about implementation}
 
-% === stopped here ===
-
 A container type implementing the multivalued naming with compound names has
 been defined in Haskell programming language. Some trade-offs between the
 mathematical purity and implementability could hardly be avoided. On the other
@@ -1034,7 +1031,7 @@ for specification purposes whereas the latter involves a trie~-- a practical
 data structure suitable for an efficient implementation. The only impractical
 feature of multitries definition introduced for the sake of mathematical
 simplicity is their infiniteness~-- every multitrie has a child node under
-every atomic name; this helped to simplify formulae by omiting check whether the
+every atomic name; this helped to simplify formulae by omiting check whether a
 name is present in the trie.  In the trie-based implementation, however, it would be
 better to store finite maps and perform such checks for the sake of efficiency.
 In particular, if the underlying trie does not contain any child node for a
@@ -1158,31 +1155,31 @@ Finally, \lstinline{map} function that implements the $\fmap$ operation
 makes \lstinline{MultiTrie} type an instance of the \lstinline{Functor} class; 
 \lstinline{apply} function as an implementation of $\apply^{\times}$
 operation makes it an instance of the \lstinline{Applicative} class; 
-\emph{bind} operation (not shown in this article) is easy to define using mapping
-and flattening operations~-- this makes the type an instance of the
+\emph{bind} operation (not shown in this article; easy to define using mapping
+and flattening operations) makes the type an instance of the
 \lstinline{Monad} class.
 
 
 
 \section{Conclusion}
 
-The notion of naming and its most general formalisation, taken as a sterting
-point, has been transformed into a specialisation enriched with specifics of
-a \emph{structured} object and that of a many-valued object. Being structured
-means that a name in an object can not only refer to an atomic value but also
+The notion of naming and its most general formalisation, taken as a starting
+point, has been transformed into a more concrete notion enriched with specifics of
+\emph{structuredness} and \emph{many-valuedness}. Being structured
+means that a name can not only refer to an atomic value but also
 to a structured value, i.e. to a subobject that, in its turn, has named parts.
 Being many-valued means that, instead of a unique atomic value, each leaf node
 of a structured object can have zero, one or multiple, even infinitely many
 values.
 
-It is not surprising that structuredness and manyvaluedness appear together in
-this consideration. Although univalued structured objects seem more familiar
-(and, in fact, found in practical programming everywhere), it is multivaluedness
-that makes mathematical properties of such namings so harmonic: otherwise
+It is not surprising that structuredness and manyvaluedness appear together.
+Although univalued structured objects seem more familiar (and, in fact, found
+in practical programming everywhere), it is multivaluedness that makes
+mathematical properties of structured namings elegant and harmonic: otherwise
 set-theoretical union and intersection, cartesian product, flattening and
-application would not have sense. Due to multivaluedness, these operations are
-not just meaningful but also obey `good' properties, e.g.
-associativity and/or distributivity over other operations.
+application would not make sense. Due to multivaluedness, these operations are
+not just meaningful but also obey `good' properties, e.g.  associativity and/or
+distributivity over other operations.
 
 From the two formalisations of multivalued structured objects, the first
 approach is \emph{extensional}~-- it concentrates on the properties of the
@@ -1195,13 +1192,13 @@ lists, maps and trees.
 
 As far as a list is a conventional model for a non-deterministic computation
 that generates cases one by one in a lazy manner, a multitrie could be used to
-represent a non-deterministic structure unfolding when the consumer
-needs more detail.  On the other hand, in the same way as a list could be
-\emph{simply a list}, a multitrie could represent a static entity for which a
-list is a normal contents. A typical example could be a directory tree
-where an atomic name corresponds to a directory, a compound name means a path,
-and values correspond to individual files.  A structure of an XML document is
-another example of such objects.
+represent a non-deterministic structure unfolding when the consumer needs more
+detail.  On the other hand, in the same way as a list could be \emph{simply a
+list}, a multitrie could represent a static entity for which a list is a normal
+contents (i.e. not a set of possibilities). A typical example could be a
+directory tree where an atomic name corresponds to a directory, a compound name
+means a path, and values correspond to individual files.  A structure of an XML
+document is another example of such objects.
 
 
 
