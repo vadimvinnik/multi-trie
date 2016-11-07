@@ -4,7 +4,7 @@ cabal-version:  >=1.8
 build-type:     Simple
 author:         Vadim Vinnik <vadim.vinnik@gmail.com>
 maintainer:     Vadim Vinnik <vadim.vinnik@gmail.com>
-synopsis:       Trie of multisets
+synopsis:       Trie of sets, as a model for compound names having multiple values
 description:
     A multi-trie is a trie (i.e. a tree whose child nodes have distinct labels)
     with each node containing a list of values.
