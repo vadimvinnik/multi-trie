@@ -113,7 +113,9 @@ type MultiTrieMap v d = M.Map v (MultiTrie v d)
 -- | A trie consists of a list of values and labelled child tries.
 data MultiTrie v d = MultiTrie
     {
+        -- | List of values in the root node.
         values :: [d],
+        -- | Map of atomic names to child sub-tries.
         children :: MultiTrieMap v d
     }
     deriving (Show)
@@ -506,6 +508,7 @@ listAsMultiSetIntersection (x:xs) ys = if x `L.elem` ys
     then x : listAsMultiSetIntersection xs (L.delete x ys)
     else listAsMultiSetIntersection xs ys
 
+-- | Check if two lists are equal as multisets, i.e. if they have equal numbers of equal values.
 listAsMultiSetEquals :: Eq a =>
     [a] ->
     [a] ->
