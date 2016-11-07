@@ -105,7 +105,6 @@ import qualified Data.Foldable as F
 import qualified Data.Map as M
 import qualified Data.Tree as T
 import qualified Data.List as L
-import Control.Applicative hiding (empty)
 import Data.Composition((.:))
 
 -- | A map of atomic names onto child nodes.
